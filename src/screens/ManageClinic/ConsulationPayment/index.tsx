@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../../styles/colors';
 import { CustomButton } from '@components/common/CustomButton';
 import { ApplePaySvg, MastercardSvg, StcPaySvg } from '@assets/icons';
-import { RecommandImage, doctor } from '@assets/images';
+import { RecommandImage, patient } from '@assets/images';
 import { styles } from './style';
 
 export function ConsultationPayment({ navigation, route }) {
@@ -37,7 +37,7 @@ export function ConsultationPayment({ navigation, route }) {
   const consultationType = consultationData.consultationTypeId || 'chat';
 
   const handleConnectWithDoctor = () => {
-    console.log('Connecting with doctor...', consultationType);
+    console.log('Connecting with patient...', consultationType);
 
     setIsLoading(true);
 
@@ -46,9 +46,9 @@ export function ConsultationPayment({ navigation, route }) {
 
       if (consultationType === 'chat') {
         navigation.navigate('ChatScreen', {
-          chatType: 'doctor',
-          doctorInfo: {
-            id: 'doctor_1',
+          chatType: 'patient',
+          patientInfo: {
+            id: 'patient_1',
             name: 'Dr. Sultan Khan',
             avatar: 'https://i.pravatar.cc/150?img=12',
           },
@@ -61,18 +61,18 @@ export function ConsultationPayment({ navigation, route }) {
       } else if (consultationType === 'audio') {
         // Navigate to Audio Consultation
         navigation.navigate('AudioConsultation', {
-          doctorInfo: {
+          patientInfo: {
             name: 'Dr. Yasmin Chowdhury',
-            avatar: doctor,
+            avatar: patient,
             specialization: 'Dermatologist',
           },
         });
       } else if (consultationType === 'video') {
         // Navigate to Video Consultation
         navigation.navigate('VideoConsultation', {
-          doctorInfo: {
+          patientInfo: {
             name: 'Dr. Yasmin Chowdhury',
-            avatar: doctor,
+            avatar: patient,
             specialization: 'Dermatologist',
           },
         });
@@ -100,7 +100,7 @@ export function ConsultationPayment({ navigation, route }) {
         {/* Success Banner */}
         <View style={styles.successBanner}>
           <Text style={styles.successText}>
-            3 doctors available for your selection.
+            3 patients available for your selection.
           </Text>
         </View>
 
@@ -291,7 +291,7 @@ export function ConsultationPayment({ navigation, route }) {
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={colors.white} />
           <Text style={styles.loadingText}>
-            We're finding a doctor for your consultation. This may take a
+            We're finding a patient for your consultation. This may take a
             moment.
           </Text>
         </View>

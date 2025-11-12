@@ -11,9 +11,12 @@ interface ConsultationCardProps {
   date: string;
   time: string;
   gender: string;
+  status: string;
+  age: string;
   duration: string;
   type: 'chat' | 'video' | 'audio';
   amount: string;
+  patientId: string;
   onViewPrescription?: () => void;
   onViewChat?: () => void;
 }
@@ -24,10 +27,13 @@ const ConsultationCard = ({
   patientImage,
   date,
   time,
+  status,
+  age,
   duration,
   type,
   amount,
   gender = 'Male',
+  patientId,
   onViewPrescription,
   onViewChat,
 }: ConsultationCardProps) => {
@@ -44,7 +50,7 @@ const ConsultationCard = ({
         {/* Consultation Info Bar */}
         <View style={styles.infoBar}>
           <View>
-            <Text style={styles.serviceName}>{sevviceName}</Text>
+            <Text style={styles.serviceName}>{patientId}</Text>
           </View>
           <View style={styles.serviceType}>
             <View style={styles.timeContainer}>
@@ -82,10 +88,50 @@ const ConsultationCard = ({
             )}
             <View>
               <Text style={styles.patientName}>{patientName}</Text>
-              <Text style={styles.patientGender}>{gender}</Text>
+              <Text style={styles.patientGender}>
+                {gender}, {age} year
+              </Text>
             </View>
           </View>
           <Text style={styles.amount}>{amount}</Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 50,
+            marginVertical: mvs(14),
+          }}
+        >
+          <View style={{ alignItems: 'center' }}>
+            <Text style={{ fontSize: 18, color: colors.secondaryText }}>
+              Service
+            </Text>
+            <Text
+              style={{ fontWeight: '500', fontSize: 16, color: colors.text }}
+            >
+              {sevviceName}
+            </Text>
+          </View>
+          <View
+            style={{
+              alignItems: 'center',
+              borderLeftColor: colors.borderDark,
+              borderLeftWidth: 2,
+              paddingLeft: 20,
+            }}
+          >
+            <Text style={{ fontSize: 18, color: colors.secondaryText }}>
+              Status
+            </Text>
+            <Text
+              style={{ fontSize: 16, fontWeight: '500', color: colors.green }}
+            >
+              {status}
+            </Text>
+          </View>
         </View>
 
         {/* Action Buttons - Conditional Rendering */}
@@ -125,11 +171,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: mvs(16),
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   cardContent: {
     flex: 1,

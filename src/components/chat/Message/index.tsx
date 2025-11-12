@@ -6,13 +6,11 @@ import { styles } from './style';
 
 interface MessageProps {
   msg: MessageType;
-  showAvatar: boolean;
   handleServicePress: (service: Service) => void;
 }
 
 export const Message: React.FC<MessageProps> = ({
   msg,
-  showAvatar,
   handleServicePress,
 }) => {
   const isUser = msg.type === 'user';
@@ -23,25 +21,30 @@ export const Message: React.FC<MessageProps> = ({
     <View style={styles.messageContainer}>
       {/* Bot Message */}
       {!isUser && (
-        <View style={showAvatar && styles.botMessageWithAvatar}>
-          {showAvatar && msg.user && (
-            <Image source={msg.user.avatar} style={styles.avatar} />
-          )}
+        <View style={styles.botMessageWithAvatar}>
+          {msg.user && <Image source={msg.user.avatar} style={styles.avatar} />}
           <View style={styles.botMessageContent}>
-            {showAvatar && msg.user && (
-              <Text style={styles.senderName}>{msg.user.name}</Text>
-            )}
-            {hasText && (
-              <View style={styles.botMessage}>
-                <Text style={styles.botMessageText}>{msg.text}</Text>
-              </View>
-            )}
-            {msg.suggestions && (
-              <Suggestion
-                suggestions={msg.suggestions}
-                handleServicePress={handleServicePress}
-              />
-            )}
+            {msg.user && <Text style={styles.senderName}>{msg.user.name}</Text>}
+
+            <View
+              style={{
+                backgroundColor: '#DACEFB',
+                borderRadius: 10,
+                padding: 5,
+              }}
+            >
+              {hasText && (
+                <View style={styles.botMessage}>
+                  <Text style={styles.botMessageText}>{msg.text}</Text>
+                </View>
+              )}
+              {msg.suggestions && (
+                <Suggestion
+                  suggestions={msg.suggestions}
+                  handleServicePress={handleServicePress}
+                />
+              )}
+            </View>
           </View>
         </View>
       )}
@@ -49,7 +52,7 @@ export const Message: React.FC<MessageProps> = ({
       {/* User Message */}
       {isUser && (
         <View style={styles.userMessageWrapper}>
-          {showAvatar && msg.user && (
+          {msg.user && (
             <View style={styles.userMessageHeader}>
               <Text style={styles.timestamp}>{msg.timestamp}</Text>
               <Text style={styles.senderName}>{msg.user.name}</Text>

@@ -30,8 +30,8 @@ type CardDetailsRouteParams = {
 
   consultationType?: 'Chat' | 'Video' | 'Audio';
   duration?: string;
-  doctorName?: string;
-  doctorAvatar?: string;
+  patientName?: string;
+  patientAvatar?: string;
   serviceName?: string;
 
   services?: Array<{
@@ -192,10 +192,10 @@ export function CardDetails({ navigation }: { navigation: any }) {
             </View>
           )}
 
-          {params.doctorName && (
+          {params.patientName && (
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Doctor Name</Text>
-              <Text style={styles.detailValue}>{params.doctorName}</Text>
+              <Text style={styles.detailValue}>{params.patientName}</Text>
             </View>
           )}
 

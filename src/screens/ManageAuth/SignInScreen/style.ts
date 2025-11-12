@@ -1,4 +1,3 @@
-
 import { StyleSheet } from 'react-native';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
@@ -85,12 +84,12 @@ export const styles = StyleSheet.create({
   signinRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems:"center"
+    alignItems: 'center',
   },
   PasswordRemember: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems:"center"
+    alignItems: 'center',
   },
   signinText: {
     color: colors.gray,
@@ -98,7 +97,7 @@ export const styles = StyleSheet.create({
   },
   signinLink: {
     color: colors.primary,
-    fontWeight:"700",
+    fontWeight: '700',
     marginLeft: mvs(4),
   },
   checkboxError: {
@@ -108,11 +107,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
-  
+
   rememberMeErrorText: {
     color: 'red',
     fontSize: 12,
-    marginLeft: mvs(30),   // align with checkbox
+    marginLeft: mvs(30), // align with checkbox
     marginTop: mvs(4),
     marginBottom: mvs(8),
   },
@@ -181,5 +180,5 @@ export const styles = StyleSheet.create({
     color: colors.primary,
     textDecorationLine: 'underline',
   },
-  CheckBox:{ flexDirection: 'row', gap: mvs(5), alignItems: 'center' }
+  CheckBox: { flexDirection: 'row', gap: mvs(5), alignItems: 'center' },
 });

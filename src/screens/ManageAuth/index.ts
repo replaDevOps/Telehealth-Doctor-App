@@ -7,5 +7,3 @@ export * from './ProfileScreen';
 export * from './SetPasswordScreen';
 export * from './SignInScreen';
 export * from './SignUpScreen';
-
-

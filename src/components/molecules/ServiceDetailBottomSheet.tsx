@@ -125,24 +125,6 @@ export const ServiceDetailBottomSheet: React.FC<
               </View>
             )}
           </ScrollView>
-
-          {/* Footer Buttons */}
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={styles.addToCartButton}
-              onPress={handleAddToCart}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.addToCartText}>Add to Cart</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.checkoutButton}
-              onPress={handleCheckout}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.checkoutText}>Checkout</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     </Modal>
@@ -162,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    height: '90%',
+    height: '80%',
   },
   handleBar: {
     width: 40,

@@ -44,8 +44,8 @@ const NoResponseModal: React.FC<NoResponseModalProps> = ({
 
           {/* Description */}
           <Text style={styles.description}>
-            The doctor didn’t respond to your consultation request. Your payment
-            will be refunded.
+            The patient didn’t respond to your consultation request. Your
+            payment will be refunded.
           </Text>
 
           {/* Buttons */}

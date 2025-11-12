@@ -15,9 +15,9 @@ import { mvs } from '@config/metrices';
 interface HomeHeaderProps {
   centerName?: string;
   location?: string;
-  doctorName?: string;
-  doctorSpecialty?: string;
-  doctorImage?: any;
+  patientName?: string;
+  patientSpecialty?: string;
+  patientImage?: any;
   isActive?: boolean;
   onToggleActive?: (value: boolean) => void;
   onNotificationPress?: () => void;
@@ -27,9 +27,9 @@ interface HomeHeaderProps {
 const HomeHeader = ({
   centerName = 'Eden Medical Center',
   location = 'Makkah',
-  doctorName = 'Dr. Sultan Khan',
-  doctorSpecialty = 'Dermatologist',
-  doctorImage,
+  patientName = 'Dr. Sultan Khan',
+  patientSpecialty = 'Dermatologist',
+  patientImage,
   isActive = true,
   onToggleActive,
   onNotificationPress,
@@ -71,16 +71,16 @@ const HomeHeader = ({
         </View>
 
         {/* Bottom Section - Doctor Info & Toggle */}
-        <View style={styles.doctorCard}>
-          <View style={styles.doctorInfoContainer}>
+        <View style={styles.patientCard}>
+          <View style={styles.patientInfoContainer}>
             {/* Doctor Avatar */}
             <View style={styles.avatarContainer}>
-              {doctorImage ? (
-                <Image source={doctorImage} style={styles.avatar} />
+              {patientImage ? (
+                <Image source={patientImage} style={styles.avatar} />
               ) : (
                 <View style={[styles.avatar, styles.avatarPlaceholder]}>
                   <Text style={styles.avatarText}>
-                    {doctorName?.charAt(3) || 'D'}
+                    {patientName?.charAt(3) || 'D'}
                   </Text>
                 </View>
               )}
@@ -101,9 +101,9 @@ const HomeHeader = ({
             </View>
 
             {/* Doctor Details */}
-            <View style={styles.doctorDetails}>
-              <Text style={styles.doctorName}>{doctorName}</Text>
-              <Text style={styles.doctorSpecialty}>{doctorSpecialty}</Text>
+            <View style={styles.patientDetails}>
+              <Text style={styles.patientName}>{patientName}</Text>
+              <Text style={styles.patientSpecialty}>{patientSpecialty}</Text>
             </View>
           </View>
 
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  doctorCard: {
+  patientCard: {
     borderRadius: 16,
     padding: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  doctorInfoContainer: {
+  patientInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
@@ -207,16 +207,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  doctorDetails: {
+  patientDetails: {
     flex: 1,
   },
-  doctorName: {
+  patientName: {
     color: colors.white,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 2,
   },
-  doctorSpecialty: {
+  patientSpecialty: {
     color: colors.white,
     fontSize: 14,
     opacity: 0.8,

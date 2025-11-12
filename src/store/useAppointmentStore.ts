@@ -3,9 +3,9 @@ import { create } from 'zustand';
 export interface Appointment {
   id: string;
   patientId: string;
-  doctorId: string;
+  patientId: string;
   patientName: string;
-  doctorName: string;
+  patientName: string;
   date: string;
   time: string;
   duration: number;
@@ -31,35 +31,34 @@ interface AppointmentState {
   setError: (error: string | null) => void;
 }
 
-export const useAppointmentStore = create<AppointmentState>((set) => ({
+export const useAppointmentStore = create<AppointmentState>(set => ({
   appointments: [],
   selectedAppointment: null,
   isLoading: false,
   error: null,
 
-  setAppointments: (appointments) => set({ appointments }),
+  setAppointments: appointments => set({ appointments }),
 
-  addAppointment: (appointment) =>
-    set((state) => ({
+  addAppointment: appointment =>
+    set(state => ({
       appointments: [...state.appointments, appointment],
     })),
 
   updateAppointment: (id, data) =>
-    set((state) => ({
-      appointments: state.appointments.map((apt) =>
-        apt.id === id ? { ...apt, ...data } : apt
+    set(state => ({
+      appointments: state.appointments.map(apt =>
+        apt.id === id ? { ...apt, ...data } : apt,
       ),
     })),
 
-  deleteAppointment: (id) =>
-    set((state) => ({
-      appointments: state.appointments.filter((apt) => apt.id !== id),
+  deleteAppointment: id =>
+    set(state => ({
+      appointments: state.appointments.filter(apt => apt.id !== id),
     })),
 
-  selectAppointment: (appointment) =>
-    set({ selectedAppointment: appointment }),
+  selectAppointment: appointment => set({ selectedAppointment: appointment }),
 
-  setLoading: (loading) => set({ isLoading: loading }),
+  setLoading: loading => set({ isLoading: loading }),
 
-  setError: (error) => set({ error }),
+  setError: error => set({ error }),
 }));

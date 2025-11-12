@@ -15,6 +15,9 @@ interface Consultation {
   type: 'chat' | 'video';
   amount: string;
   gender: string;
+  age: string;
+  status: string;
+  patientId: string;
 }
 
 interface RecentConsultationsProps {
@@ -41,6 +44,7 @@ const RecentConsultations = ({
       {consultations.map(consultation => (
         <ConsultationCard
           key={consultation.id}
+          patientId={consultation.id}
           patientName={consultation.patientName}
           patientImage={consultation.patientImage}
           sevviceName={consultation.sevviceName}
@@ -52,6 +56,8 @@ const RecentConsultations = ({
           gender={consultation.gender}
           onViewPrescription={() => onViewPrescription?.(consultation.id)}
           onViewChat={() => onViewChat?.(consultation.id)}
+          status={consultation.status}
+          age={consultation.age}
         />
       ))}
     </View>

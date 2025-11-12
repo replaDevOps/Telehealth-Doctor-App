@@ -1,4 +1,3 @@
-
 import { ImageSourcePropType } from 'react-native';
 
 export interface UserInfo {
@@ -6,7 +5,7 @@ export interface UserInfo {
   avatar: ImageSourcePropType;
 }
 
-export interface DoctorInfo extends UserInfo {
+export interface PatientInfo extends UserInfo {
   id: string;
   serviceName?: string;
 }
@@ -35,7 +34,7 @@ export interface Service {
 
 export interface Message {
   id: string;
-  type: 'user' | 'bot';
+  type: 'user' | 'bot'| 'doctor';
   text: string;
   timestamp: string;
   user?: UserInfo;

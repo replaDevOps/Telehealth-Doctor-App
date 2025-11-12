@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../../styles/colors';
-import { doctor } from '@assets/images';
+import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
 import { styles } from './style';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
 
 export function VideoConsultation({ navigation, route }) {
-  const doctorInfo = route?.params?.doctorInfo || {
+  const patientInfo = route?.params?.patientInfo || {
     name: 'Dr. Yasmin Chowdhury',
-    avatar: doctor,
+    avatar: patient,
     specialization: 'Dermatologist',
   };
 
@@ -28,6 +30,8 @@ export function VideoConsultation({ navigation, route }) {
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const closePrescription = () => setVisible(false);
 
   const handleGetPrescription = () => {
     setModalVisible(false);
@@ -88,6 +92,10 @@ export function VideoConsultation({ navigation, route }) {
     console.log('Switch camera');
   };
 
+  const showPrescriptionModal = () => {
+    setVisible(true);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -98,7 +106,7 @@ export function VideoConsultation({ navigation, route }) {
 
       {/* Full Screen Background Image */}
       <ImageBackground
-        source={doctorInfo.avatar}
+        source={patientInfo.avatar}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -109,7 +117,7 @@ export function VideoConsultation({ navigation, route }) {
         <SafeAreaView style={styles.safeArea}>
           {/* Doctor Info at Top */}
           <View style={styles.topSection}>
-            <Text style={styles.doctorName}>{doctorInfo.name}</Text>
+            <Text style={styles.patientName}>{patientInfo.name}</Text>
             <Text style={styles.callStatus}>
               {callStatus === 'Connected'
                 ? formatDuration(callDuration)
@@ -121,7 +129,7 @@ export function VideoConsultation({ navigation, route }) {
           {callStatus === 'Connected' && (
             <View style={styles.pipContainer}>
               <Image
-                source={doctorInfo.avatar}
+                source={patientInfo.avatar}
                 style={styles.pipImage}
                 resizeMode="cover"
               />
@@ -130,6 +138,15 @@ export function VideoConsultation({ navigation, route }) {
 
           {/* Call Controls at Bottom */}
           <View style={styles.controlsContainer}>
+            <TouchableOpacity
+              style={[
+                styles.controlButton,
+                { backgroundColor: colors.primary },
+              ]}
+              onPress={showPrescriptionModal}
+            >
+              <AntDesign name="plus" size={24} color={colors.white} />
+            </TouchableOpacity>
             {/* Speaker Button */}
             <TouchableOpacity
               style={[
@@ -201,6 +218,10 @@ export function VideoConsultation({ navigation, route }) {
           visible={modalVisible}
           onClose={handleClose}
           onGetPrescription={handleGetPrescription}
+        />
+        <PrescriptionBottomSheet
+          visible={visible}
+          onClose={closePrescription}
         />
       </ImageBackground>
     </View>

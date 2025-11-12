@@ -37,16 +37,16 @@ export function SignInScreen({ navigation }) {
     let valid = true;
 
     // Phone validation
-    if (!phone.trim() || !isPhoneValid) {
-      setPhoneError('Invalid phone number');
-      valid = false;
-    } else setPhoneError('');
+    // if (!phone.trim() || !isPhoneValid) {
+    //   setPhoneError('Invalid phone number');
+    //   valid = false;
+    // } else setPhoneError('');
 
     // Password validation
-    if (!password.trim()) {
-      setPasswordError('Password is required');
-      valid = false;
-    } else setPasswordError('');
+    // if (!password.trim()) {
+    //   setPasswordError('Password is required');
+    //   valid = false;
+    // } else setPasswordError('');
 
     // Final navigation
     if (valid) {

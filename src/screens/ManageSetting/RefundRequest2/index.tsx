@@ -145,11 +145,11 @@ export function RefundRequest2({ navigation }: { navigation: any }) {
 
           <View style={styles.paymentDoctorRow}>
             <View style={styles.paymentDoctorSection}>
-              <View style={styles.doctorAvatar}>
+              <View style={styles.patientAvatar}>
                 <Text style={styles.clinicLogo}>Cli. Img</Text>
               </View>
-              <View style={styles.doctorInfo}>
-                <Text style={styles.doctorName}>{item.clinicName}</Text>
+              <View style={styles.patientInfo}>
+                <Text style={styles.patientName}>{item.clinicName}</Text>
               </View>
             </View>
 

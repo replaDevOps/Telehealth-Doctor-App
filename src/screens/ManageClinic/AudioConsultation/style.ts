@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 20,
   },
-  doctorName: {
+  patientName: {
     fontSize: 22,
     fontWeight: '700',
     color: colors.white,

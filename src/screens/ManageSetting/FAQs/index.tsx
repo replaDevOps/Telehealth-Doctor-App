@@ -21,13 +21,13 @@ export const FAQs = ({ navigation }: { navigation: any }) => {
       id: 1,
       question: 'How can I book a consultation?',
       answer:
-        'You can book a consultation by selecting your preferred clinic and tapping the "Consult Now" button. The system will automatically connect you with an available doctor.',
+        'You can book a consultation by selecting your preferred clinic and tapping the "Consult Now" button. The system will automatically connect you with an available patient.',
     },
     {
       id: 2,
-      question: 'Can I choose a specific doctor?',
+      question: 'Can I choose a specific patient?',
       answer:
-        'Yes, you can choose a specific doctor from our list of available healthcare professionals. Simply browse through the doctors profiles and select your preferred specialist.',
+        'Yes, you can choose a specific patient from our list of available healthcare professionals. Simply browse through the patients profiles and select your preferred specialist.',
     },
     {
       id: 3,

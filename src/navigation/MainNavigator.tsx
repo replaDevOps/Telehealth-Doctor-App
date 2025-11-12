@@ -69,6 +69,14 @@ export const MainNavigator = () => {
         name="PrescriptionScreen"
         component={PrescriptionScreen}
       />
+      <ClinicStack.Screen
+        name="AudioConsultation"
+        component={AudioConsultation}
+      />
+      <ClinicStack.Screen
+        name="VideoConsultation"
+        component={VideoConsultation}
+      />
     </Stack.Navigator>
   );
 };
@@ -97,15 +105,6 @@ export const ClinicNavigator = () => {
       <ClinicStack.Screen
         name="ConsultationPayment"
         component={ConsultationPayment}
-      />
-
-      <ClinicStack.Screen
-        name="AudioConsultation"
-        component={AudioConsultation}
-      />
-      <ClinicStack.Screen
-        name="VideoConsultation"
-        component={VideoConsultation}
       />
     </ClinicStack.Navigator>
   );

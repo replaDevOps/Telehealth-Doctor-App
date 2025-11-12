@@ -23,7 +23,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
         <Ionicons name="search" size={20} color={colors.secondaryText} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by doctor or clinic name..."
+          placeholder="Search by patient or clinic name..."
           placeholderTextColor={colors.secondaryText}
           value={searchQuery}
           onChangeText={setSearchQuery}

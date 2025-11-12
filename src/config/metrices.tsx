@@ -1,10 +1,10 @@
-import { ScreenHeight, ScreenWidth } from "@rneui/base";
-import { Dimensions, PixelRatio } from "react-native";
-console.log("🚀 ~ ScreenWidth:", ScreenWidth);
-console.log("🚀 ~ ScreenWidth:", ScreenHeight);
+import { ScreenHeight, ScreenWidth } from '@rneui/base';
+import { Dimensions, PixelRatio } from 'react-native';
+console.log('🚀 ~ ScreenWidth:', ScreenWidth);
+console.log('🚀 ~ ScreenWidth:', ScreenHeight);
 
-const width = Math.round(Dimensions.get("window").width);
-const height = Math.round(Dimensions.get("window").height);
+const width = Math.round(Dimensions.get('window').width);
+const height = Math.round(Dimensions.get('window').height);
 const guidelineBaseWidth = 393;
 const guidelineBaseHeight = 852;
 const xdHeight = (xdHeight: number) => {

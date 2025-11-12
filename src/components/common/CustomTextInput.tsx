@@ -19,6 +19,7 @@ interface CustomTextInputProps extends TextInputProps {
   errorMessage?: string;
   value: string;
   onChangeText: (text: string) => void;
+  multiline?: boolean;
 }
 
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
@@ -30,6 +31,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   onChangeText,
   placeholder,
   secureTextEntry,
+  multiline,
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(!!secureTextEntry); // Start hidden if secureTextEntry is true
@@ -44,12 +46,17 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
 
       <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.input, style]}
+          style={[
+            styles.input,
+            style,
+            { minHeight: multiline ? 100 : undefined },
+          ]}
           placeholder={placeholder}
+          multiline={multiline}
           placeholderTextColor={colors.secondaryText}
           value={value}
           onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry && !showPassword} // Toggle visibility
+          secureTextEntry={secureTextEntry && !showPassword}
           {...props}
         />
         {secureTextEntry && (

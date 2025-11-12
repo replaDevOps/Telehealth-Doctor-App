@@ -4,7 +4,7 @@ import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
-import { doctor, RecommandImage } from '@assets/images';
+import { doctor, patient, RecommandImage } from '@assets/images';
 import { ConsultationRequest } from '@components/molecules';
 import HomeHeader from '@components/molecules/HomeHeadder';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
@@ -18,7 +18,7 @@ export const HomeScreen = ({ navigation }) => {
     ConsultationRequest[]
   >([]);
 
-  // Simulate incoming consultation requests when doctor is active
+  // Simulate incoming consultation requests when patient is active
   useEffect(() => {
     if (isActive) {
       // Simulate incoming request after 3 seconds
@@ -28,7 +28,7 @@ export const HomeScreen = ({ navigation }) => {
             id: 'req-1',
             patientName: 'Patient 1',
             patientAge: 21,
-            patientImage: doctor,
+            patientImage: patient,
 
             patientGender: 'Female',
             consultationType: 'chat',
@@ -38,10 +38,19 @@ export const HomeScreen = ({ navigation }) => {
             id: 'req-2',
             patientName: 'Patient 2',
             patientAge: 21,
-            patientImage: doctor,
+            patientImage: patient,
 
             patientGender: 'Female',
             consultationType: 'audio',
+            treatmentType: 'Acne Treatment',
+          },
+          {
+            id: 'req-3',
+            patientName: 'Patient 3',
+            patientAge: 19,
+            patientImage: patient,
+            patientGender: 'Male',
+            consultationType: 'video',
             treatmentType: 'Acne Treatment',
           },
         ];
@@ -51,7 +60,7 @@ export const HomeScreen = ({ navigation }) => {
 
       return () => clearTimeout(timer);
     } else {
-      // Close modal and clear requests when doctor goes offline
+      // Close modal and clear requests when patient goes offline
       setShowRequestModal(false);
       setConsultationRequests([]);
     }
@@ -59,6 +68,7 @@ export const HomeScreen = ({ navigation }) => {
 
   const handleAcceptRequest = (requestId: string) => {
     console.log('Accepting request:', requestId);
+    setShowRequestModal(false);
 
     // Remove the accepted request from the list
     setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
@@ -73,23 +83,32 @@ export const HomeScreen = ({ navigation }) => {
     if (request) {
       switch (request.consultationType) {
         case 'video':
-          navigation.navigate('VideoCall', { requestId });
+          navigation.navigate('VideoConsultation', {
+            patientInfo: {
+              name: 'Dr. Yasmin Chowdhury',
+              avatar: doctor,
+              specialization: 'Dermatologist',
+            },
+          });
           break;
         case 'audio':
-          navigation.navigate('AudioCall', { requestId });
+          navigation.navigate('AudioConsultation', {
+            patientInfo: {
+              name: 'Dr. Yasmin Chowdhury',
+              avatar: doctor,
+              specialization: 'Dermatologist',
+            },
+          });
           break;
         case 'chat':
           navigation.navigate('ChatScreen', {
-            chatType: 'doctor',
-            doctorInfo: {
-              id: 'doctor_1',
-              name: 'Dr. Sultan Khan',
-              avatar: 'https://i.pravatar.cc/150?img=12',
-            },
-            clinicInfo: {
-              name: 'Eden Medical Center',
-              location: 'Makkah, Saudi Arabia, 2.2km',
-              image: RecommandImage,
+            chatType: 'patient',
+            patientInfo: {
+              id: 'patient_1',
+              name: 'Patient Name',
+              gender: 'Female',
+              age: 21,
+              avatar: patient,
             },
           });
           break;
@@ -112,7 +131,7 @@ export const HomeScreen = ({ navigation }) => {
   const handleToggleActive = (value: boolean) => {
     setIsActive(value);
 
-    // Optionally call API to update doctor availability
+    // Optionally call API to update patient availability
     // updateDoctorAvailability(value);
 
     if (!value) {
@@ -128,9 +147,9 @@ export const HomeScreen = ({ navigation }) => {
       <HomeHeader
         centerName="Eden Medical Center"
         location="Makkah"
-        doctorName="Dr. Sultan Khan"
-        doctorSpecialty="Dermatologist"
-        doctorImage={doctor}
+        patientName="Dr. Sultan Khan"
+        patientSpecialty="Dermatologist"
+        patientImage={patient}
         isActive={isActive}
         onToggleActive={handleToggleActive}
         onNotificationPress={() => console.log('Notifications pressed')}
@@ -151,7 +170,17 @@ export const HomeScreen = ({ navigation }) => {
           }}
           onViewChat={id => {
             console.log('View chat:', id);
-            navigation.navigate('ChatScreen', { id });
+            navigation.navigate('ChatScreen', {
+              chatType: 'patient',
+              fromHistory: true,
+              patientInfo: {
+                id: 'patient_1',
+                name: 'Patient Name',
+                gender: 'Female',
+                age: 21,
+                avatar: patient,
+              },
+            });
           }}
         />
       </ScrollView>

@@ -1,14 +1,13 @@
-import { StyleSheet } from "react-native";
-import { mvs } from "../../../config/metrices";
-import { colors } from "../../../styles/colors";
+import { StyleSheet } from 'react-native';
+import { mvs } from '../../../config/metrices';
+import { colors } from '../../../styles/colors';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
     paddingHorizontal: mvs(20),
-    paddingVertical: "20%",
-
+    paddingVertical: '20%',
   },
   logoContainer: {
     alignItems: 'center',
@@ -18,7 +17,7 @@ const styles = StyleSheet.create({
     fontSize: mvs(16),
     color: colors.black,
     marginBottom: mvs(8),
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   title: {
     alignItems: 'center',
@@ -32,7 +31,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: colors.secondaryText,
-    textAlign:"center"
+    textAlign: 'center',
   },
   instructionText: {
     fontSize: mvs(14),
@@ -42,8 +41,8 @@ const styles = StyleSheet.create({
     marginBottom: mvs(20),
   },
   inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: mvs(15),
     marginTop: mvs(30),
   },
@@ -52,16 +51,16 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     width: mvs(50),
     height: mvs(50),
-    textAlign: "center",
+    textAlign: 'center',
     borderRadius: mvs(8),
     fontSize: mvs(18),
     color: colors.black,
-    backgroundColor:colors.gray
+    backgroundColor: colors.gray,
   },
   resendText: {
     fontSize: mvs(15),
     color: colors.border,
-    textAlign: "right",
+    textAlign: 'right',
     marginBottom: mvs(20),
     marginRight: mvs(40),
     // marginTop:mvs(10),
@@ -69,22 +68,21 @@ const styles = StyleSheet.create({
   },
   resendLink: {
     color: colors.primary,
-    fontWeight: "700",
+    fontWeight: '700',
     fontSize: 16,
-   
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
     marginTop: 10,
     paddingVertical: 10,
     gap: 10,
   },
   name: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: 'bold',
+    color: '#000',
   },
   signinRow: {
     flexDirection: 'row',

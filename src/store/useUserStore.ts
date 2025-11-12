@@ -28,30 +28,30 @@ export interface Patient {
 }
 
 interface UserState {
-  doctors: Doctor[];
+  patients: Doctor[];
   patients: Patient[];
   selectedDoctor: Doctor | null;
   selectedPatient: Patient | null;
   isLoading: boolean;
 
   // Actions
-  setDoctors: (doctors: Doctor[]) => void;
+  setDoctors: (patients: Doctor[]) => void;
   setPatients: (patients: Patient[]) => void;
-  selectDoctor: (doctor: Doctor | null) => void;
+  selectDoctor: (patient: Doctor | null) => void;
   selectPatient: (patient: Patient | null) => void;
   setLoading: (loading: boolean) => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
-  doctors: [],
+export const useUserStore = create<UserState>(set => ({
+  patients: [],
   patients: [],
   selectedDoctor: null,
   selectedPatient: null,
   isLoading: false,
 
-  setDoctors: (doctors) => set({ doctors }),
-  setPatients: (patients) => set({ patients }),
-  selectDoctor: (doctor) => set({ selectedDoctor: doctor }),
-  selectPatient: (patient) => set({ selectedPatient: patient }),
-  setLoading: (loading) => set({ isLoading: loading }),
+  setDoctors: patients => set({ patients }),
+  setPatients: patients => set({ patients }),
+  selectDoctor: patient => set({ selectedDoctor: patient }),
+  selectPatient: patient => set({ selectedPatient: patient }),
+  setLoading: loading => set({ isLoading: loading }),
 }));

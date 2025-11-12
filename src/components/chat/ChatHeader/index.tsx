@@ -1,15 +1,12 @@
-
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Header2 } from '@components/common/Header2';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
-import { DoctorInfo } from '../../../types/chat.types';
+import { PatientInfo } from '../../../types/chat.types';
 
 interface ChatHeaderProps {
-  chatType: 'ai' | 'doctor';
-  doctorInfo: DoctorInfo;
+  patientInfo: PatientInfo;
   consultationTime: string;
   fromHistory: boolean;
   handleGoBack: () => void;
@@ -17,29 +14,26 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
-  chatType,
-  doctorInfo,
+  patientInfo,
   consultationTime,
   fromHistory,
   handleGoBack,
   handleEndConsultation,
 }) => {
-  return chatType === 'ai' ? (
-    <Header2 title="Chat" showCart logo />
-  ) : (
-    <View style={styles.doctorHeaderContainer}>
+  return (
+    <View style={styles.patientHeaderContainer}>
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
         <Ionicons name="chevron-back" size={24} color={colors.text} />
       </TouchableOpacity>
 
-      <View style={styles.doctorHeaderCenter}>
-        <Text style={styles.doctorName}>{doctorInfo.name}</Text>
+      <View style={styles.patientHeaderCenter}>
+        <Text style={styles.patientName}>{patientInfo.name}</Text>
         <Text style={styles.consultationTime}>
-          {doctorInfo.serviceName || consultationTime}
+          {patientInfo.serviceName || consultationTime}
         </Text>
       </View>
 
-      {!doctorInfo.serviceName && !fromHistory && (
+      {!fromHistory && (
         <TouchableOpacity
           style={styles.endButton}
           onPress={handleEndConsultation}

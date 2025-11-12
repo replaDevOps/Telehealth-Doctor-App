@@ -1,93 +1,100 @@
-import { PipsImage, RecommandImage, doctor, onboarding1, onboarding2, onboarding3, patient, pimples } from "@assets/images";
-import { DoctorInfo, ClinicInfo, Message } from '../types/chat.types';
+import {
+  PipsImage,
+  RecommandImage,
+  doctor,
+  onboarding1,
+  onboarding2,
+  onboarding3,
+  patient,
+  pimples,
+} from '@assets/images';
+import {
+  DoctorInfo,
+  ClinicInfo,
+  Message,
+  PatientInfo,
+} from '../types/chat.types';
 
 export const ONBOARDING_STEPS = [
-    {
-      title: 'Connect with Your Patients',
-      imgSrc: onboarding1,
-      content:
-        'Connect with your patients through chat, audio, or video.',
-    },
-    {
-      title: 'Manage Your Consultations',
-      imgSrc: onboarding2,
-      content:
-        'You can manage all consultations easily in one app.',
-    },
-  ];
+  {
+    title: 'Connect with Your Patients',
+    imgSrc: onboarding1,
+    content: 'Connect with your patients through chat, audio, or video.',
+  },
+  {
+    title: 'Manage Your Consultations',
+    imgSrc: onboarding2,
+    content: 'You can manage all consultations easily in one app.',
+  },
+];
 
+export const SAMPLECLINICS = [
+  {
+    id: '1',
+    name: 'Al Noor Health Center',
+    specialty: 'Cardiology',
+    rating: 4.8,
+    location: 'Jeddah, Saudi Arabia',
+    image: RecommandImage,
+    isFeatured: true,
+  },
+  {
+    id: '2',
+    name: 'Medina Family Clinic',
+    specialty: 'Pediatrics',
+    rating: 4.6,
+    location: 'Medina, Saudi Arabia',
+    image: RecommandImage,
+    isFeatured: true,
+  },
+  {
+    id: '3',
+    name: 'CureWell Medical Complex',
+    specialty: 'Neurology',
+    rating: 4.7,
+    location: 'Riyadh, Saudi Arabia',
+    image: RecommandImage,
+    isFeatured: false,
+  },
+];
 
-
-  export const SAMPLECLINICS = [
-    {
-      id: '1',
-      name: 'Al Noor Health Center',
-      specialty: 'Cardiology',
-      rating: 4.8,
-      location: 'Jeddah, Saudi Arabia',
-      image: RecommandImage,
-      isFeatured: true,
-    },
-    {
-      id: '2',
-      name: 'Medina Family Clinic',
-      specialty: 'Pediatrics',
-      rating: 4.6,
-      location: 'Medina, Saudi Arabia',
-      image: RecommandImage,
-      isFeatured: true,
-    },
-    {
-      id: '3',
-      name: 'CureWell Medical Complex',
-      specialty: 'Neurology',
-      rating: 4.7,
-      location: 'Riyadh, Saudi Arabia',
-      image: RecommandImage,
-      isFeatured: false,
-    },
-  ];
-  
-  export const NEARBYCLINICS = [
-    {
-      id: '1',
-      name: 'HealthPlus Center',
-      specialty: 'Radiology',
-      rating: 4.4,
-      location: 'Makkah, Saudi Arabia',
-      image: RecommandImage,
-    },
-    {
-      id: '2',
-      name: 'Al Shifa Clinic',
-      specialty: 'General Medicine',
-      rating: 4.9,
-      location: 'Makkah, Saudi Arabia',
-      image: RecommandImage,
-    },
-    {
-      id: '3',
-      name: 'Vision Eye Care',
-      specialty: 'Ophthalmology',
-      rating: 4.6,
-      location: 'Makkah, Saudi Arabia',
-      image: RecommandImage,
-    },
-    {
-      id: '4',
-      name: 'Smile Dental Studio',
-      specialty: 'Dentistry',
-      rating: 4.7,
-      location: 'Makkah, Saudi Arabia',
-      image: RecommandImage,
-    },
-  ];
-  
+export const NEARBYCLINICS = [
+  {
+    id: '1',
+    name: 'HealthPlus Center',
+    specialty: 'Radiology',
+    rating: 4.4,
+    location: 'Makkah, Saudi Arabia',
+    image: RecommandImage,
+  },
+  {
+    id: '2',
+    name: 'Al Shifa Clinic',
+    specialty: 'General Medicine',
+    rating: 4.9,
+    location: 'Makkah, Saudi Arabia',
+    image: RecommandImage,
+  },
+  {
+    id: '3',
+    name: 'Vision Eye Care',
+    specialty: 'Ophthalmology',
+    rating: 4.6,
+    location: 'Makkah, Saudi Arabia',
+    image: RecommandImage,
+  },
+  {
+    id: '4',
+    name: 'Smile Dental Studio',
+    specialty: 'Dentistry',
+    rating: 4.7,
+    location: 'Makkah, Saudi Arabia',
+    image: RecommandImage,
+  },
+];
 
 export const SERVICES = [
-
   {
-
     id: '1',
 
     image: PipsImage,
@@ -103,17 +110,13 @@ export const SERVICES = [
     duration: '45 min',
 
     description:
-
       'A multi-step facial treatment that deeply cleanses, exfoliates, and hydrates the skin, leaving it refreshed and glowing.',
 
     procedure:
-
       'The procedure uses a patented device to cleanse and infuse serums into the skin for maximum hydration and brightness.',
-
   },
 
   {
-
     id: '2',
 
     image: PipsImage,
@@ -129,17 +132,13 @@ export const SERVICES = [
     duration: '1 hr',
 
     description:
-
       'Advanced laser teeth whitening procedure designed to safely and effectively brighten your smile up to 8 shades.',
 
     procedure:
-
       'A hydrogen peroxide gel is applied and activated with laser light to remove deep-set stains.',
-
   },
 
   {
-
     id: '3',
 
     image: PipsImage,
@@ -155,17 +154,13 @@ export const SERVICES = [
     duration: '30 min',
 
     description:
-
       'A non-surgical cosmetic treatment that relaxes facial muscles to reduce the appearance of fine lines and wrinkles.',
 
     procedure:
-
       'Small doses of botulinum toxin are injected into targeted muscles to temporarily relax them.',
-
   },
 
   {
-
     id: '4',
 
     image: PipsImage,
@@ -181,17 +176,13 @@ export const SERVICES = [
     duration: '90 min',
 
     description:
-
       'Long-term hair reduction treatment using advanced diode laser technology for smooth and hair-free skin.',
 
     procedure:
-
       'Laser energy targets hair follicles without damaging surrounding skin, preventing future hair growth.',
-
   },
 
   {
-
     id: '5',
 
     image: PipsImage,
@@ -207,264 +198,258 @@ export const SERVICES = [
     duration: '45 min',
 
     description:
-
       'A nutrient-rich IV infusion designed to boost energy, improve hydration, and enhance overall wellness.',
 
     procedure:
-
       'An intravenous infusion delivers vitamins and antioxidants directly into your bloodstream for faster absorption.',
-
   },
-
 ];
-  export const CLINIC_REVIEWS = [
+export const CLINIC_REVIEWS = [
+  {
+    id: '1',
+    author: 'Sultana Khan',
+    date: 'Oct 20, 2025',
+    rating: 5,
+    text: 'Amazing experience! The patients were very professional and explained everything clearly. My skin feels much better after just one session!',
+  },
+  {
+    id: '2',
+    author: 'Ahmed Ali',
+    date: 'Oct 18, 2025',
+    rating: 4,
+    text: 'Good service, but the waiting time was a bit long. Staff was friendly though.',
+  },
+  {
+    id: '3',
+    author: 'Fatima Noor',
+    date: 'Oct 15, 2025',
+    rating: 5,
+    text: 'The HydraFacial was incredible! My face has never felt this fresh before. Highly recommended.',
+  },
+  {
+    id: '4',
+    author: 'Omar Saeed',
+    date: 'Oct 12, 2025',
+    rating: 3,
+    text: 'The treatment worked, but I wish the clinic had better parking options.',
+  },
+  {
+    id: '5',
+    author: 'Hania Rizvi',
+    date: 'Oct 8, 2025',
+    rating: 5,
+    text: 'Professional staff and top-quality equipment. The Botox procedure was quick and painless!',
+  },
+];
+
+export const CLINIC_ABOUT_DATA = {
+  description:
+    'At GlowCare Clinic, we believe that confidence begins with healthy skin and a beautiful smile. Our clinic specializes in dermatology, dentistry, and aesthetic care — combining advanced technology with expert medical guidance.\n' +
+    'Our team of experienced patients and skincare professionals focuses on providing personalized treatments tailored to each patient’s needs. Whether you’re looking for acne treatment, skin rejuvenation, or a brighter smile, we’re here to help you glow with confidence.',
+  devices: [
     {
       id: '1',
-      author: 'Sultana Khan',
-      date: 'Oct 20, 2025',
-      rating: 5,
-      text: 'Amazing experience! The doctors were very professional and explained everything clearly. My skin feels much better after just one session!',
+      image: RecommandImage,
+      title: 'Fractional CO₂ Laser',
+      note: 'Used for skin resurfacing and scar reduction with minimal downtime.',
+      badge: {
+        1: 'Acne Scar Treatment',
+        2: 'Wrinkle Reduction',
+        3: 'Skin Tightening',
+        4: 'Pigmentation Removal',
+        5: 'Stretch Mark Fading',
+      },
     },
     {
       id: '2',
-      author: 'Ahmed Ali',
-      date: 'Oct 18, 2025',
-      rating: 4,
-      text: 'Good service, but the waiting time was a bit long. Staff was friendly though.',
+      image: RecommandImage,
+      title: 'Ultherapy Device',
+      note: 'Non-invasive ultrasound lifting treatment for face and neck tightening.',
+      badge: {
+        1: 'Face Lifting',
+        2: 'Jawline Definition',
+        3: 'Skin Firming',
+        4: 'Neck Contour Enhancement',
+        5: 'Collagen Boost',
+      },
     },
     {
       id: '3',
-      author: 'Fatima Noor',
-      date: 'Oct 15, 2025',
-      rating: 5,
-      text: 'The HydraFacial was incredible! My face has never felt this fresh before. Highly recommended.',
+      image: RecommandImage,
+      title: 'CoolSculpting Machine',
+      note: 'Targets stubborn fat cells through controlled cooling without surgery.',
+      badge: {
+        1: 'Body Contouring',
+        2: 'Fat Reduction',
+        3: 'Tummy Sculpt',
+        4: 'Thigh Slimming',
+        5: 'Double Chin Removal',
+      },
     },
     {
       id: '4',
-      author: 'Omar Saeed',
-      date: 'Oct 12, 2025',
-      rating: 3,
-      text: 'The treatment worked, but I wish the clinic had better parking options.',
+      image: RecommandImage,
+      title: 'PicoSure Laser',
+      note: 'Advanced laser for pigmentation, tattoos, and skin texture improvement.',
+      badge: {
+        1: 'Tattoo Removal',
+        2: 'Pigment Correction',
+        3: 'Skin Brightening',
+        4: 'Acne Mark Fading',
+        5: 'Freckle Reduction',
+      },
     },
     {
       id: '5',
-      author: 'Hania Rizvi',
-      date: 'Oct 8, 2025',
-      rating: 5,
-      text: 'Professional staff and top-quality equipment. The Botox procedure was quick and painless!',
+      image: RecommandImage,
+      title: 'Invisalign Scanner',
+      note: 'Digital 3D scan for custom-made invisible dental aligners.',
+      badge: {
+        1: 'Teeth Alignment',
+        2: 'Smile Correction',
+        3: 'Jaw Adjustment',
+        4: 'Gum Health Assessment',
+        5: 'Digital Smile Preview',
+      },
     },
-  ];
+  ],
+};
 
-  export const CLINIC_ABOUT_DATA = {
-    description:
-      'At GlowCare Clinic, we believe that confidence begins with healthy skin and a beautiful smile. Our clinic specializes in dermatology, dentistry, and aesthetic care — combining advanced technology with expert medical guidance.\n' +
-      'Our team of experienced doctors and skincare professionals focuses on providing personalized treatments tailored to each patient’s needs. Whether you’re looking for acne treatment, skin rejuvenation, or a brighter smile, we’re here to help you glow with confidence.',
-    devices: [
+export const CONSULTATION_HISTORY = [
+  {
+    id: '1',
+    date: '10/02/2025 11:05 am',
+    serviceName: 'Service Name',
+    duration: '19 min',
+    type: 'Chat',
+    icon: 'chatbubble',
+    patientName: 'Doctor Name',
+    patientAvatar: 'https://i.pravatar.cc/100?img=1',
+    clinicName: 'Clinic Name',
+    price: 'SAR 20',
+  },
+  {
+    id: '2',
+    date: '10/02/2025 11:05 am',
+    serviceName: 'Service Name',
+    duration: '19 min',
+    type: 'Audio',
+    icon: 'mic',
+    patientName: 'Doctor Name',
+    patientAvatar: 'https://i.pravatar.cc/100?img=2',
+    clinicName: 'Clinic Name',
+    price: 'SAR 20',
+  },
+  // add more …
+];
+
+export const PAYMENT_HISTORY = [
+  // ---- Consultation ----
+  {
+    id: 'c1',
+    kind: 'consultation',
+    date: '10/02/2025',
+    paymentId: '#12453',
+    type: 'Chat',
+    serviceName: 'Acne Itching Treatm...',
+    patientStatus: 'No patient accepted!',
+    clinicName: 'Eden Medical Center',
+    clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
+    price: 'SAR 20',
+    status: 'Refund',
+    statusColor: '#ef4444',
+  },
+  {
+    id: 'c2',
+    kind: 'consultation',
+    date: '10/02/2025',
+    paymentId: '#21234',
+    type: 'Video',
+    duration: '19 min',
+    serviceName: 'Acne Itching Treatm...',
+    patientName: 'Patient Name',
+    patientAvatar: 'https://i.pravatar.cc/100?img=4',
+    clinicName: 'Eden Medical Center',
+    clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
+    price: 'SAR 20',
+    status: 'Paid',
+    statusColor: '#10b981',
+  },
+
+  // ---- Appointment ----
+  {
+    id: 'a1',
+    kind: 'appointment',
+    date: '10/02/2025',
+    paymentId: 'Appt. ID',
+    clinicImg: true,
+    clinicName: 'Eden Medical Center',
+    clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
+    numberOfService: '03',
+    price: 'SAR 20',
+    status: 'Refund',
+    statusColor: '#ef4444',
+    services: [
       {
-        id: '1',
-        image: RecommandImage,
-        title: 'Fractional CO₂ Laser',
-        note: 'Used for skin resurfacing and scar reduction with minimal downtime.',
-        badge: {
-          1: 'Acne Scar Treatment',
-          2: 'Wrinkle Reduction',
-          3: 'Skin Tightening',
-          4: 'Pigmentation Removal',
-          5: 'Stretch Mark Fading',
-        },
+        id: 1,
+        name: 'Acne Treatment',
+        duration: '40 min',
+        price: '200 SAR',
+        category: 'Dental',
+        categoryBadge: 'Enaqa Name',
+        image: PipsImage,
       },
       {
-        id: '2',
-        image: RecommandImage,
-        title: 'Ultherapy Device',
-        note: 'Non-invasive ultrasound lifting treatment for face and neck tightening.',
-        badge: {
-          1: 'Face Lifting',
-          2: 'Jawline Definition',
-          3: 'Skin Firming',
-          4: 'Neck Contour Enhancement',
-          5: 'Collagen Boost',
-        },
-      },
-      {
-        id: '3',
-        image: RecommandImage,
-        title: 'CoolSculpting Machine',
-        note: 'Targets stubborn fat cells through controlled cooling without surgery.',
-        badge: {
-          1: 'Body Contouring',
-          2: 'Fat Reduction',
-          3: 'Tummy Sculpt',
-          4: 'Thigh Slimming',
-          5: 'Double Chin Removal',
-        },
-        },
-      {
-        id: '4',
-        image: RecommandImage,
-        title: 'PicoSure Laser',
-        note: 'Advanced laser for pigmentation, tattoos, and skin texture improvement.',
-        badge: {
-          1: 'Tattoo Removal',
-          2: 'Pigment Correction',
-          3: 'Skin Brightening',
-          4: 'Acne Mark Fading',
-          5: 'Freckle Reduction',
-        },
-      },
-      {
-        id: '5',
-        image: RecommandImage,
-        title: 'Invisalign Scanner',
-        note: 'Digital 3D scan for custom-made invisible dental aligners.',
-        badge: {
-          1: 'Teeth Alignment',
-          2: 'Smile Correction',
-          3: 'Jaw Adjustment',
-          4: 'Gum Health Assessment',
-          5: 'Digital Smile Preview',
-        },
+        id: 2,
+        name: 'Teeth Whiting',
+        duration: '40 min',
+        price: '200 SAR',
+        category: 'Dental',
+        categoryBadge: 'Group Name',
+        image: PipsImage,
       },
     ],
-  };
-
-
-  export const CONSULTATION_HISTORY= [
+  },
+  {
+    id: 'a2',
+    kind: 'appointment',
+    date: '10/02/2025',
+    paymentId: '#23231',
+    clinicImg: true,
+    clinicName: 'Eden Medical Center',
+    clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
+    numberOfService: '03',
+    price: 'SAR 20',
+    status: 'Paid',
+    statusColor: '#10b981',
+    services: [
       {
-        id: '1',
-        date: '10/02/2025 11:05 am',
-        serviceName: 'Service Name',
-        duration: '19 min',
-        type: 'Chat',
-        icon: 'chatbubble',
-        doctorName: 'Doctor Name',
-        doctorAvatar: 'https://i.pravatar.cc/100?img=1',
-        clinicName: 'Clinic Name',
-        price: 'SAR 20',
+        id: 1,
+        name: 'Acne Treatment',
+        duration: '40 min',
+        price: '200 SAR',
+        category: 'Dental',
+        categoryBadge: 'Enaqa Name',
+        image: PipsImage,
       },
       {
-        id: '2',
-        date: '10/02/2025 11:05 am',
-        serviceName: 'Service Name',
-        duration: '19 min',
-        type: 'Audio',
-        icon: 'mic',
-        doctorName: 'Doctor Name',
-        doctorAvatar: 'https://i.pravatar.cc/100?img=2',
-        clinicName: 'Clinic Name',
-        price: 'SAR 20',
+        id: 2,
+        name: 'Teeth Whiting',
+        duration: '40 min',
+        price: '200 SAR',
+        category: 'Dental',
+        categoryBadge: 'Group Name',
+        image: PipsImage,
       },
-      // add more …
-    ];
-  
-   export const PAYMENT_HISTORY = [
-      // ---- Consultation ----
-      {
-        id: 'c1',
-        kind: 'consultation',
-        date: '10/02/2025',
-        paymentId: '#12453',
-        type: 'Chat',
-        serviceName: 'Acne Itching Treatm...',
-        doctorStatus: 'No doctor accepted!',
-        clinicName: 'Eden Medical Center',
-        clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
-        price: 'SAR 20',
-        status: 'Refund',
-        statusColor: '#ef4444',
-      },
-      {
-        id: 'c2',
-        kind: 'consultation',
-        date: '10/02/2025',
-        paymentId: '#21234',
-        type: 'Video',
-        duration: '19 min',
-        serviceName: 'Acne Itching Treatm...',
-        doctorName: 'Doctor Name',
-        doctorAvatar: 'https://i.pravatar.cc/100?img=4',
-        clinicName: 'Eden Medical Center',
-        clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
-        price: 'SAR 20',
-        status: 'Paid',
-        statusColor: '#10b981',
-      },
-  
-      // ---- Appointment ----
-      {
-        id: 'a1',
-        kind: 'appointment',
-        date: '10/02/2025',
-        paymentId: 'Appt. ID',
-        clinicImg: true,
-        clinicName: 'Eden Medical Center',
-        clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
-        numberOfService: '03',
-        price: 'SAR 20',
-        status: 'Refund',
-        statusColor: '#ef4444',
-        services: [
-          {
-            id: 1,
-            name: 'Acne Treatment',
-            duration: '40 min',
-            price: '200 SAR',
-            category: 'Dental',
-            categoryBadge: 'Enaqa Name',
-            image: PipsImage,
-          },
-          {
-            id: 2,
-            name: 'Teeth Whiting',
-            duration: '40 min',
-            price: '200 SAR',
-            category: 'Dental',
-            categoryBadge: 'Group Name',
-            image: PipsImage,
-          },
-        ],
-      },
-      {
-        id: 'a2',
-        kind: 'appointment',
-        date: '10/02/2025',
-        paymentId: '#23231',
-        clinicImg: true,
-        clinicName: 'Eden Medical Center',
-        clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
-        numberOfService: '03',
-        price: 'SAR 20',
-        status: 'Paid',
-        statusColor: '#10b981',
-        services: [
-          {
-            id: 1,
-            name: 'Acne Treatment',
-            duration: '40 min',
-            price: '200 SAR',
-            category: 'Dental',
-            categoryBadge: 'Enaqa Name',
-            image: PipsImage,
-          },
-          {
-            id: 2,
-            name: 'Teeth Whiting',
-            duration: '40 min',
-            price: '200 SAR',
-            category: 'Dental',
-            categoryBadge: 'Group Name',
-            image: PipsImage,
-          },
-        ],
-      },
-    ];
-  
+    ],
+  },
+];
 
 // ---------- Chat Constants and Helper Functions ----------
-export const DEFAULT_DOCTOR_INFO: DoctorInfo = {
-  id: 'doctor_1',
-  name: 'Dr. Sultan Khan',
-  avatar: doctor,
+export const DEFAULT_PATIENT_INFO: PatientInfo = {
+  id: 'patient_1',
+  name: 'Patient Name',
+  avatar: patient,
   serviceName: '',
 };
 
@@ -491,34 +476,149 @@ export function formatTime(seconds: number): string {
   return `${minutes}:${secs}`;
 }
 
+// Add this function to your constants/appData.ts file
+
+export function getAIChatHistory(patientInfo: DoctorInfo): Message[] {
+  const timestamp = getCurrentTimestamp();
+
+  return [
+    {
+      id: 'ai-1',
+      type: 'user',
+      text: "I've uploaded a photo. I have some redness and itching on my face.",
+      timestamp,
+      images: [pimples, pimples], // Your imported images
+    },
+    {
+      id: 'ai-2',
+      type: 'bot',
+      text: "It seems like mild skin irritation. Based on your clinic's services, I'd recommend:",
+      timestamp,
+      suggestions: [
+        {
+          id: 's1',
+          image: PipsImage,
+          type: 'Service',
+          serviceGroup: 'Acne Treatment',
+          serviceName: 'Advanced Facial',
+          price: '350 SAR',
+          duration: '45 min',
+          description: 'A multi-step facial treatment.',
+          procedure: 'Uses patented device.',
+        },
+        {
+          id: 's2',
+          image: PipsImage,
+          type: 'Device',
+          serviceGroup: 'Wood lamp',
+          serviceName: 'Diagnostic',
+          price: '600 SAR',
+          duration: '1 hr',
+          description: 'Advanced diagnostic.',
+          procedure: 'Device for skin analysis.',
+        },
+      ],
+    },
+    {
+      id: 'ai-3',
+      type: 'bot',
+      text: "It seems like mild also irritation. Based on your clinic's services, I'd recommend:",
+      timestamp,
+      suggestions: [
+        {
+          id: 's3',
+          image: PipsImage,
+          type: 'Service',
+          serviceGroup: 'Functional (DO...)',
+          serviceName: 'Fractional CO2...',
+          price: '350 SAR',
+          duration: '45 min',
+          description: 'A multi-step facial treatment.',
+          procedure: 'Uses patented device.',
+        },
+        {
+          id: 's4',
+          image: PipsImage,
+          type: 'Device',
+          serviceGroup: 'Functional (DO...)',
+          serviceName: 'Fractional CO2...',
+          price: '600 SAR',
+          duration: '1 hr',
+          description: 'Advanced diagnostic.',
+          procedure: 'Device for skin analysis.',
+        },
+      ],
+    },
+    {
+      id: 'ai-4',
+      type: 'bot',
+      text: 'Suggest me devices related to my problem:',
+      timestamp,
+      suggestions: [
+        {
+          id: 's5',
+          image: PipsImage,
+          type: 'Service',
+          serviceGroup: 'Functional (DO...)',
+          serviceName: 'Fractional CO2...',
+          price: '350 SAR',
+          duration: '45 min',
+          description: 'A multi-step facial treatment.',
+          procedure: 'Uses patented device.',
+        },
+        {
+          id: 's6',
+          image: PipsImage,
+          type: 'Device',
+          serviceGroup: 'Functional (DO...)',
+          serviceName: 'Fractional CO2...',
+          price: '600 SAR',
+          duration: '1 hr',
+          description: 'Advanced diagnostic.',
+          procedure: 'Device for skin analysis.',
+        },
+      ],
+    },
+  ];
+}
+
+// Update your existing getInitialMessages function to handle both scenarios better
 export function getInitialMessages(
-  chatType: 'ai' | 'doctor',
-  doctorInfo: DoctorInfo,
+  chatType: 'ai' | 'patient',
+  patientInfo: DoctorInfo,
 ): Message[] {
   const timestamp = getCurrentTimestamp();
 
-  if (chatType === 'doctor') {
+  if (chatType === 'patient') {
+    // Doctor-Patient chat messages
     return [
       {
         id: '1',
-        type: 'bot',
+        type: 'user',
         text: 'Hello',
         timestamp,
-        user: { name: doctorInfo.name, avatar: doctor },
+        user: { name: patientInfo.name, avatar: patient },
       },
       {
         id: '2',
-        type: 'user',
-        text: "I've been having some redness and small bumps on my cheeks for past few days.",
+        type: 'doctor',
+        text: "Hi !",
         timestamp,
-        user: { name: 'Bassil Kuncill Saadeh', avatar: patient },
+        user: { name: 'Doctor Name', avatar: doctor },
       },
       {
         id: '3',
-        type: 'bot',
+        type: 'user',
+        text: 'Ive been having some redness and small bumps on my cheeks for past few days.',
+        timestamp,
+        user: { name: patientInfo.name, avatar: patient },
+      },
+      {
+        id: '4',
+        type: 'doctor',
         text: 'I recommend using a gentle cleanser and applying a hydrating cream twice daily...',
         timestamp,
-        user: { name: doctorInfo.name, avatar: doctor },
+        user: { name: patientInfo.name, avatar: doctor },
         suggestions: [
           {
             id: '1',
@@ -547,7 +647,7 @@ export function getInitialMessages(
     ];
   }
 
-  // AI Chat
+  // AI Chat (when doctor opens AI chat directly)
   return [
     { id: '1', type: 'user', text: 'Hi!', timestamp },
     {
@@ -556,68 +656,50 @@ export function getInitialMessages(
       text: 'Welcome! You can ask me anything or upload a photo to get suggestions.',
       timestamp,
     },
-    {
-      id: '3',
-      type: 'user',
-      text: "I've uploaded a photo. I have some redness and itching on my face.",
-      timestamp,
-      images: [pimples, pimples],
-    },
-    {
-      id: '4',
-      type: 'bot',
-      text: "It seems like mild skin irritation. Based on your clinic's services, I'd recommend:",
-      timestamp,
-      suggestions: [
-        {
-          id: '1',
-          image: PipsImage,
-          type: 'Dermatology',
-          serviceGroup: 'Skin Rejuvenation',
-          serviceName: 'HydraFacial Glow',
-          price: '350 SAR',
-          duration: '45 min',
-          description: 'Deep cleansing facial.',
-          procedure: 'Uses a patented device.',
-        },
-        {
-          id: '2',
-          image: PipsImage,
-          type: 'Dentistry',
-          serviceGroup: 'Teeth Whitening',
-          serviceName: 'Laser Smile Brightening',
-          price: '600 SAR',
-          duration: '1 hr',
-          description: 'Advanced laser teeth whitening.',
-          procedure: 'Hydrogen peroxide gel with laser.',
-        },
-      ],
-    },
   ];
 }
- export const CONSULTATION_REQUESTS = [
-      {
-        id: '1',
-        patientName: 'Patient 1',
-        patientImage: doctor,
-        sevviceName: 'Acne Treatment',
-        gender: 'Male',
-        date: '8/30/2024 11:35 am',
-        time: '30 mins',
-        duration: '1hr',
-        type: 'chat' as const,
-        amount: 'SAR 20',
-      },
-      {
-        id: '2',
-        patientName: 'Patient 2',
-        patientImage: doctor,
-        sevviceName: 'Acne Treatment',
-        gender: 'Female',
-        date: '8/30/2024 11:35 am',
-        time: '21 mins',
-        duration: '2 mins',
-        type: 'video' as const,
-        amount: 'SAR 20',
-      },
-    ];
+
+export const CONSULTATION_REQUESTS = [
+  {
+    id: '#8E8E8E',
+    patientName: 'Patient 1',
+    patientImage: patient,
+    sevviceName: 'Acne Treatment',
+    gender: 'Male',
+    date: '8/30/2024 11:35 am',
+    time: '30 mins',
+    duration: '1hr',
+    type: 'chat' as const,
+    amount: 'SAR 20',
+    age: '25',
+    status: 'pending',
+  },
+  {
+    id: '#E9EDF7',
+    patientName: 'Patient 2',
+    patientImage: patient,
+    sevviceName: 'Acne Treatment',
+    gender: 'Female',
+    date: '8/30/2024 11:35 am',
+    time: '21 mins',
+    duration: '2 mins',
+    type: 'video' as const,
+    amount: 'SAR 20',
+    age: '24',
+    status: 'complete',
+  },
+  {
+    id: '#090987',
+    patientName: 'Patient 3',
+    patientImage: patient,
+    sevviceName: 'Rutine Checkup',
+    gender: 'Male',
+    date: '3/31/2024 11:35 am',
+    time: '18 mins',
+    duration: '1 mins',
+    type: 'audio' as const,
+    amount: 'SAR 20',
+    age: '24',
+    status: 'complete',
+  },
+];

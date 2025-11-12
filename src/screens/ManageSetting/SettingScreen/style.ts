@@ -12,8 +12,8 @@ export default StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 12,
     borderRadius: 8,
-    marginVertical: 8,  
-    paddingVertical:12
+    marginVertical: 8,
+    paddingVertical: 12,
   },
   menuLeft: {
     flexDirection: 'row',

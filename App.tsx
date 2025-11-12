@@ -4,6 +4,7 @@ import { StatusBar, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/root-navigation';
 import { colors } from './src/styles/colors';
 import { setGlobalFont } from './src/utils/overrideText';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 setGlobalFont();
 
@@ -15,9 +16,11 @@ const App = () => {
         translucent={false}
         barStyle="dark-content"
       />
-      {/* <SafeAreaView style={styles.safeArea}> */}
-      <AppNavigator />
-      {/* </SafeAreaView> */}
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        {/* <SafeAreaView style={styles.safeArea}> */}
+        <AppNavigator />
+        {/* </SafeAreaView> */}
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 };

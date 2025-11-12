@@ -1,4 +1,3 @@
-
 import { StyleSheet } from 'react-native';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';

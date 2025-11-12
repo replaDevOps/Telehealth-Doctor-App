@@ -6,7 +6,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'patient' | 'doctor';
+  role: 'patient' | 'patient';
   avatar?: string;
   phone?: string;
 }
@@ -16,7 +16,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  
+
   // Actions
   login: (user: User, token: string) => void;
   logout: () => void;
@@ -26,7 +26,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    set => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -48,17 +48,16 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
         }),
 
-      updateUser: (userData) =>
-        set((state) => ({
+      updateUser: userData =>
+        set(state => ({
           user: state.user ? { ...state.user, ...userData } : null,
         })),
 
-      setLoading: (loading) =>
-        set({ isLoading: loading }),
+      setLoading: loading => set({ isLoading: loading }),
     }),
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );

@@ -9,16 +9,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
-import { doctor } from '@assets/images';
-import { mvs } from '@config/metrices';
+import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
-
-
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 export function AudioConsultation({ navigation, route }) {
-  const doctorInfo = route?.params?.doctorInfo || {
+  const patientInfo = route?.params?.patientInfo || {
     name: 'Dr. Yasmin Chowdhury',
-    avatar: doctor,
+    avatar: patient,
     specialization: 'Dermatologist',
   };
 
@@ -27,6 +25,9 @@ export function AudioConsultation({ navigation, route }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const closePrescription = () => setVisible(false);
+
   const handleGetPrescription = () => {
     setModalVisible(false);
     console.log('User wants to get the prescription');
@@ -78,6 +79,9 @@ export function AudioConsultation({ navigation, route }) {
   const toggleSpeaker = () => {
     setIsSpeakerOn(!isSpeakerOn);
   };
+  const showprescriptionModal = () => {
+    setVisible(true);
+  };
 
   return (
     <View style={styles.container}>
@@ -89,7 +93,7 @@ export function AudioConsultation({ navigation, route }) {
 
       {/* Full Screen Background Image */}
       <ImageBackground
-        source={doctorInfo.avatar}
+        source={patientInfo.avatar}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -99,7 +103,7 @@ export function AudioConsultation({ navigation, route }) {
         <SafeAreaView style={styles.safeArea}>
           {/* Doctor Info at Top */}
           <View style={styles.topSection}>
-            <Text style={styles.doctorName}>{doctorInfo.name}</Text>
+            <Text style={styles.patientName}>{patientInfo.name}</Text>
             <Text style={styles.callStatus}>
               {callStatus === 'Connected'
                 ? formatDuration(callDuration)
@@ -109,6 +113,15 @@ export function AudioConsultation({ navigation, route }) {
 
           {/* Call Controls at Bottom */}
           <View style={styles.controlsContainer}>
+            <TouchableOpacity
+              style={[
+                styles.controlButton,
+                { backgroundColor: colors.primary },
+              ]}
+              onPress={showprescriptionModal}
+            >
+              <AntDesign name="plus" size={24} color={colors.white} />
+            </TouchableOpacity>
             {/* Speaker Button */}
             <TouchableOpacity
               style={[
@@ -153,9 +166,14 @@ export function AudioConsultation({ navigation, route }) {
           onClose={handleClose}
           onGetPrescription={handleGetPrescription}
         />
+        <PrescriptionBottomSheet
+          visible={visible}
+          onClose={closePrescription}
+        />
       </ImageBackground>
     </View>
   );
 }
 
 import { styles } from './style';
+import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';

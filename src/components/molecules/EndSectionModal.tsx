@@ -17,12 +17,14 @@ interface ConsultationEndedModalProps {
   visible: boolean;
   onClose: () => void;
   onGetPrescription: () => void;
+  writePrescription?: boolean;
 }
 
 const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   visible,
   onClose,
   onGetPrescription,
+  writePrescription,
 }) => {
   return (
     <Modal
@@ -38,30 +40,45 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
             <Text style={styles.closeText}>×</Text>
           </TouchableOpacity>
 
-          {/* Title */}
-          <Text style={styles.title}>Consultation Ended</Text>
+          {writePrescription ? (
+            <View>
+              {/* Title */}
 
-          {/* Description */}
-          <Text style={styles.description}>
-            The consultation has ended. The doctor has shared your prescription.
-            You can download it now or anytime from your history.
-          </Text>
+              <Text style={styles.title}>Consultation Ended!</Text>
+              {/* Description */}
 
-          {/* Buttons */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.prescriptionButton}
-              onPress={onGetPrescription}
-            >
-              <Text style={styles.prescriptionButtonText}>
-                Get Prescription
+              <Text style={styles.description}>
+                This consultation has ended.
               </Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          ) : (
+            <View>
+              {/* Title */}
+              <Text style={styles.title}>No Prescription Added</Text>
+
+              {/* Description */}
+              <Text style={styles.description}>
+                You haven’t created a prescription for this session. Are you
+                sure you want to end the consultation without writing one?
+              </Text>
+
+              {/* Buttons */}
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                  <Text style={styles.closeButtonText}>End Consultation</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.prescriptionButton}
+                  onPress={onGetPrescription}
+                >
+                  <Text style={styles.prescriptionButtonText}>
+                    Write Prescription
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
       </View>
     </Modal>

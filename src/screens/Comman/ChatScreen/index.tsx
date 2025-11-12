@@ -9,56 +9,55 @@ import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ServiceDetailBottomSheet } from '@components/molecules';
 import { styles } from './style';
-import { patient } from '@assets/images';
+import { doctor, patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
-import { launchImageLibrary } from 'react-native-image-picker';
 import {
   ChatHeader,
   MessageInput,
   MessageList,
 } from '../../../components/chat';
 import {
-  DEFAULT_DOCTOR_INFO,
-  DEFAULT_CLINIC_INFO,
+  DEFAULT_PATIENT_INFO,
   CONSULTATION_DURATION,
   getCurrentTimestamp,
   formatTime,
   getInitialMessages,
 } from '../../../constants/appData';
 import { Message, Service } from '../../../types/chat.types';
+import { AIChatHistoryBottomSheet } from '@components/molecules/AIChatHistoryBottomSheet';
+import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
 
 // ---------- Main Component ----------
 export function ChatScreen({ navigation, route }) {
   // Extract route params with defaults
-  const chatType = route?.params?.chatType || 'ai';
+  const chatType = route?.params?.chatType || 'patient'; // 'patient' | 'ai'
   const fromHistory = route?.params?.fromHistory || false;
-  const doctorInfo = route?.params?.doctorInfo || DEFAULT_DOCTOR_INFO;
-  const clinicInfo = route?.params?.clinicInfo || DEFAULT_CLINIC_INFO;
+  const patientInfo = route?.params?.patientInfo || DEFAULT_PATIENT_INFO;
 
   // ---------- State ----------
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [aiChatHistory, setAiChatHistory] = useState<Message[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [serviceDetailVisible, setServiceDetailVisible] = useState(false);
+  const [aiHistoryVisible, setAiHistoryVisible] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(
     CONSULTATION_DURATION,
   );
   const [isConsultationActive, setIsConsultationActive] = useState(
-    chatType === 'doctor' && !fromHistory,
+    chatType === 'patient' && !fromHistory,
   );
   const [modalVisible, setModalVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
-
-  useEffect(() => {
-    console.log('clinicInfo.image type:', typeof clinicInfo.image);
-    console.log('clinicInfo.image value:', clinicInfo.image);
-  }, []);
+  const openPrescription = () => setVisible(true);
+  const closePrescription = () => setVisible(false);
 
   // ---------- Memoized Values ----------
   const initialMessages = useMemo(
-    () => getInitialMessages(chatType, doctorInfo),
-    [chatType, doctorInfo], // Only recreate if chatType or doctor changes
+    () => getInitialMessages(chatType, patientInfo),
+    [chatType, patientInfo],
   );
 
   const consultationTime = useMemo(
@@ -66,17 +65,99 @@ export function ChatScreen({ navigation, route }) {
     [remainingSeconds],
   );
 
-  const showAvatar = chatType === 'doctor';
+  const showAvatar = chatType === 'patient';
   const canSendMessages = !fromHistory;
+
+  // Show "AI Chat History" button only when chatting with patient (not in AI mode)
+  const showAIChatHistoryButton = chatType === 'patient';
 
   // ---------- Lifecycle ----------
   useEffect(() => {
     setMessages(initialMessages);
   }, [initialMessages]);
 
-  // Timer for doctor consultation
+  // Load AI chat history when component mounts
   useEffect(() => {
-    if (chatType !== 'doctor' || !isConsultationActive) return;
+    // TEMPORARY: Mock data for testing
+    // Replace this with actual getAIChatHistory(patientInfo) from appData.ts
+    const mockHistory: Message[] = [
+      {
+        id: 'ai-1',
+        type: 'user',
+        text: "I've uploaded a photo. I have some redness and itching on my face.",
+        timestamp: getCurrentTimestamp(),
+        images: [patient, patient], // Using patient image as placeholder
+        user: {
+          name: patientInfo.name,
+          avatar: patientInfo.avatar,
+        },
+      },
+      {
+        id: 'ai-2',
+        type: 'bot',
+        text: "It seems like mild skin irritation. Based on your clinic's services, I'd recommend:",
+        timestamp: getCurrentTimestamp(),
+        user: {
+          name: 'Vena AI',
+          avatar: patient,
+        },
+        suggestions: [
+          {
+            id: 's1',
+            image: patient, // Replace with PipsImage
+            type: 'Service',
+            serviceGroup: 'Acne Treatment',
+            serviceName: 'Advanced Facial',
+            price: '350 SAR',
+            duration: '45 min',
+            description: 'A multi-step facial treatment.',
+            procedure: 'Uses patented device.',
+          },
+          {
+            id: 's2',
+            image: patient, // Replace with PipsImage
+            type: 'Device',
+            serviceGroup: 'Wood lamp',
+            serviceName: 'Diagnostic',
+            price: '600 SAR',
+            duration: '1 hr',
+            description: 'Advanced diagnostic.',
+            procedure: 'Device for skin analysis.',
+          },
+        ],
+      },
+      {
+        id: 'ai-3',
+        type: 'bot',
+        text: 'Suggest me devices related to my problem:',
+        timestamp: getCurrentTimestamp(),
+        user: {
+          name: 'Vena AI',
+          avatar: patient,
+        },
+        suggestions: [
+          {
+            id: 's3',
+            image: patient,
+            type: 'Service',
+            serviceGroup: 'Functional (DO...)',
+            serviceName: 'Fractional CO2...',
+            price: '350 SAR',
+            duration: '45 min',
+            description: 'A multi-step facial treatment.',
+            procedure: 'Uses patented device.',
+          },
+        ],
+      },
+    ];
+
+    console.log('AI Chat History loaded, count:', mockHistory.length);
+    setAiChatHistory(mockHistory);
+  }, [patientInfo.avatar, patientInfo.name]);
+
+  // Timer for patient consultation
+  useEffect(() => {
+    if (chatType !== 'patient' || !isConsultationActive) return;
 
     const timer = setInterval(() => {
       setRemainingSeconds(prev => {
@@ -102,44 +183,8 @@ export function ChatScreen({ navigation, route }) {
 
   // ---------- Handlers ----------
   const handleImagePick = useCallback(() => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        quality: 0.8,
-        selectionLimit: 1,
-      },
-      response => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-          return;
-        }
-
-        if (response.errorCode) {
-          console.error('Image Picker Error:', response.errorMessage);
-          return;
-        }
-
-        const asset = response.assets?.[0];
-        if (!asset?.uri) {
-          console.error('No image URI found');
-          return;
-        }
-
-        const newMessage: Message = {
-          id: Date.now().toString(),
-          type: 'user',
-          text: '',
-          timestamp: getCurrentTimestamp(),
-          user: showAvatar
-            ? { name: 'Bassil Kuncill Saadeh', avatar: patient }
-            : undefined,
-          images: [{ uri: asset.uri }],
-        };
-
-        setMessages(prev => [...prev, newMessage]);
-      },
-    );
-  }, [showAvatar]);
+    // TODO: Implement image picker
+  }, []);
 
   const handleSend = useCallback(() => {
     const trimmedMessage = message.trim();
@@ -147,12 +192,10 @@ export function ChatScreen({ navigation, route }) {
 
     const newMsg: Message = {
       id: Date.now().toString(),
-      type: 'user',
+      type: 'doctor',
       text: trimmedMessage,
       timestamp: getCurrentTimestamp(),
-      user: showAvatar
-        ? { name: 'Bassil Kuncill Saadeh', avatar: patient }
-        : undefined,
+      user: showAvatar ? { name: 'Doctor Name', avatar: doctor } : undefined,
     };
 
     setMessages(prev => [...prev, newMsg]);
@@ -195,58 +238,68 @@ export function ChatScreen({ navigation, route }) {
     navigation.goBack();
   }, [navigation]);
 
+  const handleAIChatHistory = useCallback(() => {
+    console.log('Opening AI Chat History');
+    console.log('aiChatHistory state:', aiChatHistory);
+    console.log('aiChatHistory length:', aiChatHistory.length);
+    setAiHistoryVisible(true);
+  }, [aiChatHistory]);
+
+  const handleCloseAIHistory = useCallback(() => {
+    setAiHistoryVisible(false);
+  }, []);
+
   // ---------- Main Render ----------
   return (
     <SafeAreaView style={styles.container}>
       <ChatHeader
-        chatType={chatType}
-        doctorInfo={doctorInfo}
+        patientInfo={patientInfo}
         consultationTime={consultationTime}
         fromHistory={fromHistory}
         handleGoBack={handleGoBack}
         handleEndConsultation={handleEndConsultation}
       />
 
-      {/* Clinic Info */}
+      {/* Clinic/Patient Info */}
       <View style={styles.clinicInfo}>
         <View style={styles.clinicLeft}>
-          <Image
-            source={
-              typeof clinicInfo.image === 'number'
-                ? { uri: Image.resolveAssetSource(clinicInfo.image).uri }
-                : clinicInfo.image
-            }
-            style={styles.clinicImage}
-          />
+          <Image source={patientInfo.avatar} style={styles.clinicImage} />
           <View>
-            <Text style={styles.clinicName}>{clinicInfo.name}</Text>
-            <Text style={styles.clinicLocation}>{clinicInfo.location}</Text>
+            <Text style={styles.clinicName}>{patientInfo.name}</Text>
+            <Text style={styles.clinicLocation}>
+              {patientInfo.gender + ', ' + patientInfo.age}
+              {' Year Old'}
+            </Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.consultButton}>
-          <Text style={styles.consultButtonText}>
-            {chatType === 'doctor' ? 'Visit' : 'Consult Now'}
-          </Text>
-        </TouchableOpacity>
+        {showAIChatHistoryButton && (
+          <TouchableOpacity
+            style={styles.consultButton}
+            onPress={handleAIChatHistory}
+          >
+            <Text style={styles.consultButtonText}>AI Chat History</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Messages */}
       <MessageList
         messages={messages}
         scrollRef={scrollRef}
-        showAvatar={showAvatar}
         handleServicePress={handleServicePress}
       />
 
       {/* Input - Only show if not viewing history */}
-      <MessageInput
-        message={message}
-        setMessage={setMessage}
-        handleSend={handleSend}
-        handleImagePick={handleImagePick}
-        canSendMessages={canSendMessages}
-      />
+      {canSendMessages && (
+        <MessageInput
+          message={message}
+          setMessage={setMessage}
+          handleSend={handleSend}
+          canSendMessages={canSendMessages}
+          handleImagePick={openPrescription}
+        />
+      )}
 
       {/* Modals */}
       <ServiceDetailBottomSheet
@@ -256,11 +309,24 @@ export function ChatScreen({ navigation, route }) {
         onAddToCart={handleAddToCart}
         onCheckout={handleCheckout}
       />
+
       <ConsultationEndedModal
         visible={modalVisible}
         onClose={handleCloseModal}
         onGetPrescription={handleGetPrescription}
+        writePrescription={true}
       />
+
+      <AIChatHistoryBottomSheet
+        visible={aiHistoryVisible}
+        onClose={() => setAiHistoryVisible(false)}
+        handleServicePress={service => {
+          console.log('Service pressed:', service);
+        }}
+        patientInfo={patientInfo}
+      />
+
+      <PrescriptionBottomSheet visible={visible} onClose={closePrescription} />
     </SafeAreaView>
   );
 }

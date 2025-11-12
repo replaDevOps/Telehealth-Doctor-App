@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -27,13 +26,13 @@ export const Suggestion: React.FC<SuggestionProps> = ({
           <View style={styles.suggestionContent}>
             <Text style={styles.suggestionTitle}>{service.serviceGroup}</Text>
             <View style={styles.suggestionSubtitleRow}>
-              <Text style={styles.suggestionSubtitle}>
+              <Text style={styles.suggestionSubtitle} numberOfLines={1}>
                 {service.serviceName}
               </Text>
               <FontAwesome5
                 name="external-link-alt"
                 size={12}
-                color={colors.primary}
+                color={colors.white}
               />
             </View>
           </View>

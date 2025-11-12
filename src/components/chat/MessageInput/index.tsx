@@ -13,7 +13,7 @@ interface MessageInputProps {
   message: string;
   setMessage: (message: string) => void;
   handleSend: () => void;
-  handleImagePick: () => void;
+  handleImagePick: () => any;
   canSendMessages: boolean;
 }
 

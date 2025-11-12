@@ -16,8 +16,8 @@ export interface ConsultationRequest {
 export interface ConsultationSession {
   id: string;
   requestId: string;
+  doctortId: string;
   patientId: string;
-  doctorId: string;
   type: ConsultationType;
   status: 'active' | 'completed' | 'cancelled';
   startTime: Date;
