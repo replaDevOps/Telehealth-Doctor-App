@@ -1,23 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   ImageBackground,
-  Image,
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../../styles/colors';
 import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
-import { styles } from './style';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
 
-export function VideoConsultation({ navigation, route }) {
+export function AudioConsultation({ navigation, route }) {
   const patientInfo = route?.params?.patientInfo || {
     name: 'Dr. Yasmin Chowdhury',
     avatar: patient,
@@ -28,15 +24,37 @@ export function VideoConsultation({ navigation, route }) {
   const [callDuration, setCallDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
-  const [isCameraOn, setIsCameraOn] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const closePrescription = () => setVisible(false);
 
+  // Get prescription state and reset function from Zustand
+  const writePrescription = usePrescriptionStore(
+    state => state.writePrescription,
+  );
+  const resetPrescription = usePrescriptionStore(
+    state => state.resetPrescription,
+  );
+
+  // ✅ Reset prescription state when component unmounts
+  useEffect(() => {
+    return () => {
+      // This cleanup function runs when component unmounts
+      console.log(
+        'VideoConsultation unmounting - resetting prescription state',
+      );
+      resetPrescription();
+    };
+  }, []); // Empty dependency array means this only runs on mount/unmount
+
+  // Optional: Log when writePrescription changes
+  useEffect(() => {
+    console.log('Prescription status:', writePrescription);
+  }, [writePrescription]);
+
   const handleGetPrescription = () => {
     setModalVisible(false);
-    console.log('User wants to get the prescription');
-    navigation.navigate('PrescriptionScreen');
+    setVisible(true);
   };
 
   const handleClose = () => {
@@ -74,6 +92,11 @@ export function VideoConsultation({ navigation, route }) {
 
   const handleEndCall = () => {
     setModalVisible(true);
+    if (writePrescription) {
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
+    }
   };
 
   const toggleMute = () => {
@@ -83,16 +106,7 @@ export function VideoConsultation({ navigation, route }) {
   const toggleSpeaker = () => {
     setIsSpeakerOn(!isSpeakerOn);
   };
-
-  const toggleCamera = () => {
-    setIsCameraOn(!isCameraOn);
-  };
-
-  const switchCamera = () => {
-    console.log('Switch camera');
-  };
-
-  const showPrescriptionModal = () => {
+  const showprescriptionModal = () => {
     setVisible(true);
   };
 
@@ -112,7 +126,6 @@ export function VideoConsultation({ navigation, route }) {
       >
         {/* Dark Overlay */}
         <View style={styles.overlay} />
-
         {/* Content */}
         <SafeAreaView style={styles.safeArea}>
           {/* Doctor Info at Top */}
@@ -125,17 +138,6 @@ export function VideoConsultation({ navigation, route }) {
             </Text>
           </View>
 
-          {/* Small Doctor Preview (Picture-in-Picture) - Only when connected */}
-          {callStatus === 'Connected' && (
-            <View style={styles.pipContainer}>
-              <Image
-                source={patientInfo.avatar}
-                style={styles.pipImage}
-                resizeMode="cover"
-              />
-            </View>
-          )}
-
           {/* Call Controls at Bottom */}
           <View style={styles.controlsContainer}>
             <TouchableOpacity
@@ -143,7 +145,7 @@ export function VideoConsultation({ navigation, route }) {
                 styles.controlButton,
                 { backgroundColor: colors.primary },
               ]}
-              onPress={showPrescriptionModal}
+              onPress={showprescriptionModal}
             >
               <AntDesign name="plus" size={24} color={colors.white} />
             </TouchableOpacity>
@@ -157,7 +159,7 @@ export function VideoConsultation({ navigation, route }) {
             >
               <Ionicons
                 name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
-                size={24}
+                size={28}
                 color={colors.white}
               />
             </TouchableOpacity>
@@ -172,34 +174,7 @@ export function VideoConsultation({ navigation, route }) {
             >
               <Ionicons
                 name={isMuted ? 'mic-off' : 'mic'}
-                size={24}
-                color={colors.white}
-              />
-            </TouchableOpacity>
-
-            {/* Camera Toggle Button */}
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                !isCameraOn && styles.controlButtonActive,
-              ]}
-              onPress={toggleCamera}
-            >
-              <Ionicons
-                name={isCameraOn ? 'videocam' : 'videocam-off'}
-                size={24}
-                color={colors.white}
-              />
-            </TouchableOpacity>
-
-            {/* Switch Camera Button */}
-            <TouchableOpacity
-              style={styles.controlButton}
-              onPress={switchCamera}
-            >
-              <MaterialCommunityIcons
-                name="camera-flip"
-                size={24}
+                size={28}
                 color={colors.white}
               />
             </TouchableOpacity>
@@ -213,11 +188,11 @@ export function VideoConsultation({ navigation, route }) {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-
         <ConsultationEndedModal
           visible={modalVisible}
           onClose={handleClose}
           onGetPrescription={handleGetPrescription}
+          writePrescription={writePrescription}
         />
         <PrescriptionBottomSheet
           visible={visible}
@@ -227,3 +202,7 @@ export function VideoConsultation({ navigation, route }) {
     </View>
   );
 }
+
+import { styles } from './style';
+import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
+import usePrescriptionStore from '@store/usePrescriptionStore';

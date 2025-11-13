@@ -18,15 +18,17 @@ import { styles } from './style';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import parsePhoneNumberFromString from 'libphonenumber-js';
+import { useAuthStore } from '@store';
 
 export function SignInScreen({ navigation }) {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [phoneError, setPhoneError] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage] = useState('');
   const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [countryCode, setCountryCode] = useState('PK');
+  const { login } = useAuthStore();
 
   const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
   const formattedPhone = phoneNumber
@@ -36,20 +38,23 @@ export function SignInScreen({ navigation }) {
   const handleSignIn = () => {
     let valid = true;
 
-    // Phone validation
-    // if (!phone.trim() || !isPhoneValid) {
-    //   setPhoneError('Invalid phone number');
-    //   valid = false;
-    // } else setPhoneError('');
+    if (!phone.trim() || !isPhoneValid) {
+      setPhoneError('Invalid phone number');
+      valid = false;
+    } else setPhoneError('');
 
-    // Password validation
-    // if (!password.trim()) {
-    //   setPasswordError('Password is required');
-    //   valid = false;
-    // } else setPasswordError('');
+    if (!password.trim()) {
+      setPasswordError('Password is required');
+      valid = false;
+    } else setPasswordError('');
 
-    // Final navigation
     if (valid) {
+      const User = { phone: formattedPhone, password: password };
+      const fakeToken = 'abc123';
+
+      login(User, fakeToken);
+
+      // ✅ Navigate to home screen
       navigation.navigate('Main', { screen: 'Home' });
     }
   };

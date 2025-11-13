@@ -6,7 +6,7 @@ import { styles } from './style';
 
 interface MessageListProps {
   messages: any;
-  scrollRef: React.RefObject<ScrollView>;
+  scrollRef: React.RefObject<ScrollView | null>;
   handleServicePress: (service: Service) => void;
 }
 

@@ -12,12 +12,11 @@ interface Consultation {
   date: string;
   time: string;
   duration: string;
-  type: 'chat' | 'video';
+  type: 'chat' | 'video' | 'audio';
   amount: string;
   gender: string;
   age: string;
   status: string;
-  patientId: string;
 }
 
 interface RecentConsultationsProps {

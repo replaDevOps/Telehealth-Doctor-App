@@ -8,11 +8,11 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import { colors } from '../../styles/colors'; // Adjust path as needed
-
+import { colors } from '../../styles/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
+import usePrescriptionStore from '../../store/usePrescriptionStore';
+import { MedicationCard } from './MedicationCard';
 interface Medication {
   id: number;
   name: string;
@@ -22,9 +22,6 @@ interface Medication {
   expanded?: boolean;
 }
 
-/* ------------------------------------------------------------------ */
-/*                     PrescriptionBottomSheet                       */
-/* ------------------------------------------------------------------ */
 const PrescriptionBottomSheet = ({
   visible,
   onClose,
@@ -32,6 +29,14 @@ const PrescriptionBottomSheet = ({
   visible: boolean;
   onClose: () => void;
 }) => {
+  // Get the action from store
+  const setWritePrescription = usePrescriptionStore(
+    state => state.setWritePrescription,
+  );
+  const setPrescriptionData = usePrescriptionStore(
+    state => state.setPrescriptionData,
+  );
+
   const [diagnosisExpanded, setDiagnosisExpanded] = useState(false);
   const [treatmentExpanded, setTreatmentExpanded] = useState(false);
 
@@ -84,6 +89,25 @@ const PrescriptionBottomSheet = ({
     );
   };
 
+  const handleSendPrescription = () => {
+    console.log('Prescription sent!');
+
+    // Set the state to true in Zustand store
+    setWritePrescription(true);
+
+    // Optionally save the prescription data
+    const prescriptionData = {
+      diagnosisSummary,
+      treatmentName,
+      treatmentNotes,
+      medications: medications.filter(m => m.name.trim() !== ''),
+      timestamp: new Date().toISOString(),
+    };
+    setPrescriptionData(prescriptionData);
+
+    onClose();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -93,13 +117,9 @@ const PrescriptionBottomSheet = ({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.bottomSheet}>
-          {/* ---------- Header ---------- */}
-
+          {/* Header */}
           <View style={styles.header}>
             <View />
-
-            {/* <Text style={styles.headerTitle}>Prescription</Text>
-             */}
             <View
               style={{
                 alignItems: 'center',
@@ -120,7 +140,7 @@ const PrescriptionBottomSheet = ({
             style={styles.content}
             showsVerticalScrollIndicator={false}
           >
-            {/* ---------- Patient Info ---------- */}
+            {/* Patient Info */}
             <Text style={styles.sectionTitle1}>Patient Information</Text>
             <View style={styles.section1}>
               <View style={styles.rowBetween}>
@@ -141,7 +161,7 @@ const PrescriptionBottomSheet = ({
               </View>
             </View>
 
-            {/* ---------- Diagnosis (collapsible) ---------- */}
+            {/* Diagnosis (collapsible) */}
             <TouchableOpacity
               style={styles.collapsibleHeader}
               onPress={() => setDiagnosisExpanded(!diagnosisExpanded)}
@@ -173,7 +193,7 @@ const PrescriptionBottomSheet = ({
               </View>
             )}
 
-            {/* ---------- Treatment Details (collapsible) ---------- */}
+            {/* Treatment Details (collapsible) */}
             <TouchableOpacity
               style={styles.collapsibleHeader}
               onPress={() => setTreatmentExpanded(!treatmentExpanded)}
@@ -211,7 +231,7 @@ const PrescriptionBottomSheet = ({
               </View>
             )}
 
-            {/* ---------- Medications ---------- */}
+            {/* Medications */}
             <View style={styles.section}>
               <View style={styles.medicationHeader}>
                 <Text style={styles.sectionTitle}>Medication</Text>
@@ -236,12 +256,15 @@ const PrescriptionBottomSheet = ({
               ))}
             </View>
 
-            {/* ---------- Buttons ---------- */}
+            {/* Buttons */}
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.submitButton}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSendPrescription}
+              >
                 <Text style={styles.submitButtonText}>Send Prescription</Text>
               </TouchableOpacity>
             </View>
@@ -252,106 +275,7 @@ const PrescriptionBottomSheet = ({
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*                     Medication Card Component                     */
-/* ------------------------------------------------------------------ */
-interface MedicationCardProps {
-  medication: Medication;
-  index: number;
-  onToggle: (id: number) => void;
-  onRemove: (id: number) => void;
-  onUpdate: (
-    id: number,
-    field: keyof Omit<Medication, 'id' | 'expanded'>,
-    value: string,
-  ) => void;
-  medicationsLength: number;
-}
-
-const MedicationCard: React.FC<MedicationCardProps> = ({
-  medication,
-  index,
-  onToggle,
-  onRemove,
-  onUpdate,
-  medicationsLength,
-}) => {
-  return (
-    <View style={styles.medicationCard}>
-      {/* Header */}
-      <TouchableOpacity
-        style={styles.medicationCardHeader}
-        onPress={() => onToggle(medication.id)}
-      >
-        <Text style={styles.medicationTitle}>Medicine {index + 1}</Text>
-        <View style={styles.rightIcons}>
-          <Text style={styles.toggleIcon}>
-            {medication.expanded ? (
-              <Ionicons name="chevron-up" size={24} color="black" />
-            ) : (
-              <Ionicons name="chevron-down" size={24} color="black" />
-            )}
-          </Text>
-          {medicationsLength > 1 && (
-            <TouchableOpacity
-              style={{
-                padding: 2,
-                backgroundColor: 'red',
-                borderRadius: '50%',
-              }}
-              onPress={e => {
-                e.stopPropagation();
-                onRemove(medication.id);
-              }}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="close-outline" size={18} color="white" />
-            </TouchableOpacity>
-          )}
-        </View>
-      </TouchableOpacity>
-
-      {/* Body */}
-      {medication.expanded && (
-        <>
-          <CustomTextInput
-            label="Medicine Name"
-            placeholder="e.g Amoxicilin 500mg"
-            value={medication.name}
-            onChangeText={text => onUpdate(medication.id, 'name', text)}
-          />
-
-          <CustomTextInput
-            label="Dosage"
-            placeholder="e.g 1 capsule twice daily"
-            value={medication.dosage}
-            onChangeText={text => onUpdate(medication.id, 'dosage', text)}
-          />
-
-          <CustomTextInput
-            label="Duration"
-            placeholder="e.g 5 days"
-            value={medication.duration}
-            onChangeText={text => onUpdate(medication.id, 'duration', text)}
-          />
-
-          <CustomTextInput
-            label="Instructions"
-            placeholder="Any additional instructions..."
-            value={medication.instructions}
-            onChangeText={text => onUpdate(medication.id, 'instructions', text)}
-            multiline
-            numberOfLines={2}
-            maxLength={10}
-          />
-          <Text style={styles.charCount}>
-            {medication.instructions.length}/10
-          </Text>
-        </>
-      )}
-    </View>
-  );
-};
+// MedicationCard component remains the same...
 
 /* ------------------------------------------------------------------ */
 /*                             Styles                                 */
@@ -367,6 +291,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     height: '90%',
+    paddingBottom: 30,
   },
   header: {
     flexDirection: 'row',
@@ -449,7 +374,7 @@ const styles = StyleSheet.create({
   },
   addButton: { fontSize: 28, color: 'white', fontWeight: '300' },
   medicationCard: {
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.gray,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingTop: 12,

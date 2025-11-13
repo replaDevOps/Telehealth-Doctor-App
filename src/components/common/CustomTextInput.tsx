@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     paddingVertical: mvs(12),
     fontSize: mvs(14),
     color: colors.black,
+    borderRadius: 8,
   },
   iconContainer: {
     paddingHorizontal: mvs(10),

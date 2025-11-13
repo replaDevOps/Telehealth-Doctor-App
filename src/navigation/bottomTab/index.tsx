@@ -39,7 +39,6 @@ export default function CustomTabBar() {
 
           const showTabScreens = [
             'HomeScreen',
-            'ClinicScreen',
             'HistoryScreen',
             'SettingScreen',
           ];

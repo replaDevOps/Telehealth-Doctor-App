@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, Platform } from 'react-native';
-import { KeyboardAvoidScrollview } from '../../../components/common/keyboard-avoid-scrollview';
+import { View, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import UserProfile from '../../../components/common/UserProfile';
 import { Header2 } from '../../../components/common/Header2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../../styles/colors';
 
-import {
-  ProfileSvg,
-  FAQsSvg,
-  RefundSvg,
-  LoyaltyPSvg,
-  LogoutSvg,
-} from '@assets/icons';
-import { Share } from 'react-native'; // for sharing
+import { ProfileSvg, LogoutSvg } from '@assets/icons';
 import style from './style';
 import { mvs } from '@config/metrices';
+import { InfoSection } from '@components/common';
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
   const [profileImage, setProfileImage] = useState<string>('');
@@ -24,21 +17,6 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
   // =============== Handlers ===============
   const handleImageSelected = (uri: string) => {
     setProfileImage(uri);
-  };
-
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message:
-          Platform.OS === 'android'
-            ? 'Check out this awesome app! https://your-app-link.com'
-            : 'Check out this awesome app!',
-        url: 'https://your-app-link.com', // iOS
-        title: 'Share App',
-      });
-    } catch (error) {
-      Alert.alert('Error', 'Unable to share at the moment');
-    }
   };
 
   const handleLogout = () => {
@@ -60,10 +38,6 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
       ],
       { cancelable: true },
     );
-  };
-
-  const handleSaveAndContinue = () => {
-    Alert.alert('Success', 'Settings saved successfully!');
   };
 
   // =============== Menu Data ===============
@@ -112,22 +86,47 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
     );
   };
 
+  const personalData = [
+    { label: 'Full Name:', value: 'Ali Abdul Aziz' },
+    { label: 'Phone Number:', value: '+966 324 464 232' },
+    { label: 'Email Address:', value: 'abc@gmail.com' },
+    { label: 'Specialization:', value: 'MBBS' },
+    { label: 'Year of Experience:', value: '10 Years' },
+  ];
+  const workingHoursData = [
+    { label: 'Monday:', value: '9:00 PM - 6:00 PM' },
+    { label: 'Tuesday:', value: '9:00 PM - 6:00 PM' },
+    { label: 'Wednesday:', value: '9:00 PM - 6:00 PM' },
+    { label: 'Thursday:', value: '9:00 PM - 6:00 PM' },
+    { label: 'Friday:', value: '9:00 PM - 6:00 PM' },
+    { label: 'Saturday:', value: 'Day Off', isDayOff: true },
+    { label: 'Sunday:', value: 'Day Off', isDayOff: true },
+  ];
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <Header2 title="Settings" />
 
-      <View style={style.container}>
-        {/* User Profile Section */}
-        <UserProfile
-          profileImage={profileImage}
-          onImageSelected={handleImageSelected}
-        />
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: mvs(30) }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={style.container}>
+          {/* User Profile Section */}
+          <UserProfile
+            profileImage={profileImage}
+            onImageSelected={handleImageSelected}
+          />
 
-        <View style={{ marginVertical: mvs(30) }} />
+          <View style={{ marginVertical: mvs(10) }} />
 
-        {/* Menu Items */}
-        {menuData.map(renderMenuItem)}
-      </View>
+          <InfoSection title="Personal Information" data={personalData} />
+          <InfoSection title="Working Hour" data={workingHoursData} />
+
+          {/* Menu Items */}
+          {menuData.map(renderMenuItem)}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

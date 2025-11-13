@@ -1,4 +1,3 @@
-/* HistoryScreen.tsx */
 import React, { useState } from 'react';
 import { View, TextInput, ScrollView, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +8,7 @@ import { Header2 } from '@components/common/Header2';
 import { CONSULTATION_REQUESTS } from '@constants';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
 
-export function HistoryScreen({ navigation }: { navigation: any }) {
+export function HistoryScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -30,9 +29,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
         />
       </View>
 
-      {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Consultations */}
         <RecentConsultations
           consultations={CONSULTATION_REQUESTS}
           onViewPrescription={id => {
@@ -41,7 +38,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
           }}
           onViewChat={id => {
             console.log('View chat:', id);
-            navigation.navigate('Chat', { id });
+            navigation.navigate('ChatScreen', { id, fromHistory: true });
           }}
         />
       </ScrollView>

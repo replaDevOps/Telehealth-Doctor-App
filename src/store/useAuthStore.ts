@@ -3,12 +3,9 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'patient' | 'patient';
-  avatar?: string;
-  phone?: string;
+
+  phone: string;
+  password: string;
 }
 
 interface AuthState {
@@ -33,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
 
       login: (user, token) =>
-        set({
+        set({ 
           user,
           token,
           isAuthenticated: true,

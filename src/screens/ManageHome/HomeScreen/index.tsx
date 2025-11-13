@@ -4,7 +4,7 @@ import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
-import { doctor, patient, RecommandImage } from '@assets/images';
+import { doctor, patient } from '@assets/images';
 import { ConsultationRequest } from '@components/molecules';
 import HomeHeader from '@components/molecules/HomeHeadder';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
@@ -18,10 +18,8 @@ export const HomeScreen = ({ navigation }) => {
     ConsultationRequest[]
   >([]);
 
-  // Simulate incoming consultation requests when patient is active
   useEffect(() => {
     if (isActive) {
-      // Simulate incoming request after 3 seconds
       const timer = setTimeout(() => {
         const mockRequests: ConsultationRequest[] = [
           {
@@ -60,7 +58,6 @@ export const HomeScreen = ({ navigation }) => {
 
       return () => clearTimeout(timer);
     } else {
-      // Close modal and clear requests when patient goes offline
       setShowRequestModal(false);
       setConsultationRequests([]);
     }
@@ -70,15 +67,12 @@ export const HomeScreen = ({ navigation }) => {
     console.log('Accepting request:', requestId);
     setShowRequestModal(false);
 
-    // Remove the accepted request from the list
     setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
 
-    // If no more requests, close modal
     if (consultationRequests.length === 1) {
       setShowRequestModal(false);
     }
 
-    // Navigate to consultation screen
     const request = consultationRequests.find(req => req.id === requestId);
     if (request) {
       switch (request.consultationType) {
@@ -119,10 +113,8 @@ export const HomeScreen = ({ navigation }) => {
   const handleDeclineRequest = (requestId: string) => {
     console.log('Declining request:', requestId);
 
-    // Remove the declined request from the list
     setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
 
-    // If no more requests, close modal
     if (consultationRequests.length === 1) {
       setShowRequestModal(false);
     }
@@ -131,11 +123,7 @@ export const HomeScreen = ({ navigation }) => {
   const handleToggleActive = (value: boolean) => {
     setIsActive(value);
 
-    // Optionally call API to update patient availability
-    // updateDoctorAvailability(value);
-
     if (!value) {
-      // Close modal when going offline
       setShowRequestModal(false);
       setConsultationRequests([]);
     }
@@ -157,10 +145,8 @@ export const HomeScreen = ({ navigation }) => {
       />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Stats Row */}
         <StatsRow totalConsultations={142} thisMonth={28} />
 
-        {/* Recent Consultations */}
         <RecentConsultations
           consultations={CONSULTATION_REQUESTS}
           onViewAll={() => navigation.navigate('History')}
@@ -185,7 +171,6 @@ export const HomeScreen = ({ navigation }) => {
         />
       </ScrollView>
 
-      {/* Consultation Request Modal */}
       <ConsultationRequestModal
         visible={showRequestModal && consultationRequests.length > 0}
         requests={consultationRequests}

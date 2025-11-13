@@ -26,6 +26,7 @@ import {
 import { Message, Service } from '../../../types/chat.types';
 import { AIChatHistoryBottomSheet } from '@components/molecules/AIChatHistoryBottomSheet';
 import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
+import usePrescriptionStore from '@store/usePrescriptionStore';
 
 // ---------- Main Component ----------
 export function ChatScreen({ navigation, route }) {
@@ -53,6 +54,30 @@ export function ChatScreen({ navigation, route }) {
   const scrollRef = useRef<ScrollView>(null);
   const openPrescription = () => setVisible(true);
   const closePrescription = () => setVisible(false);
+
+  // Get prescription state and reset function from Zustand
+  const writePrescription = usePrescriptionStore(
+    state => state.writePrescription,
+  );
+  const resetPrescription = usePrescriptionStore(
+    state => state.resetPrescription,
+  );
+
+  // ✅ Reset prescription state when component unmounts
+  useEffect(() => {
+    return () => {
+      // This cleanup function runs when component unmounts
+      console.log(
+        'VideoConsultation unmounting - resetting prescription state',
+      );
+      resetPrescription();
+    };
+  }, []); // Empty dependency array means this only runs on mount/unmount
+
+  // Optional: Log when writePrescription changes
+  useEffect(() => {
+    console.log('Prescription status:', writePrescription);
+  }, [writePrescription]);
 
   // ---------- Memoized Values ----------
   const initialMessages = useMemo(
@@ -181,11 +206,6 @@ export function ChatScreen({ navigation, route }) {
     }
   }, [messages.length]);
 
-  // ---------- Handlers ----------
-  const handleImagePick = useCallback(() => {
-    // TODO: Implement image picker
-  }, []);
-
   const handleSend = useCallback(() => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage) return;
@@ -220,14 +240,20 @@ export function ChatScreen({ navigation, route }) {
     navigation.navigate('CheckoutScreen');
   }, [navigation]);
 
-  const handleEndConsultation = useCallback(() => {
+  const handleEndConsultation = () => {
     setIsConsultationActive(false);
     setModalVisible(true);
-  }, []);
+    if (writePrescription) {
+      setTimeout(() => {
+        navigation.goBack();
+        console.log('first');
+      }, 2000);
+    }
+  };
 
   const handleGetPrescription = useCallback(() => {
     setModalVisible(false);
-    navigation.navigate('PrescriptionScreen');
+    setVisible(true);
   }, [navigation]);
 
   const handleCloseModal = useCallback(() => {
@@ -244,10 +270,6 @@ export function ChatScreen({ navigation, route }) {
     console.log('aiChatHistory length:', aiChatHistory.length);
     setAiHistoryVisible(true);
   }, [aiChatHistory]);
-
-  const handleCloseAIHistory = useCallback(() => {
-    setAiHistoryVisible(false);
-  }, []);
 
   // ---------- Main Render ----------
   return (
@@ -314,7 +336,7 @@ export function ChatScreen({ navigation, route }) {
         visible={modalVisible}
         onClose={handleCloseModal}
         onGetPrescription={handleGetPrescription}
-        writePrescription={true}
+        writePrescription={writePrescription}
       />
 
       <AIChatHistoryBottomSheet

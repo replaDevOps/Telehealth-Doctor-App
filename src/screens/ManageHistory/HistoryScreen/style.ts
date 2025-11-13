@@ -72,6 +72,7 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    marginVertical:10,
     padding: 16,
   },
   card: {

@@ -1,19 +1,5 @@
-export * from './ClinicHeader';
-export * from './ClinicInfo';
-export * from './ClinicListItem';
-export * from './RecommendedClinics';
-export * from './ServiceCard';
-export * from './TabBar';
-export * from './FilterBottomSheet';
 export * from './ServiceDetailBottomSheet';
-export * from './Reviews';
-export * from './AboutCard';
-export * from './DeviceDetailBottomSheet';
-export * from './ConsultDoctorBottomSheet';
 export * from './EndSectionModal';
-export * from './NoResponseModal';
-export * from './RatingBottomSheet';
-export * from './SuccessMessageModal';
 export * from './HomeSectionTitle';
 export * from './StatsCard';
 export * from './StatsRow';
@@ -21,3 +7,5 @@ export * from './Organisms/RecentConsultations';
 export * from './Organisms/ConsultationRequestModal';
 export * from './ConsultationRequestCard';
 export * from './PrescriptionBottomSheet';
+export * from './MedicationCard';
+
