@@ -200,6 +200,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -5,
     right: 0,
+    left: 0,
+    zIndex: 1,
     width: mvs(50),
     height: 15,
     backgroundColor: '#34C759',

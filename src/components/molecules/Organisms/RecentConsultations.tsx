@@ -8,7 +8,7 @@ interface Consultation {
   id: string;
   patientName: string;
   patientImage?: any;
-  sevviceName: string;
+  ServiceName: string;
   date: string;
   time: string;
   duration: string;
@@ -46,7 +46,7 @@ const RecentConsultations = ({
           patientId={consultation.id}
           patientName={consultation.patientName}
           patientImage={consultation.patientImage}
-          sevviceName={consultation.sevviceName}
+          ServiceName={consultation.ServiceName}
           date={consultation.date}
           time={consultation.time}
           duration={consultation.duration}

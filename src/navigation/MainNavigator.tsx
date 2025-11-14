@@ -3,13 +3,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomTabBar from './bottomTab';
 import { HomeScreen } from '@screens';
 import { HistoryScreen } from '@screens/ManageHistory';
-import { ChangePassword, SettingScreen } from '@screens/ManageSetting';
+import {
+  ChangePassword,
+  Settings,
+  SettingScreen,
+} from '@screens/ManageSetting';
 import {
   AudioConsultation,
   ChatScreen,
   PrescriptionScreen,
   VideoConsultation,
 } from '@screens/Comman';
+import SignatureScreen from '@screens/ManageSetting/Signature';
 
 export type MainStackParamList = {
   Home: undefined;
@@ -59,6 +64,8 @@ export const SettingNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SettingScreen" component={SettingScreen} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
+      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="SignatureScreen" component={SignatureScreen} />
     </Stack.Navigator>
   );
 };

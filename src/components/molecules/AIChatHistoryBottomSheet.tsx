@@ -22,11 +22,11 @@ const { height } = Dimensions.get('window');
 
 export const AIChatHistoryBottomSheet: React.FC<
   AIChatHistoryBottomSheetProps
-> = ({ visible, onClose, handleServicePress, patientInfo }) => {
+> = ({ visible, onClose, handleServicePress }) => {
   const scrollRef = useRef<ScrollView>(null);
 
   // FIX: Call the function to get the actual messages array
-  const messages = getAIChatHistory(patientInfo);
+  const messages = getAIChatHistory();
 
   // Debug: Check if messages are loading
   useEffect(() => {

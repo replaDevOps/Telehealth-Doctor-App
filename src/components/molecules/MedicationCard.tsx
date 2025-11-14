@@ -101,12 +101,10 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({
             onChangeText={text => onUpdate(medication.id, 'instructions', text)}
             multiline
             numberOfLines={2}
-            maxLength={10}
-            style={{ backgroundColor: colors.white }}
+            maxLength={150}
+            showCharCount={true}
+            style={{ backgroundColor: colors.white, borderRadius: 8 }}
           />
-          <Text style={styles.charCount}>
-            {medication.instructions.length}/10
-          </Text>
         </>
       )}
     </View>

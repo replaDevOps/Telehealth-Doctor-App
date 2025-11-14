@@ -21,3 +21,5 @@ export { default as LoyaltyPSvg } from './LoyaltyPSvg';
 export { default as LogoutSvg } from './LogoutSvg';
 export { default as TotalConsultationSvg } from './TotalConsultationSvg';
 export { default as OffSvg } from './OffSvg';
+export { default as SignatureSvg } from './SignatureSvg';
+export { default as PasswordSvg } from './PasswordSvg';

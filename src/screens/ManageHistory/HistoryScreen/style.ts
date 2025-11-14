@@ -4,7 +4,7 @@ import { colors } from '../../../styles/colors';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: colors.white,
   },
   header: {
     flexDirection: 'row',
@@ -74,6 +74,16 @@ export const styles = StyleSheet.create({
   content: {
     marginVertical:10,
     padding: 16,
+  },
+  noResultsContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noResultsText: {
+    fontSize: 16,
+    color: colors.secondaryText,
+    textAlign: 'center',
   },
   card: {
     backgroundColor: colors.white,

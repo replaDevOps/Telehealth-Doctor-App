@@ -1,18 +1,18 @@
 import { CustomTextInput } from '@components/common/CustomTextInput';
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Modal,
-} from 'react-native';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 import { colors } from '../../styles/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import usePrescriptionStore from '../../store/usePrescriptionStore';
 import { MedicationCard } from './MedicationCard';
+import { InfoSection } from '@components/common';
+import { PATIENT_DATA } from '@constants';
+
 interface Medication {
   id: number;
   name: string;
@@ -37,6 +37,11 @@ const PrescriptionBottomSheet = ({
     state => state.setPrescriptionData,
   );
 
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // Use only one snap point to prevent expanding
+  const snapPoints = useMemo(() => ['90%'], []);
+
   const [diagnosisExpanded, setDiagnosisExpanded] = useState(false);
   const [treatmentExpanded, setTreatmentExpanded] = useState(false);
 
@@ -54,6 +59,33 @@ const PrescriptionBottomSheet = ({
       expanded: true,
     },
   ]);
+
+  const handleClose = () => {
+    bottomSheetRef.current?.close();
+  };
+
+  // Handle bottom sheet changes
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      if (index === -1) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  // Custom backdrop component
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+      />
+    ),
+    [],
+  );
 
   const addMedication = () => {
     setMedications([
@@ -105,210 +137,182 @@ const PrescriptionBottomSheet = ({
     };
     setPrescriptionData(prescriptionData);
 
-    onClose();
+    handleClose();
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
+    <BottomSheet
+      ref={bottomSheetRef}
+      index={visible ? 0 : -1}
+      snapPoints={snapPoints}
+      onChange={handleSheetChanges}
+      backdropComponent={renderBackdrop}
+      enablePanDownToClose={true}
+      enableOverDrag={true}
+      enableContentPanningGesture={false} // Disable scroll to expand
+      backgroundStyle={styles.background}
+      handleIndicatorStyle={styles.handleIndicator}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.bottomSheet}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View />
-            <View
-              style={{
-                alignItems: 'center',
-                width: 50,
-                height: 5,
-                backgroundColor: 'black',
-                borderRadius: 10,
-              }}
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+          <Ionicons name="close-outline" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.headerTitle}>Prescription</Text>
+
+      <BottomSheetScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Your existing content remains the same */}
+        {/* Patient Info */}
+        <InfoSection title="Patient Information" data={PATIENT_DATA} />
+
+        {/* Diagnosis (collapsible) */}
+        <TouchableOpacity
+          style={styles.collapsibleHeader}
+          onPress={() => setDiagnosisExpanded(!diagnosisExpanded)}
+        >
+          <Text style={styles.sectionTitle}>Diagnosis</Text>
+          <Text style={styles.expandIcon}>
+            {diagnosisExpanded ? (
+              <Ionicons name="chevron-up" size={24} color="black" />
+            ) : (
+              <Ionicons name="chevron-down" size={24} color="black" />
+            )}
+          </Text>
+        </TouchableOpacity>
+
+        {diagnosisExpanded && (
+          <View style={styles.section}>
+            <CustomTextInput
+              label="Diagnosis Summary"
+              placeholder="Write summary here..."
+              value={diagnosisSummary}
+              onChangeText={setDiagnosisSummary}
+              multiline={true}
+              numberOfLines={2}
+              maxLength={150}
+              showCharCount={true}
             />
-            <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close-outline" size={24} color="black" />
+          </View>
+        )}
+
+        {/* Treatment Details (collapsible) */}
+        <TouchableOpacity
+          style={styles.collapsibleHeader}
+          onPress={() => setTreatmentExpanded(!treatmentExpanded)}
+        >
+          <Text style={styles.sectionTitle}>Treatment Details</Text>
+          <Text style={styles.expandIcon}>
+            {treatmentExpanded ? (
+              <Ionicons name="chevron-up" size={24} color="black" />
+            ) : (
+              <Ionicons name="chevron-down" size={24} color="black" />
+            )}
+          </Text>
+        </TouchableOpacity>
+
+        {treatmentExpanded && (
+          <View style={styles.section}>
+            <CustomTextInput
+              label="Treatment Name"
+              placeholder="e.g Root Canal Therapy"
+              value={treatmentName}
+              onChangeText={setTreatmentName}
+            />
+            <CustomTextInput
+              label="Treatment Notes"
+              placeholder="Write treatment notes here..."
+              value={treatmentNotes}
+              onChangeText={setTreatmentNotes}
+              multiline
+              numberOfLines={2}
+              maxLength={150}
+              showCharCount={true}
+            />
+          </View>
+        )}
+
+        {/* Medications */}
+        <View style={styles.section}>
+          <View style={styles.medicationHeader}>
+            <Text style={styles.sectionTitle}>Medication</Text>
+            <TouchableOpacity
+              onPress={addMedication}
+              style={styles.addBtttonContainer}
+            >
+              <AntDesign name="plus" color={colors.white} size={18} />
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.headerTitle}>Prescription</Text>
-
-          <ScrollView
-            style={styles.content}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Patient Info */}
-            <Text style={styles.sectionTitle1}>Patient Information</Text>
-            <View style={styles.section1}>
-              <View style={styles.rowBetween}>
-                <Text style={styles.label1}>Patient Name:</Text>
-                <Text style={styles.value}>Ali Abdul Aziz</Text>
-              </View>
-              <View style={styles.rowBetween}>
-                <Text style={styles.label1}>Age:</Text>
-                <Text style={styles.value}>20</Text>
-              </View>
-              <View style={styles.rowBetween}>
-                <Text style={styles.label1}>Gender:</Text>
-                <Text style={styles.value}>Male</Text>
-              </View>
-              <View style={styles.rowBetween}>
-                <Text style={styles.label1}>Date:</Text>
-                <Text style={styles.value}>02/02/2025</Text>
-              </View>
-            </View>
-
-            {/* Diagnosis (collapsible) */}
-            <TouchableOpacity
-              style={styles.collapsibleHeader}
-              onPress={() => setDiagnosisExpanded(!diagnosisExpanded)}
-            >
-              <Text style={styles.sectionTitle}>Diagnosis</Text>
-              <Text style={styles.expandIcon}>
-                {diagnosisExpanded ? (
-                  <Ionicons name="chevron-up" size={24} color="black" />
-                ) : (
-                  <Ionicons name="chevron-down" size={24} color="black" />
-                )}
-              </Text>
-            </TouchableOpacity>
-
-            {diagnosisExpanded && (
-              <View style={styles.section}>
-                <CustomTextInput
-                  label="Diagnosis Summary"
-                  placeholder="Write summary here..."
-                  value={diagnosisSummary}
-                  onChangeText={setDiagnosisSummary}
-                  multiline={true}
-                  numberOfLines={3}
-                  maxLength={100}
-                />
-                <Text style={styles.charCount}>
-                  {diagnosisSummary.length}/100
-                </Text>
-              </View>
-            )}
-
-            {/* Treatment Details (collapsible) */}
-            <TouchableOpacity
-              style={styles.collapsibleHeader}
-              onPress={() => setTreatmentExpanded(!treatmentExpanded)}
-            >
-              <Text style={styles.sectionTitle}>Treatment Details</Text>
-              <Text style={styles.expandIcon}>
-                {treatmentExpanded ? (
-                  <Ionicons name="chevron-up" size={24} color="black" />
-                ) : (
-                  <Ionicons name="chevron-down" size={24} color="black" />
-                )}
-              </Text>
-            </TouchableOpacity>
-
-            {treatmentExpanded && (
-              <View style={styles.section}>
-                <CustomTextInput
-                  label="Treatment Name"
-                  placeholder="e.g Root Canal Therapy"
-                  value={treatmentName}
-                  onChangeText={setTreatmentName}
-                />
-                <CustomTextInput
-                  label="Treatment Notes"
-                  placeholder="Write treatment notes here..."
-                  value={treatmentNotes}
-                  onChangeText={setTreatmentNotes}
-                  multiline
-                  numberOfLines={3}
-                  maxLength={100}
-                />
-                <Text style={styles.charCount}>
-                  {treatmentNotes.length}/100
-                </Text>
-              </View>
-            )}
-
-            {/* Medications */}
-            <View style={styles.section}>
-              <View style={styles.medicationHeader}>
-                <Text style={styles.sectionTitle}>Medication</Text>
-                <TouchableOpacity
-                  onPress={addMedication}
-                  style={styles.addBtttonContainer}
-                >
-                  <AntDesign name="plus" color={colors.white} size={18} />
-                </TouchableOpacity>
-              </View>
-
-              {medications.map((med, idx) => (
-                <MedicationCard
-                  key={med.id}
-                  medication={med}
-                  index={idx}
-                  onToggle={toggleMedication}
-                  onRemove={removeMedication}
-                  onUpdate={updateMedicationField}
-                  medicationsLength={medications.length}
-                />
-              ))}
-            </View>
-
-            {/* Buttons */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleSendPrescription}
-              >
-                <Text style={styles.submitButtonText}>Send Prescription</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+          {medications.map((med, idx) => (
+            <MedicationCard
+              key={med.id}
+              medication={med}
+              index={idx}
+              onToggle={toggleMedication}
+              onRemove={removeMedication}
+              onUpdate={updateMedicationField}
+              medicationsLength={medications.length}
+            />
+          ))}
         </View>
-      </View>
-    </Modal>
+
+        {/* Buttons */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSendPrescription}
+          >
+            <Text style={styles.submitButtonText}>Send Prescription</Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheetScrollView>
+    </BottomSheet>
   );
 };
 
-// MedicationCard component remains the same...
+// ... styles remain the same as previous solution
 
 /* ------------------------------------------------------------------ */
 /*                             Styles                                 */
 /* ------------------------------------------------------------------ */
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  bottomSheet: {
+  background: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: '90%',
-    paddingBottom: 30,
+  },
+  handleIndicator: {
+    backgroundColor: '#ccc',
+    width: 40,
+    height: 4,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
     paddingHorizontal: 16,
+    alignSelf: 'flex-end',
   },
-  closeButton: { fontSize: 24, color: '#333', width: 30 },
+  closeButton: {
+    paddingHorizontal: 4,
+  },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 19,
+    fontWeight: '700',
     color: '#333',
     alignSelf: 'center',
   },
-
-  content: { flex: 1, paddingHorizontal: 16 },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
 
   /* ---- Patient Info ---- */
   section1: {
@@ -358,7 +362,13 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 12,
   },
-  charCount: { fontSize: 11, color: '#999', textAlign: 'right', marginTop: 4 },
+  charCount: {
+    fontSize: 11,
+    color: '#999',
+    textAlign: 'right',
+    marginTop: 4,
+    marginRight: 5,
+  },
 
   /* ---- Medication ---- */
   medicationHeader: {
@@ -373,36 +383,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   addButton: { fontSize: 28, color: 'white', fontWeight: '300' },
-  medicationCard: {
-    backgroundColor: colors.gray,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  medicationCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  medicationTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-  },
-  rightIcons: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  toggleIcon: { fontSize: 16, color: '#666' },
-  removeButton: { fontSize: 24, color: '#EF4444' },
 
   /* ---- Buttons ---- */
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 24,
+    paddingBottom: 120,
     gap: 12,
   },
   cancelButton: {

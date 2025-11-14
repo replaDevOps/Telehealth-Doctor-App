@@ -4,12 +4,10 @@ import {
   doctor,
   onboarding1,
   onboarding2,
-  onboarding3,
   patient,
   pimples,
 } from '@assets/images';
 import {
-  DoctorInfo,
   ClinicInfo,
   Message,
   PatientInfo,
@@ -478,10 +476,22 @@ export function formatTime(seconds: number): string {
 
 // Add this function to your constants/appData.ts file
 
-export function getAIChatHistory(patientInfo: DoctorInfo): Message[] {
+export function getAIChatHistory(): Message[] {
   const timestamp = getCurrentTimestamp();
 
   return [
+    {
+      id: 'ai-10',
+      type: 'user',
+      text: "Hello !",
+      timestamp,
+    },
+    {
+      id: 'ai-11',
+      type: 'bot',
+      text: "Hello, how can I assist you today? ",
+      timestamp,
+    },
     {
       id: 'ai-1',
       type: 'user',
@@ -519,73 +529,13 @@ export function getAIChatHistory(patientInfo: DoctorInfo): Message[] {
         },
       ],
     },
-    {
-      id: 'ai-3',
-      type: 'bot',
-      text: "It seems like mild also irritation. Based on your clinic's services, I'd recommend:",
-      timestamp,
-      suggestions: [
-        {
-          id: 's3',
-          image: PipsImage,
-          type: 'Service',
-          serviceGroup: 'Functional (DO...)',
-          serviceName: 'Fractional CO2...',
-          price: '350 SAR',
-          duration: '45 min',
-          description: 'A multi-step facial treatment.',
-          procedure: 'Uses patented device.',
-        },
-        {
-          id: 's4',
-          image: PipsImage,
-          type: 'Device',
-          serviceGroup: 'Functional (DO...)',
-          serviceName: 'Fractional CO2...',
-          price: '600 SAR',
-          duration: '1 hr',
-          description: 'Advanced diagnostic.',
-          procedure: 'Device for skin analysis.',
-        },
-      ],
-    },
-    {
-      id: 'ai-4',
-      type: 'bot',
-      text: 'Suggest me devices related to my problem:',
-      timestamp,
-      suggestions: [
-        {
-          id: 's5',
-          image: PipsImage,
-          type: 'Service',
-          serviceGroup: 'Functional (DO...)',
-          serviceName: 'Fractional CO2...',
-          price: '350 SAR',
-          duration: '45 min',
-          description: 'A multi-step facial treatment.',
-          procedure: 'Uses patented device.',
-        },
-        {
-          id: 's6',
-          image: PipsImage,
-          type: 'Device',
-          serviceGroup: 'Functional (DO...)',
-          serviceName: 'Fractional CO2...',
-          price: '600 SAR',
-          duration: '1 hr',
-          description: 'Advanced diagnostic.',
-          procedure: 'Device for skin analysis.',
-        },
-      ],
-    },
   ];
 }
 
 // Update your existing getInitialMessages function to handle both scenarios better
 export function getInitialMessages(
   chatType: 'ai' | 'patient',
-  patientInfo: DoctorInfo,
+  patientInfo: PatientInfo,
 ): Message[] {
   const timestamp = getCurrentTimestamp();
 
@@ -664,7 +614,7 @@ export const CONSULTATION_REQUESTS = [
     id: '#8E8E8E',
     patientName: 'Patient 1',
     patientImage: patient,
-    sevviceName: 'Acne Treatment',
+    ServiceName: 'Acne Treatment',
     gender: 'Male',
     date: '8/30/2024 11:35 am',
     time: '30 mins',
@@ -678,7 +628,7 @@ export const CONSULTATION_REQUESTS = [
     id: '#E9EDF7',
     patientName: 'Patient 2',
     patientImage: patient,
-    sevviceName: 'Acne Treatment',
+    ServiceName: 'Acne Treatment',
     gender: 'Female',
     date: '8/30/2024 11:35 am',
     time: '21 mins',
@@ -692,7 +642,7 @@ export const CONSULTATION_REQUESTS = [
     id: '#090987',
     patientName: 'Patient 3',
     patientImage: patient,
-    sevviceName: 'Rutine Checkup',
+    ServiceName: 'Rutine Checkup',
     gender: 'Male',
     date: '3/31/2024 11:35 am',
     time: '18 mins',
@@ -702,4 +652,31 @@ export const CONSULTATION_REQUESTS = [
     age: '24',
     status: 'complete',
   },
+];
+
+
+
+export const PERSONAL_DATA = [
+  { label: 'Full Name:', value: 'Ali Abdul Aziz' },
+  { label: 'Phone Number:', value: '+966 324 464 232' },
+  { label: 'Email Address:', value: 'abc@gmail.com' },
+  { label: 'Specialization:', value: 'MBBS' },
+  { label: 'Year of Experience:', value: '10 Years' },
+];
+export const WORKING_HOURS_DATA = [
+  { label: 'Monday:', value: '9:00 PM - 6:00 PM' },
+  { label: 'Tuesday:', value: '9:00 PM - 6:00 PM' },
+  { label: 'Wednesday:', value: '9:00 PM - 6:00 PM' },
+  { label: 'Thursday:', value: '9:00 PM - 6:00 PM' },
+  { label: 'Friday:', value: '9:00 PM - 6:00 PM' },
+  { label: 'Saturday:', value: 'Day Off', isDayOff: true },
+  { label: 'Sunday:', value: 'Day Off', isDayOff: true },
+];
+
+
+export const PATIENT_DATA = [
+  { label: 'Patient Name:', value: 'Ali Abdul Aziz' },
+  { label: 'Age:', value: '39' },
+  { label: 'Gender:', value: 'Male' },
+  { label: 'Date:', value: '02/02/2023' },
 ];

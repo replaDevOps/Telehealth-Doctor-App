@@ -69,10 +69,6 @@ export const HomeScreen = ({ navigation }) => {
 
     setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
 
-    if (consultationRequests.length === 1) {
-      setShowRequestModal(false);
-    }
-
     const request = consultationRequests.find(req => req.id === requestId);
     if (request) {
       switch (request.consultationType) {

@@ -10,6 +10,7 @@ import { ProfileSvg, LogoutSvg } from '@assets/icons';
 import style from './style';
 import { mvs } from '@config/metrices';
 import { InfoSection } from '@components/common';
+import { PERSONAL_DATA, WORKING_HOURS_DATA } from '@constants';
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
   const [profileImage, setProfileImage] = useState<string>('');
@@ -45,7 +46,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
     {
       icon: ProfileSvg,
       title: 'Settings',
-      onPress: () => navigation.navigate('ProfileSetting'), // Fixed loop!
+      onPress: () => navigation.navigate('Settings'),
     },
     {
       icon: LogoutSvg,
@@ -67,9 +68,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
         style={[
           style.menuItem,
           {
-            // marginTop: isLogout ? 30 : 0,
             backgroundColor: isLogout ? colors.red : colors.gray,
-            // paddingVertical: isLogout ? 16 : 20,
           },
         ]}
         onPress={item.onPress}
@@ -86,26 +85,9 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
     );
   };
 
-  const personalData = [
-    { label: 'Full Name:', value: 'Ali Abdul Aziz' },
-    { label: 'Phone Number:', value: '+966 324 464 232' },
-    { label: 'Email Address:', value: 'abc@gmail.com' },
-    { label: 'Specialization:', value: 'MBBS' },
-    { label: 'Year of Experience:', value: '10 Years' },
-  ];
-  const workingHoursData = [
-    { label: 'Monday:', value: '9:00 PM - 6:00 PM' },
-    { label: 'Tuesday:', value: '9:00 PM - 6:00 PM' },
-    { label: 'Wednesday:', value: '9:00 PM - 6:00 PM' },
-    { label: 'Thursday:', value: '9:00 PM - 6:00 PM' },
-    { label: 'Friday:', value: '9:00 PM - 6:00 PM' },
-    { label: 'Saturday:', value: 'Day Off', isDayOff: true },
-    { label: 'Sunday:', value: 'Day Off', isDayOff: true },
-  ];
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <Header2 title="Settings" />
+      <Header2 title="Setting" />
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: mvs(30) }}
@@ -120,8 +102,8 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
 
           <View style={{ marginVertical: mvs(10) }} />
 
-          <InfoSection title="Personal Information" data={personalData} />
-          <InfoSection title="Working Hour" data={workingHoursData} />
+          <InfoSection title="Personal Information" data={PERSONAL_DATA} />
+          <InfoSection title="Working Hour" data={WORKING_HOURS_DATA} />
 
           {/* Menu Items */}
           {menuData.map(renderMenuItem)}
