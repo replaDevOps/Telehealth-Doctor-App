@@ -226,6 +226,7 @@ export function ChatScreen({ navigation, route }) {
   }, [message, showAvatar]);
 
   const handleServicePress = useCallback((service: Service) => {
+    setAiHistoryVisible(false); // Close AI history sheet if open
     setSelectedService(service);
     setServiceDetailVisible(true);
   }, []);
@@ -342,10 +343,7 @@ export function ChatScreen({ navigation, route }) {
       <AIChatHistoryBottomSheet
         visible={aiHistoryVisible}
         onClose={() => setAiHistoryVisible(false)}
-        handleServicePress={service => {
-          console.log('Service pressed:', service);
-        }}
-        patientInfo={patientInfo}
+        handleServicePress={handleServicePress}
       />
 
       <PrescriptionBottomSheet visible={visible} onClose={closePrescription} />

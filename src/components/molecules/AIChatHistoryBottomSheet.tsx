@@ -1,6 +1,6 @@
 import { Message } from '@components/chat';
 import { getAIChatHistory } from '@constants';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,6 @@ interface AIChatHistoryBottomSheetProps {
   visible: boolean;
   onClose: () => void;
   handleServicePress: (service: any) => void;
-  patientInfo: any; // Add this prop
 }
 
 const { height } = Dimensions.get('window');
@@ -27,14 +26,6 @@ export const AIChatHistoryBottomSheet: React.FC<
 
   // FIX: Call the function to get the actual messages array
   const messages = getAIChatHistory();
-
-  // Debug: Check if messages are loading
-  useEffect(() => {
-    if (visible) {
-      console.log('Messages data:', messages);
-      console.log('Messages length:', messages.length);
-    }
-  }, [visible, messages]);
 
   return (
     <Modal
@@ -54,14 +45,6 @@ export const AIChatHistoryBottomSheet: React.FC<
             </TouchableOpacity>
             <Text style={styles.title}>Chat With Vena AI</Text>
           </View>
-
-          {/* Debug Info */}
-          {messages.length === 0 && (
-            <View style={styles.debugContainer}>
-              <Text style={styles.debugText}>No messages to display</Text>
-              <Text style={styles.debugText}>Messages array is empty</Text>
-            </View>
-          )}
 
           {/* Messages */}
           <ScrollView
@@ -168,18 +151,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
-  },
-  debugContainer: {
-    backgroundColor: '#ffebee',
-    padding: 16,
-    margin: 16,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#f44336',
-  },
-  debugText: {
-    fontSize: 14,
-    color: '#c62828',
-    marginBottom: 4,
   },
 });
