@@ -94,4 +94,12 @@ export const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: mvs(20),
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  langOptionInner: {
+    flexDirection: 'row',
+    gap: mvs(10),
+  },
 });

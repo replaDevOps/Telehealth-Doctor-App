@@ -10,6 +10,7 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTranslation } from 'react-i18next';
 
 interface ConsultationCardProps {
   ServiceName?: string;
@@ -19,6 +20,8 @@ interface ConsultationCardProps {
   time: string;
   gender?: string;
   status: string;
+  unitOfDuration: string;
+  unitOfTime: string;
   age: string;
   duration: string;
   type: 'chat' | 'video' | 'audio';
@@ -39,15 +42,20 @@ const InfoBar = ({
   patientId,
   time,
   duration,
+  unitOfTime,
+  unitOfDuration,
   type,
 }: {
   patientId: string;
   time: string;
   duration: string;
+  unitOfTime: string;
+  unitOfDuration: string;
   type: 'chat' | 'video' | 'audio';
 }) => {
   const iconName =
     type === 'video' ? 'videocam' : type === 'chat' ? 'chatbubble' : 'mic';
+  const { t } = useTranslation();
 
   return (
     <View style={styles.infoBar}>
@@ -55,11 +63,15 @@ const InfoBar = ({
       <View style={styles.serviceType}>
         <View style={styles.timeContainer}>
           <Ionicons name="time-outline" size={16} color={colors.white} />
-          <Text style={styles.timeText}>{time}</Text>
+          <Text style={styles.timeText}>
+            {time} {t(unitOfTime)}
+          </Text>
         </View>
         <View style={styles.typeContainer}>
           <Ionicons name={iconName} size={14} color={colors.white} />
-          <Text style={styles.typeText}>{duration}</Text>
+          <Text style={styles.typeText}>
+            {duration} {t(unitOfDuration)}
+          </Text>
         </View>
       </View>
     </View>
@@ -80,6 +92,7 @@ const PatientInfo = ({
   amount: string;
 }) => {
   const initial = patientName.charAt(0).toUpperCase();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.patientSection}>
@@ -94,7 +107,8 @@ const PatientInfo = ({
         <View>
           <Text style={styles.patientName}>{patientName}</Text>
           <Text style={styles.patientGender}>
-            {gender}, {age} year{age !== '1' ? 's' : ''}
+            {t(gender?.toLowerCase()) || gender}, {age}{' '}
+            {age !== '1' ? t('years') : t('year')}
           </Text>
         </View>
       </View>
@@ -109,18 +123,21 @@ const ServiceStatusRow = ({
 }: {
   ServiceName: string;
   status: string;
-}) => (
-  <View style={styles.serviceStatusRow}>
-    <View style={styles.serviceStatusItem}>
-      <Text style={styles.label}>Service</Text>
-      <Text style={styles.value}>{ServiceName}</Text>
+}) => {
+  const { t } = useTranslation();
+  return (
+    <View style={styles.serviceStatusRow}>
+      <View style={styles.serviceStatusItem}>
+        <Text style={styles.label}>{t('service')}</Text>
+        <Text style={styles.value}>{ServiceName}</Text>
+      </View>
+      <View style={[styles.serviceStatusItem, styles.statusWithBorder]}>
+        <Text style={styles.label}>{t('status')}</Text>
+        <Text style={[styles.value, styles.statusText]}>{status}</Text>
+      </View>
     </View>
-    <View style={[styles.serviceStatusItem, styles.statusWithBorder]}>
-      <Text style={styles.label}>Status</Text>
-      <Text style={[styles.value, styles.statusText]}>{status}</Text>
-    </View>
-  </View>
-);
+  );
+};
 
 const ActionButtons = ({
   type,
@@ -132,6 +149,7 @@ const ActionButtons = ({
   onViewChat?: () => void;
 }) => {
   const isChat = type === 'chat';
+  const { t } = useTranslation();
 
   return (
     <View style={styles.actionButtons}>
@@ -143,7 +161,9 @@ const ActionButtons = ({
         onPress={onViewPrescription}
         activeOpacity={0.7}
       >
-        <Text style={styles.prescriptionButtonText}>View Prescription</Text>
+        <Text style={styles.prescriptionButtonText}>
+          {t('view_prescription')}
+        </Text>
       </TouchableOpacity>
 
       {isChat && onViewChat && (
@@ -152,7 +172,7 @@ const ActionButtons = ({
           onPress={onViewChat}
           activeOpacity={0.7}
         >
-          <Text style={styles.chatButtonText}>View Chat</Text>
+          <Text style={styles.chatButtonText}>{t('view_chat')}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -165,7 +185,9 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
   patientName,
   patientImage,
   date,
+  unitOfDuration,
   time,
+  unitOfTime,
   gender = 'Male',
   status,
   age,
@@ -183,7 +205,9 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
         <InfoBar
           patientId={patientId}
           time={time}
+          unitOfTime={unitOfTime}
           duration={duration}
+          unitOfDuration={unitOfDuration}
           type={type}
         />
         <PatientInfo

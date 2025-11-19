@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,9 +14,11 @@ import { colors } from '../../../styles/colors';
 import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
 import { styles } from './style';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
 import usePrescriptionStore from '@store/usePrescriptionStore';
+import { AIChatHistoryBottomSheet } from '@components/molecules/AIChatHistoryBottomSheet';
+import { Service } from '../../../types/chat.types';
+import { FloatingActionButton } from '@components/molecules';
 
 export function VideoConsultation({ navigation, route }) {
   const patientInfo = route?.params?.patientInfo || {
@@ -32,6 +34,9 @@ export function VideoConsultation({ navigation, route }) {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [aiHistoryVisible, setAiHistoryVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [serviceDetailVisible, setServiceDetailVisible] = useState(false);
 
   const writePrescription = usePrescriptionStore(
     state => state.writePrescription,
@@ -120,6 +125,16 @@ export function VideoConsultation({ navigation, route }) {
     setVisible(true);
   };
 
+  const showAIChat = () => {
+    setAiHistoryVisible(true);
+  };
+
+  const handleServicePress = useCallback((service: Service) => {
+    setAiHistoryVisible(false);
+    setSelectedService(service);
+    setServiceDetailVisible(true);
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -156,15 +171,11 @@ export function VideoConsultation({ navigation, route }) {
           )}
 
           <View style={styles.controlsContainer}>
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                { backgroundColor: colors.primary },
-              ]}
-              onPress={showPrescriptionModal}
-            >
-              <AntDesign name="plus" size={24} color={colors.white} />
-            </TouchableOpacity>
+            {/* FAB Component */}
+            <FloatingActionButton
+              onPrescriptionPress={showPrescriptionModal}
+              onAIChatPress={showAIChat}
+            />
 
             <TouchableOpacity
               style={[
@@ -189,20 +200,6 @@ export function VideoConsultation({ navigation, route }) {
             >
               <Ionicons
                 name={isMuted ? 'mic-off' : 'mic'}
-                size={24}
-                color={colors.white}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                !isCameraOn && styles.controlButtonActive,
-              ]}
-              onPress={toggleCamera}
-            >
-              <Ionicons
-                name={isCameraOn ? 'videocam' : 'videocam-off'}
                 size={24}
                 color={colors.white}
               />
@@ -237,6 +234,11 @@ export function VideoConsultation({ navigation, route }) {
         <PrescriptionBottomSheet
           visible={visible}
           onClose={closePrescription}
+        />
+        <AIChatHistoryBottomSheet
+          visible={aiHistoryVisible}
+          onClose={() => setAiHistoryVisible(false)}
+          handleServicePress={handleServicePress}
         />
       </ImageBackground>
     </View>

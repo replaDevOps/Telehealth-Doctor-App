@@ -1,9 +1,15 @@
 import { StyleSheet } from 'react-native';
 
+import { colors } from '../../../styles/colors';
+
 export default StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
   },
   menuItem: {
     flexDirection: 'row',

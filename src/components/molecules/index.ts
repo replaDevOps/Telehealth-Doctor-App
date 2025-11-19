@@ -8,4 +8,5 @@ export * from './Organisms/ConsultationRequestModal';
 export * from './ConsultationRequestCard';
 export * from './PrescriptionBottomSheet';
 export * from './MedicationCard';
+export * from './FloatiingActionButton'
 

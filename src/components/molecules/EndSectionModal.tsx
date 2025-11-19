@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   View,
@@ -7,8 +7,9 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { colors } from '../../styles/colors'; // Adjust path as needed
+import { colors } from '../../styles/colors';
 import { mvs } from '@config/metrices';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const MODAL_WIDTH = width * 0.85;
@@ -18,6 +19,7 @@ interface ConsultationEndedModalProps {
   onClose: () => void;
   onGetPrescription: () => void;
   writePrescription?: boolean;
+  endSeassion: () => void;
 }
 
 const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
@@ -25,47 +27,70 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   onClose,
   onGetPrescription,
   writePrescription,
+  endSeassion,
 }) => {
+  const { t } = useTranslation();
+  const [consultationEnded, setConsultationEnded] = useState(false);
+
+  // Reset state when modal becomes visible
+  React.useEffect(() => {
+    if (visible) {
+      setConsultationEnded(false);
+    }
+  }, [visible]);
+
+  const handleEndConsultation = () => {
+    setConsultationEnded(true);
+    endSeassion;
+  };
+
+  const handleClose = () => {
+    setConsultationEnded(false);
+    onClose();
+  };
+
   return (
     <Modal
       transparent
       visible={visible}
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Close Icon */}
-          <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
+          <TouchableOpacity style={styles.closeIcon} onPress={handleClose}>
             <Text style={styles.closeText}>×</Text>
           </TouchableOpacity>
 
-          {writePrescription ? (
+          {writePrescription || consultationEnded ? (
             <View>
               {/* Title */}
-
-              <Text style={styles.title}>Consultation Ended!</Text>
+              <Text style={styles.title}>{t('consultation_ended')}</Text>
               {/* Description */}
-
               <Text style={styles.description}>
-                This consultation has ended.
+                {t('this_consultation_has_ended')}
               </Text>
             </View>
           ) : (
             <View>
               {/* Title */}
-              <Text style={styles.title}>No Prescription Added</Text>
+              <Text style={styles.title}>{t('no_prescription_added')}</Text>
 
               {/* Description */}
               <Text style={styles.description}>
-                You haven’t created a prescription for this session. Are you
-                sure you want to end the consultation without writing one?
+                {t('no_prescription_message')}
               </Text>
 
               {/* Buttons */}
               <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                  <Text style={styles.closeButtonText}>End Consultation</Text>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={handleEndConsultation}
+                >
+                  <Text style={styles.closeButtonText}>
+                    {t('end_consultation')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -73,7 +98,7 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                   onPress={onGetPrescription}
                 >
                   <Text style={styles.prescriptionButtonText}>
-                    Write Prescription
+                    {t('write_prescription')}
                   </Text>
                 </TouchableOpacity>
               </View>

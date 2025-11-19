@@ -19,6 +19,7 @@ import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import parsePhoneNumberFromString from 'libphonenumber-js';
 import { useAuthStore } from '@store';
+import { useTranslation } from 'react-i18next';
 
 export function SignInScreen({ navigation }) {
   const [phone, setPhone] = useState('');
@@ -29,6 +30,7 @@ export function SignInScreen({ navigation }) {
   const [passwordError, setPasswordError] = useState('');
   const [countryCode, setCountryCode] = useState('PK');
   const { login } = useAuthStore();
+  const { t } = useTranslation();
 
   const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
   const formattedPhone = phoneNumber
@@ -39,12 +41,12 @@ export function SignInScreen({ navigation }) {
     let valid = true;
 
     if (!phone.trim() || !isPhoneValid) {
-      setPhoneError('Invalid phone number');
+      setPhoneError(t('invalid_phone_number'));
       valid = false;
     } else setPhoneError('');
 
     if (!password.trim()) {
-      setPasswordError('Password is required');
+      setPasswordError(t('password_required'));
       valid = false;
     } else setPasswordError('');
 
@@ -60,7 +62,7 @@ export function SignInScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -81,17 +83,17 @@ export function SignInScreen({ navigation }) {
 
           {/* Title */}
           <View style={styles.title}>
-            <CustomText text="Welcome Back" />
+            <CustomText text={t('welcome_back')} />
           </View>
           <View style={styles.content}>
             <Text style={styles.TextContent}>
-              Login and continue your healthy journey today!
+              {t('login_continue_journey')}
             </Text>
           </View>
 
           {/* Phone Input */}
           <View style={{ marginTop: mvs(25) }}>
-            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.label}>{t('phone_number')}</Text>
             <PhoneNumberInput
               phone={phone}
               setPhone={setPhone}
@@ -106,8 +108,8 @@ export function SignInScreen({ navigation }) {
 
           {/* Password Input */}
           <CustomTextInput
-            label="Password"
-            placeholder="Enter your password"
+            label={t('password')}
+            placeholder={t('enter_your_password')}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
@@ -115,13 +117,13 @@ export function SignInScreen({ navigation }) {
           />
 
           {/* Sign In Button */}
-          <CustomButton title="Sign In" onPress={handleSignIn} />
+          <CustomButton title={t('sign_in')} onPress={handleSignIn} />
 
           {/* Sign Up Link */}
           <View style={styles.signinRow}>
-            <Text style={styles.TextContent}>Need Help? </Text>
+            <Text style={styles.TextContent}>{t('need_help')} </Text>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.signinLink}>Contact admin</Text>
+              <Text style={styles.signinLink}>{t('contact_admin')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

@@ -181,4 +181,8 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   CheckBox: { flexDirection: 'row', gap: mvs(5), alignItems: 'center' },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
 });

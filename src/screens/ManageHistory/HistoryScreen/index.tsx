@@ -6,9 +6,11 @@ import { Header2 } from '@components/common/Header2';
 import { CONSULTATION_REQUESTS } from '@constants';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
 import { SearchBar } from '@components/atoms';
+import { useTranslation } from 'react-i18next';
 
 export function HistoryScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation();
 
   // Filter consultations based on search query
   const filteredConsultations = useMemo(() => {
@@ -30,13 +32,13 @@ export function HistoryScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Header2 title="History" />
+      <Header2 title={t('history')} />
 
       {/* Search Component */}
       <SearchBar
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
-        placeholder="Search by patient name"
+        placeholder={t('search_by_patient_name')}
       />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -56,7 +58,7 @@ export function HistoryScreen({ navigation }) {
         {filteredConsultations.length === 0 && searchQuery.trim() !== '' && (
           <View style={styles.noResultsContainer}>
             <Text style={styles.noResultsText}>
-              No patients found matching "{searchQuery}"
+              {t('no_patients_found')} "{searchQuery}"
             </Text>
           </View>
         )}

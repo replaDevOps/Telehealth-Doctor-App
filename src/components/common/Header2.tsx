@@ -6,6 +6,7 @@ import { mvs } from '../../config/metrices';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackSvg, ShopingCartSvg, SingleLogo } from '../../assets/icons';
 import { colors } from '../../styles/colors';
+import { useTranslation } from 'react-i18next';
 
 type RootStackParamList = {
   [key: string]: undefined;
@@ -57,6 +58,7 @@ const Header2: React.FC<Header2Props> = ({
   logo = false,
 }) => {
   const navigation = useNavigation<NavigationProp>();
+  const { t } = useTranslation();
 
   const onBackPress = () => {
     if (handleBackPress) {
@@ -75,7 +77,7 @@ const Header2: React.FC<Header2Props> = ({
       {back && (
         <TouchableOpacity style={styles.headerButton} onPress={onBackPress}>
           {useCancel ? (
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('cancel')}</Text>
           ) : (
             <BackSvg />
           )}
@@ -92,17 +94,17 @@ const Header2: React.FC<Header2Props> = ({
 
       {useSave ? (
         <TouchableOpacity
-          style={[styles.icon, saveDisabled && { opacity: 0.5 }]}
+          style={[styles.icon, saveDisabled && styles.disabled]}
           onPress={() => handleSave}
           disabled={saveDisabled}
         >
-          <Text style={[styles.saveText, saveDisabled && { color: 'gray' }]}>
-            Save
+          <Text style={[styles.saveText, saveDisabled && styles.disabledText]}>
+            {t('save')}
           </Text>
         </TouchableOpacity>
       ) : useSkip && handleSkip ? (
         <TouchableOpacity style={styles.icon} onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('skip')}</Text>
         </TouchableOpacity>
       ) : showCart ? (
         <TouchableOpacity
@@ -119,7 +121,7 @@ const Header2: React.FC<Header2Props> = ({
       ) : showLanguage ? (
         <TouchableOpacity style={styles.icon} onPress={() => handleLanguage()}>
           <Ionicons name="globe" size={18} color={colors.black} />
-          <Text style={styles.languageText}>Eng</Text>
+          <Text style={styles.languageText}>{t('eng')}</Text>
           <Ionicons name="chevron-down" size={16} color={colors.black} />
         </TouchableOpacity>
       ) : showEdit ? (
@@ -211,6 +213,12 @@ const styles = StyleSheet.create({
   },
   emptySpace: {
     width: 45,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  disabledText: {
+    color: 'gray',
   },
 });
 

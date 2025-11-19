@@ -2,6 +2,7 @@ import { OffSvg } from '@assets/icons';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../../styles/colors';
+import { useTranslation } from 'react-i18next';
 
 interface InfoItem {
   label: string;
@@ -15,13 +16,15 @@ interface InfoSectionProps {
 }
 
 export const InfoSection: React.FC<InfoSectionProps> = ({ title, data }) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.section}>
         {data.map((item, index) => (
           <View key={index} style={styles.rowBetween}>
-            <Text style={[styles.label]}>{item.label}</Text>
+            <Text style={[styles.label]}>{t(item.label)}</Text>
             <View style={styles.valueContainer}>
               {item.isDayOff && (
                 <View style={styles.closeIcon}>

@@ -11,9 +11,11 @@ import style from './style';
 import { mvs } from '@config/metrices';
 import { InfoSection } from '@components/common';
 import { PERSONAL_DATA, WORKING_HOURS_DATA } from '@constants';
+import { useTranslation } from 'react-i18next';
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
   const [profileImage, setProfileImage] = useState<string>('');
+  const { t } = useTranslation();
 
   // =============== Handlers ===============
   const handleImageSelected = (uri: string) => {
@@ -22,12 +24,12 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
 
   const handleLogout = () => {
     Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out?',
+      t('log_out'),
+      t('are_you_sure_logout'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Log Out',
+          text: t('log_out'),
           style: 'destructive',
           onPress: () => {
             navigation.reset({
@@ -45,12 +47,12 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
   const menuData = [
     {
       icon: ProfileSvg,
-      title: 'Settings',
+      title: t('settings'),
       onPress: () => navigation.navigate('Settings'),
     },
     {
       icon: LogoutSvg,
-      title: 'Log Out',
+      title: t('log_out'),
       backgroundColor: '#FEECED',
       textColor: '#EB5757',
       onPress: handleLogout,
@@ -60,7 +62,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
   // =============== Render Menu Item ===============
   const renderMenuItem = (item: any, index: number) => {
     const Icon = item.icon;
-    const isLogout = item.title === 'Log Out';
+    const isLogout = item.title === t('log_out');
 
     return (
       <TouchableOpacity
@@ -85,9 +87,26 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
     );
   };
 
+  const PERSONAL_DATA = [
+    { label: 'full_name', value: 'Ali Abdul Aziz' },
+    { label: 'phone_number', value: '+966 324 464 232' },
+    { label: 'email_address', value: 'abc@gmail.com' },
+    { label: 'specialization', value: 'MBBS' },
+    { label: 'year_of_experience', value: '10 Years' },
+  ];
+  const WORKING_HOURS_DATA = [
+    { label: 'monday', value: '9:00 PM - 6:00 PM' },
+    { label: 'tuesday', value: '9:00 PM - 6:00 PM' },
+    { label: 'wednesday', value: '9:00 PM - 6:00 PM' },
+    { label: 'thursday', value: '9:00 PM - 6:00 PM' },
+    { label: 'friday', value: '9:00 PM - 6:00 PM' },
+    { label: 'saturday', value: 'Day Off', isDayOff: true },
+    { label: 'sunday', value: 'Day Off', isDayOff: true },
+  ];
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <Header2 title="Setting" />
+    <SafeAreaView style={style.safeArea}>
+      <Header2 title={t('setting')} />
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: mvs(30) }}
@@ -102,8 +121,8 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
 
           <View style={{ marginVertical: mvs(10) }} />
 
-          <InfoSection title="Personal Information" data={PERSONAL_DATA} />
-          <InfoSection title="Working Hour" data={WORKING_HOURS_DATA} />
+          <InfoSection title={t('personal_information')} data={PERSONAL_DATA} />
+          <InfoSection title={t('working_hour')} data={WORKING_HOURS_DATA} />
 
           {/* Menu Items */}
           {menuData.map(renderMenuItem)}

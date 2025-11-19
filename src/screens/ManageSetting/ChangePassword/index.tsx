@@ -7,6 +7,7 @@ import CustomText from '../../../components/common/CustomText';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './style';
+import { useTranslation } from 'react-i18next';
 
 export const ChangePassword = ({ navigation }) => {
   const [password, setPassword] = useState('');
@@ -15,6 +16,7 @@ export const ChangePassword = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const validatePassword = (password: string) => {
     // Example: Password must be at least 8 characters, include a number and a special character
@@ -27,7 +29,7 @@ export const ChangePassword = ({ navigation }) => {
     setError('');
 
     if (!password || !confirmPassword) {
-      setError('Both fields are required.');
+      setError(t('both_fields_required'));
       return;
     }
 
@@ -39,7 +41,7 @@ export const ChangePassword = ({ navigation }) => {
     // }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError(t('passwords_do_not_match'));
       return;
     }
 
@@ -53,30 +55,30 @@ export const ChangePassword = ({ navigation }) => {
 
   return (
     <KeyboardAvoidScrollview>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Header2 title="Password" useSave={true} handleSave={handleSave} />
+      <SafeAreaView style={styles.safeArea}>
+        <Header2 title={t('password')} useSave={true} handleSave={handleSave} />
 
         <View style={styles.container}>
           <View style={styles.InputContainer}>
             <CustomTextInput
-              label="Old Password"
-              placeholder="Enter old password"
+              label={t('old_password')}
+              placeholder={t('enter_old_password')}
               value={oldPassword}
               onChangeText={setOldPassword}
               secureTextEntry={true}
               errorMessage={error}
             />
             <CustomTextInput
-              label="New Password"
-              placeholder="Enter new password"
+              label={t('new_password')}
+              placeholder={t('enter_new_password')}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={true}
               errorMessage={error}
             />
             <CustomTextInput
-              label="Re-Type Password"
-              placeholder="Re-Type New Password"
+              label={t('re_type_password')}
+              placeholder={t('re_type_new_password')}
               secureTextEntry
               value={confirmPassword}
               onChangeText={text => setConfirmPassword(text)}

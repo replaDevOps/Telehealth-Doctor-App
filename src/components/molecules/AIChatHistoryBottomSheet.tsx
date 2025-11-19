@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface AIChatHistoryBottomSheetProps {
   visible: boolean;
@@ -23,6 +24,7 @@ export const AIChatHistoryBottomSheet: React.FC<
   AIChatHistoryBottomSheetProps
 > = ({ visible, onClose, handleServicePress }) => {
   const scrollRef = useRef<ScrollView>(null);
+  const { t } = useTranslation();
 
   // FIX: Call the function to get the actual messages array
   const messages = getAIChatHistory();
@@ -43,7 +45,7 @@ export const AIChatHistoryBottomSheet: React.FC<
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
-            <Text style={styles.title}>Chat With Vena AI</Text>
+            <Text style={styles.title}>{t('chat_with_vena_ai')}</Text>
           </View>
 
           {/* Messages */}
@@ -67,7 +69,7 @@ export const AIChatHistoryBottomSheet: React.FC<
             ) : (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateText}>
-                  No chat history available
+                  {t('no_chat_history_available')}
                 </Text>
               </View>
             )}

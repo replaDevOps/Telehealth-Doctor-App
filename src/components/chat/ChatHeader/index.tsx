@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { PatientInfo } from '../../../types/chat.types';
+import { useTranslation } from 'react-i18next';
 
 interface ChatHeaderProps {
   patientInfo: PatientInfo;
@@ -20,6 +21,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   handleGoBack,
   handleEndConsultation,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.patientHeaderContainer}>
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
@@ -38,7 +41,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           style={styles.endButton}
           onPress={handleEndConsultation}
         >
-          <Text style={styles.endButtonText}>End</Text>
+          <Text style={styles.endButtonText}>{t('end')}</Text>
         </TouchableOpacity>
       )}
     </View>

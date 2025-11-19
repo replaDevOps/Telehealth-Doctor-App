@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
 import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import { PaperProvider } from 'react-native-paper';
+import { styles } from './style';
+import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
+import usePrescriptionStore from '@store/usePrescriptionStore';
+import { AIChatHistoryBottomSheet } from '@components/molecules/AIChatHistoryBottomSheet';
+import { Service } from '../../../types/chat.types';
+import { FloatingActionButton } from '@components/molecules';
 
 export function AudioConsultation({ navigation, route }) {
   const patientInfo = route?.params?.patientInfo || {
@@ -27,6 +33,9 @@ export function AudioConsultation({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const closePrescription = () => setVisible(false);
+  const [aiHistoryVisible, setAiHistoryVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [serviceDetailVisible, setServiceDetailVisible] = useState(false);
 
   // Get prescription state and reset function from Zustand
   const writePrescription = usePrescriptionStore(
@@ -36,18 +45,15 @@ export function AudioConsultation({ navigation, route }) {
     state => state.resetPrescription,
   );
 
-  // ✅ Reset prescription state when component unmounts
   useEffect(() => {
     return () => {
-      // This cleanup function runs when component unmounts
       console.log(
         'VideoConsultation unmounting - resetting prescription state',
       );
       resetPrescription();
     };
-  }, []); // Empty dependency array means this only runs on mount/unmount
+  }, []);
 
-  // Optional: Log when writePrescription changes
   useEffect(() => {
     console.log('Prescription status:', writePrescription);
   }, [writePrescription]);
@@ -62,7 +68,6 @@ export function AudioConsultation({ navigation, route }) {
   };
 
   useEffect(() => {
-    // Simulate connecting to call
     const connectTimer = setTimeout(() => {
       setCallStatus('Connected');
     }, 3000);
@@ -71,7 +76,6 @@ export function AudioConsultation({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    // Start call duration timer when connected
     let interval;
     if (callStatus === 'Connected') {
       interval = setInterval(() => {
@@ -106,9 +110,20 @@ export function AudioConsultation({ navigation, route }) {
   const toggleSpeaker = () => {
     setIsSpeakerOn(!isSpeakerOn);
   };
-  const showprescriptionModal = () => {
+
+  const showPrescriptionModal = () => {
     setVisible(true);
   };
+
+  const showAIChat = () => {
+    setAiHistoryVisible(true);
+  };
+
+  const handleServicePress = useCallback((service: Service) => {
+    setAiHistoryVisible(false);
+    setSelectedService(service);
+    setServiceDetailVisible(true);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -117,92 +132,86 @@ export function AudioConsultation({ navigation, route }) {
         backgroundColor="transparent"
         translucent
       />
+      <PaperProvider>
+        <ImageBackground
+          source={patientInfo.avatar}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          <View style={styles.overlay} />
+          <SafeAreaView style={styles.safeArea}>
+            <View style={styles.topSection}>
+              <Text style={styles.patientName}>{patientInfo.name}</Text>
+              <Text style={styles.callStatus}>
+                {callStatus === 'Connected'
+                  ? formatDuration(callDuration)
+                  : callStatus}
+              </Text>
+            </View>
 
-      {/* Full Screen Background Image */}
-      <ImageBackground
-        source={patientInfo.avatar}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        {/* Dark Overlay */}
-        <View style={styles.overlay} />
-        {/* Content */}
-        <SafeAreaView style={styles.safeArea}>
-          {/* Doctor Info at Top */}
-          <View style={styles.topSection}>
-            <Text style={styles.patientName}>{patientInfo.name}</Text>
-            <Text style={styles.callStatus}>
-              {callStatus === 'Connected'
-                ? formatDuration(callDuration)
-                : callStatus}
-            </Text>
-          </View>
-
-          {/* Call Controls at Bottom */}
-          <View style={styles.controlsContainer}>
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                { backgroundColor: colors.primary },
-              ]}
-              onPress={showprescriptionModal}
-            >
-              <AntDesign name="plus" size={24} color={colors.white} />
-            </TouchableOpacity>
-            {/* Speaker Button */}
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                isSpeakerOn && styles.controlButtonActive,
-              ]}
-              onPress={toggleSpeaker}
-            >
-              <Ionicons
-                name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
-                size={28}
-                color={colors.white}
+            <View style={styles.controlsContainer}>
+              {/* FAB Component */}
+              <FloatingActionButton
+                onPrescriptionPress={showPrescriptionModal}
+                onAIChatPress={showAIChat}
               />
-            </TouchableOpacity>
 
-            {/* Mute Button */}
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                isMuted && styles.controlButtonActive,
-              ]}
-              onPress={toggleMute}
-            >
-              <Ionicons
-                name={isMuted ? 'mic-off' : 'mic'}
-                size={28}
-                color={colors.white}
-              />
-            </TouchableOpacity>
+              {/* Speaker Button */}
+              <TouchableOpacity
+                style={[
+                  styles.controlButton,
+                  isSpeakerOn && styles.controlButtonActive,
+                ]}
+                onPress={toggleSpeaker}
+              >
+                <Ionicons
+                  name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
+                  size={28}
+                  color={colors.white}
+                />
+              </TouchableOpacity>
 
-            {/* End Call Button */}
-            <TouchableOpacity
-              style={styles.endCallButton}
-              onPress={handleEndCall}
-            >
-              <Ionicons name="close" size={32} color={colors.white} />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-        <ConsultationEndedModal
-          visible={modalVisible}
-          onClose={handleClose}
-          onGetPrescription={handleGetPrescription}
-          writePrescription={writePrescription}
-        />
-        <PrescriptionBottomSheet
-          visible={visible}
-          onClose={closePrescription}
-        />
-      </ImageBackground>
+              {/* Mute Button */}
+              <TouchableOpacity
+                style={[
+                  styles.controlButton,
+                  isMuted && styles.controlButtonActive,
+                ]}
+                onPress={toggleMute}
+              >
+                <Ionicons
+                  name={isMuted ? 'mic-off' : 'mic'}
+                  size={28}
+                  color={colors.white}
+                />
+              </TouchableOpacity>
+
+              {/* End Call Button */}
+              <TouchableOpacity
+                style={styles.endCallButton}
+                onPress={handleEndCall}
+              >
+                <Ionicons name="close" size={32} color={colors.white} />
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+          <ConsultationEndedModal
+            visible={modalVisible}
+            onClose={handleClose}
+            onGetPrescription={handleGetPrescription}
+            writePrescription={writePrescription}
+          />
+          <PrescriptionBottomSheet
+            visible={visible}
+            onClose={closePrescription}
+          />
+          <AIChatHistoryBottomSheet
+            visible={aiHistoryVisible}
+            onClose={() => setAiHistoryVisible(false)}
+            handleServicePress={handleServicePress}
+          />
+        </ImageBackground>
+      </PaperProvider>
     </View>
   );
 }
-
-import { styles } from './style';
-import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
-import usePrescriptionStore from '@store/usePrescriptionStore';

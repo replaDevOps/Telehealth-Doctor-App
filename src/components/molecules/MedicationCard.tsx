@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../styles/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTranslation } from 'react-i18next';
 
 interface Medication {
   id: number;
@@ -34,13 +35,16 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({
   onUpdate,
   medicationsLength,
 }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.medicationCard}>
       <TouchableOpacity
         style={styles.medicationCardHeader}
         onPress={() => onToggle(medication.id)}
       >
-        <Text style={styles.medicationTitle}>Medicine {index + 1}</Text>
+        <Text style={styles.medicationTitle}>
+          {t('medicine')} {index + 1}
+        </Text>
         <View style={styles.rightIcons}>
           <Text style={styles.toggleIcon}>
             {medication.expanded ? (
@@ -51,11 +55,7 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({
           </Text>
           {medicationsLength > 1 && (
             <TouchableOpacity
-              style={{
-                padding: 2,
-                backgroundColor: 'red',
-                borderRadius: '50%',
-              }}
+              style={styles.removeButton}
               onPress={e => {
                 e.stopPropagation();
                 onRemove(medication.id);
@@ -71,32 +71,32 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({
       {medication.expanded && (
         <>
           <CustomTextInput
-            label="Medicine Name"
-            placeholder="e.g Amoxicilin 500mg"
+            label={t('medicine_name')}
+            placeholder={t('eg_amoxicilin_500mg')}
             value={medication.name}
             onChangeText={text => onUpdate(medication.id, 'name', text)}
             style={{ backgroundColor: colors.white }}
           />
 
           <CustomTextInput
-            label="Dosage"
-            placeholder="e.g 1 capsule twice daily"
+            label={t('dosage')}
+            placeholder={t('eg_1_capsule_twice_daily')}
             value={medication.dosage}
             onChangeText={text => onUpdate(medication.id, 'dosage', text)}
             style={{ backgroundColor: colors.white }}
           />
 
           <CustomTextInput
-            label="Duration"
-            placeholder="e.g 5 days"
+            label={t('duration')}
+            placeholder={t('eg_5_days')}
             value={medication.duration}
             onChangeText={text => onUpdate(medication.id, 'duration', text)}
             style={{ backgroundColor: colors.white }}
           />
 
           <CustomTextInput
-            label="Instructions"
-            placeholder="Any additional instructions..."
+            label={t('instructions')}
+            placeholder={t('any_additional_instructions')}
             value={medication.instructions}
             onChangeText={text => onUpdate(medication.id, 'instructions', text)}
             multiline

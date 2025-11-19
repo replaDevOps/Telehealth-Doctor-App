@@ -13,14 +13,14 @@ import {
 
 export const ONBOARDING_STEPS = [
   {
-    title: 'Connect with Your Patients',
+    title: 'onboarding_title_1',
     imgSrc: onboarding1,
-    content: 'Connect with your patients through chat, audio, or video.',
+    content: 'onboarding_content_1',
   },
   {
-    title: 'Manage Your Consultations',
+    title: 'onboarding_title_2',
     imgSrc: onboarding2,
-    content: 'You can manage all consultations easily in one app.',
+    content: 'onboarding_content_2',
   },
 ];
 
@@ -192,8 +192,10 @@ export const CONSULTATION_REQUESTS = [
     ServiceName: 'Acne Treatment',
     gender: 'Male',
     date: '8/30/2024 11:35 am',
-    time: '30 mins',
-    duration: '1hr',
+    time: '30',
+    unitOfTime:'mins',
+    duration: '1',
+    unitOfDuration:'hr',
     type: 'chat' as const,
     amount: 'SAR 20',
     age: '25',
@@ -206,8 +208,10 @@ export const CONSULTATION_REQUESTS = [
     ServiceName: 'Acne Treatment',
     gender: 'Female',
     date: '8/30/2024 11:35 am',
-    time: '21 mins',
-    duration: '2 mins',
+    time: '5',
+    unitOfTime:'mins',
+    duration: '8',
+    unitOfDuration:'hr',
     type: 'video' as const,
     amount: 'SAR 20',
     age: '24',
@@ -220,8 +224,10 @@ export const CONSULTATION_REQUESTS = [
     ServiceName: 'Rutine Checkup',
     gender: 'Male',
     date: '3/31/2024 11:35 am',
-    time: '18 mins',
-    duration: '1 mins',
+    time: '10',
+    unitOfTime:'mins',
+    duration: '3',
+    unitOfDuration:'hr',
     type: 'audio' as const,
     amount: 'SAR 20',
     age: '24',
@@ -232,26 +238,26 @@ export const CONSULTATION_REQUESTS = [
 
 
 export const PERSONAL_DATA = [
-  { label: 'Full Name:', value: 'Ali Abdul Aziz' },
-  { label: 'Phone Number:', value: '+966 324 464 232' },
-  { label: 'Email Address:', value: 'abc@gmail.com' },
-  { label: 'Specialization:', value: 'MBBS' },
-  { label: 'Year of Experience:', value: '10 Years' },
+  { label: 'full_name', value: 'Ali Abdul Aziz' },
+  { label: 'phone_number', value: '+966 324 464 232' },
+  { label: 'email_address', value: 'abc@gmail.com' },
+  { label: 'specialization', value: 'MBBS' },
+  { label: 'year_of_experience', value: '10 Years' },
 ];
 export const WORKING_HOURS_DATA = [
-  { label: 'Monday:', value: '9:00 PM - 6:00 PM' },
-  { label: 'Tuesday:', value: '9:00 PM - 6:00 PM' },
-  { label: 'Wednesday:', value: '9:00 PM - 6:00 PM' },
-  { label: 'Thursday:', value: '9:00 PM - 6:00 PM' },
-  { label: 'Friday:', value: '9:00 PM - 6:00 PM' },
-  { label: 'Saturday:', value: 'Day Off', isDayOff: true },
-  { label: 'Sunday:', value: 'Day Off', isDayOff: true },
+  { label: 'monday', value: '9:00 PM - 6:00 PM' },
+  { label: 'tuesday', value: '9:00 PM - 6:00 PM' },
+  { label: 'wednesday', value: '9:00 PM - 6:00 PM' },
+  { label: 'thursday', value: '9:00 PM - 6:00 PM' },
+  { label: 'friday', value: '9:00 PM - 6:00 PM' },
+  { label: 'saturday', value: 'day_off', isDayOff: true },
+  { label: 'sunday', value: 'day_off', isDayOff: true },
 ];
 
 
 export const PATIENT_DATA = [
-  { label: 'Patient Name:', value: 'Ali Abdul Aziz' },
-  { label: 'Age:', value: '39' },
-  { label: 'Gender:', value: 'Male' },
-  { label: 'Date:', value: '02/02/2023' },
+  { label: 'patient_name', value: 'Ali Abdul Aziz' },
+  { label: 'age', value: '39' },
+  { label: 'gender', value: 'Male' },
+  { label: 'date', value: '02/02/2023' },
 ];

@@ -1,10 +1,17 @@
 import { CustomTextInput } from '@components/common/CustomTextInput';
-import React, { useState, useRef, useMemo, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  ScrollView,
+  Animated,
+  Dimensions,
+  TouchableWithoutFeedback,
+  PanResponder,
+} from 'react-native';
 import { colors } from '../../styles/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -12,6 +19,9 @@ import usePrescriptionStore from '../../store/usePrescriptionStore';
 import { MedicationCard } from './MedicationCard';
 import { InfoSection } from '@components/common';
 import { PATIENT_DATA } from '@constants';
+import { useTranslation } from 'react-i18next';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface Medication {
   id: number;
@@ -29,18 +39,13 @@ const PrescriptionBottomSheet = ({
   visible: boolean;
   onClose: () => void;
 }) => {
-  // Get the action from store
   const setWritePrescription = usePrescriptionStore(
     state => state.setWritePrescription,
   );
   const setPrescriptionData = usePrescriptionStore(
     state => state.setPrescriptionData,
   );
-
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // Use only one snap point to prevent expanding
-  const snapPoints = useMemo(() => ['90%'], []);
+  const { t } = useTranslation();
 
   const [diagnosisExpanded, setDiagnosisExpanded] = useState(false);
   const [treatmentExpanded, setTreatmentExpanded] = useState(false);
@@ -60,32 +65,58 @@ const PrescriptionBottomSheet = ({
     },
   ]);
 
+  const translateY = React.useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  React.useEffect(() => {
+    if (visible) {
+      Animated.spring(translateY, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11,
+      }).start();
+    } else {
+      Animated.timing(translateY, {
+        toValue: SCREEN_HEIGHT,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible]);
+
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return gestureState.dy > 5;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dy > 0) {
+          translateY.setValue(gestureState.dy);
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 100 || gestureState.vy > 0.5) {
+          handleClose();
+        } else {
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    }),
+  ).current;
+
   const handleClose = () => {
-    bottomSheetRef.current?.close();
+    Animated.timing(translateY, {
+      toValue: SCREEN_HEIGHT,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => {
+      onClose();
+    });
   };
-
-  // Handle bottom sheet changes
-  const handleSheetChanges = useCallback(
-    (index: number) => {
-      if (index === -1) {
-        onClose();
-      }
-    },
-    [onClose],
-  );
-
-  // Custom backdrop component
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    [],
-  );
 
   const addMedication = () => {
     setMedications([
@@ -124,10 +155,8 @@ const PrescriptionBottomSheet = ({
   const handleSendPrescription = () => {
     console.log('Prescription sent!');
 
-    // Set the state to true in Zustand store
     setWritePrescription(true);
 
-    // Optionally save the prescription data
     const prescriptionData = {
       diagnosisSummary,
       treatmentName,
@@ -141,158 +170,190 @@ const PrescriptionBottomSheet = ({
   };
 
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={visible ? 0 : -1}
-      snapPoints={snapPoints}
-      onChange={handleSheetChanges}
-      backdropComponent={renderBackdrop}
-      enablePanDownToClose={true}
-      enableOverDrag={true}
-      enableContentPanningGesture={false} // Disable scroll to expand
-      backgroundStyle={styles.background}
-      handleIndicatorStyle={styles.handleIndicator}
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={handleClose}
+      statusBarTranslucent
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-          <Ionicons name="close-outline" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
 
-      <Text style={styles.headerTitle}>Prescription</Text>
-
-      <BottomSheetScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Your existing content remains the same */}
-        {/* Patient Info */}
-        <InfoSection title="Patient Information" data={PATIENT_DATA} />
-
-        {/* Diagnosis (collapsible) */}
-        <TouchableOpacity
-          style={styles.collapsibleHeader}
-          onPress={() => setDiagnosisExpanded(!diagnosisExpanded)}
+        <Animated.View
+          style={[
+            styles.bottomSheetContainer,
+            {
+              transform: [{ translateY }],
+            },
+          ]}
         >
-          <Text style={styles.sectionTitle}>Diagnosis</Text>
-          <Text style={styles.expandIcon}>
-            {diagnosisExpanded ? (
-              <Ionicons name="chevron-up" size={24} color="black" />
-            ) : (
-              <Ionicons name="chevron-down" size={24} color="black" />
-            )}
-          </Text>
-        </TouchableOpacity>
-
-        {diagnosisExpanded && (
-          <View style={styles.section}>
-            <CustomTextInput
-              label="Diagnosis Summary"
-              placeholder="Write summary here..."
-              value={diagnosisSummary}
-              onChangeText={setDiagnosisSummary}
-              multiline={true}
-              numberOfLines={2}
-              maxLength={150}
-              showCharCount={true}
-            />
+          {/* Drag Handle */}
+          <View style={styles.handleContainer} {...panResponder.panHandlers}>
+            <View style={styles.handle} />
           </View>
-        )}
 
-        {/* Treatment Details (collapsible) */}
-        <TouchableOpacity
-          style={styles.collapsibleHeader}
-          onPress={() => setTreatmentExpanded(!treatmentExpanded)}
-        >
-          <Text style={styles.sectionTitle}>Treatment Details</Text>
-          <Text style={styles.expandIcon}>
-            {treatmentExpanded ? (
-              <Ionicons name="chevron-up" size={24} color="black" />
-            ) : (
-              <Ionicons name="chevron-down" size={24} color="black" />
-            )}
-          </Text>
-        </TouchableOpacity>
-
-        {treatmentExpanded && (
-          <View style={styles.section}>
-            <CustomTextInput
-              label="Treatment Name"
-              placeholder="e.g Root Canal Therapy"
-              value={treatmentName}
-              onChangeText={setTreatmentName}
-            />
-            <CustomTextInput
-              label="Treatment Notes"
-              placeholder="Write treatment notes here..."
-              value={treatmentNotes}
-              onChangeText={setTreatmentNotes}
-              multiline
-              numberOfLines={2}
-              maxLength={150}
-              showCharCount={true}
-            />
-          </View>
-        )}
-
-        {/* Medications */}
-        <View style={styles.section}>
-          <View style={styles.medicationHeader}>
-            <Text style={styles.sectionTitle}>Medication</Text>
-            <TouchableOpacity
-              onPress={addMedication}
-              style={styles.addBtttonContainer}
-            >
-              <AntDesign name="plus" color={colors.white} size={18} />
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+              <Ionicons name="close-outline" size={24} color="black" />
             </TouchableOpacity>
           </View>
 
-          {medications.map((med, idx) => (
-            <MedicationCard
-              key={med.id}
-              medication={med}
-              index={idx}
-              onToggle={toggleMedication}
-              onRemove={removeMedication}
-              onUpdate={updateMedicationField}
-              medicationsLength={medications.length}
-            />
-          ))}
-        </View>
+          <Text style={styles.headerTitle}>{t('prescription')}</Text>
 
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSendPrescription}
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
           >
-            <Text style={styles.submitButtonText}>Send Prescription</Text>
-          </TouchableOpacity>
-        </View>
-      </BottomSheetScrollView>
-    </BottomSheet>
+            {/* Patient Info */}
+            <InfoSection title={t('patient_information')} data={PATIENT_DATA} />
+
+            {/* Diagnosis (collapsible) */}
+            <TouchableOpacity
+              style={styles.collapsibleHeader}
+              onPress={() => setDiagnosisExpanded(!diagnosisExpanded)}
+            >
+              <Text style={styles.sectionTitle}>{t('diagnosis')}</Text>
+              <Text style={styles.expandIcon}>
+                {diagnosisExpanded ? (
+                  <Ionicons name="chevron-up" size={24} color="black" />
+                ) : (
+                  <Ionicons name="chevron-down" size={24} color="black" />
+                )}
+              </Text>
+            </TouchableOpacity>
+
+            {diagnosisExpanded && (
+              <View style={styles.section}>
+                <CustomTextInput
+                  label={t('diagnosis_summary')}
+                  placeholder={t('write_summary_here')}
+                  value={diagnosisSummary}
+                  onChangeText={setDiagnosisSummary}
+                  multiline={true}
+                  numberOfLines={2}
+                  maxLength={150}
+                  showCharCount={true}
+                />
+              </View>
+            )}
+
+            {/* Treatment Details (collapsible) */}
+            <TouchableOpacity
+              style={styles.collapsibleHeader}
+              onPress={() => setTreatmentExpanded(!treatmentExpanded)}
+            >
+              <Text style={styles.sectionTitle}>{t('treatment_details')}</Text>
+              <Text style={styles.expandIcon}>
+                {treatmentExpanded ? (
+                  <Ionicons name="chevron-up" size={24} color="black" />
+                ) : (
+                  <Ionicons name="chevron-down" size={24} color="black" />
+                )}
+              </Text>
+            </TouchableOpacity>
+
+            {treatmentExpanded && (
+              <View style={styles.section}>
+                <CustomTextInput
+                  label={t('treatment_name')}
+                  placeholder={t('eg_root_canal_therapy')}
+                  value={treatmentName}
+                  onChangeText={setTreatmentName}
+                />
+                <CustomTextInput
+                  label={t('treatment_notes')}
+                  placeholder={t('write_treatment_notes_here')}
+                  value={treatmentNotes}
+                  onChangeText={setTreatmentNotes}
+                  multiline
+                  numberOfLines={2}
+                  maxLength={150}
+                  showCharCount={true}
+                />
+              </View>
+            )}
+
+            {/* Medications */}
+            <View style={styles.section}>
+              <View style={styles.medicationHeader}>
+                <Text style={styles.sectionTitle}>{t('medication')}</Text>
+                <TouchableOpacity
+                  onPress={addMedication}
+                  style={styles.addBtttonContainer}
+                >
+                  <AntDesign name="plus" color={colors.white} size={18} />
+                </TouchableOpacity>
+              </View>
+
+              {medications.map((med, idx) => (
+                <MedicationCard
+                  key={med.id}
+                  medication={med}
+                  index={idx}
+                  onToggle={toggleMedication}
+                  onRemove={removeMedication}
+                  onUpdate={updateMedicationField}
+                  medicationsLength={medications.length}
+                />
+              ))}
+            </View>
+
+            {/* Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleClose}
+              >
+                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSendPrescription}
+              >
+                <Text style={styles.submitButtonText}>{t('send_prescription')}</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </Animated.View>
+      </View>
+    </Modal>
   );
 };
 
-// ... styles remain the same as previous solution
-
-/* ------------------------------------------------------------------ */
-/*                             Styles                                 */
-/* ------------------------------------------------------------------ */
 const styles = StyleSheet.create({
-  background: {
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  bottomSheetContainer: {
+    height: SCREEN_HEIGHT * 0.9,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 10,
   },
-  handleIndicator: {
-    backgroundColor: '#ccc',
+  handleContainer: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  handle: {
     width: 40,
     height: 4,
+    backgroundColor: '#ccc',
+    borderRadius: 2,
   },
   header: {
     flexDirection: 'row',
@@ -308,13 +369,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#333',
     alignSelf: 'center',
+    marginBottom: 8,
   },
   content: {
     flex: 1,
     paddingHorizontal: 16,
   },
-
-  /* ---- Patient Info ---- */
   section1: {
     backgroundColor: '#fff',
     borderWidth: 1,
@@ -341,8 +401,6 @@ const styles = StyleSheet.create({
   },
   label1: { fontSize: 14, color: '#555' },
   value: { fontSize: 14, color: '#000', fontWeight: '500' },
-
-  /* ---- Collapsible Headers ---- */
   collapsibleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -353,8 +411,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   expandIcon: { fontSize: 16, color: '#666' },
-
-  /* ---- Input + Text ---- */
   section: { marginTop: 10 },
   sectionTitle: {
     fontSize: 16,
@@ -369,8 +425,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginRight: 5,
   },
-
-  /* ---- Medication ---- */
   medicationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -383,8 +437,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   addButton: { fontSize: 28, color: 'white', fontWeight: '300' },
-
-  /* ---- Buttons ---- */
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

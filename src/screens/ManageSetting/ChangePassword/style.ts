@@ -33,4 +33,7 @@ export const styles = StyleSheet.create({
   InputContainer: {
     marginTop: 50,
   },
+  safeArea: {
+    flex: 1,
+  },
 });

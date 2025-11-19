@@ -10,6 +10,7 @@ import HomeHeader from '@components/molecules/HomeHeadder';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
 import ConsultationRequestModal from '@components/molecules/Organisms/ConsultationRequestModal';
 import { CONSULTATION_REQUESTS } from '@constants';
+import { useTranslation } from 'react-i18next';
 
 export const HomeScreen = ({ navigation }) => {
   const [isActive, setIsActive] = useState(false);
@@ -17,6 +18,7 @@ export const HomeScreen = ({ navigation }) => {
   const [consultationRequests, setConsultationRequests] = useState<
     ConsultationRequest[]
   >([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isActive) {
@@ -129,10 +131,10 @@ export const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <HomeHeader
-        centerName="Eden Medical Center"
-        location="Makkah"
-        patientName="Dr. Sultan Khan"
-        patientSpecialty="Dermatologist"
+        centerName={t('eden_medical_center')}
+        location={t('makkah')}
+        patientName={t('dr_sultan_khan')}
+        patientSpecialty={t('dermatologist')}
         patientImage={patient}
         isActive={isActive}
         onToggleActive={handleToggleActive}

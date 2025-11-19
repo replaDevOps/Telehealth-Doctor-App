@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { mvs } from '@config/metrices';
 import StatsCard from './StatsCard';
+import { useTranslation } from 'react-i18next';
 
 interface StatsRowProps {
   totalConsultations?: number;
@@ -12,17 +13,18 @@ const StatsRow = ({
   totalConsultations = 142,
   thisMonth = 28,
 }: StatsRowProps) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <StatsCard
         icon="chatbubbles"
-        title="Total Consultations"
+        title={t('total_consultations')}
         value={totalConsultations}
         color="#7625D7"
       />
       <StatsCard
         icon="calendar"
-        title="This Month Consul..."
+        title={t('this_month_consul')}
         value={thisMonth}
         color="#FF6B6B"
       />

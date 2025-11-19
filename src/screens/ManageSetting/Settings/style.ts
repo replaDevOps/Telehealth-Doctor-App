@@ -6,6 +6,10 @@ export default StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',

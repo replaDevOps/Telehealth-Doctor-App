@@ -11,6 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import { mvs } from '@config/metrices';
+import { useTranslation } from 'react-i18next';
 
 interface HomeHeaderProps {
   centerName?: string;
@@ -25,16 +26,17 @@ interface HomeHeaderProps {
 }
 
 const HomeHeader = ({
-  centerName = 'Eden Medical Center',
-  location = 'Makkah',
-  patientName = 'Dr. Sultan Khan',
-  patientSpecialty = 'Dermatologist',
+  centerName = 'eden_medical_center',
+  location = 'makkah',
+  patientName = 'dr_sultan_khan',
+  patientSpecialty = 'dermatologist',
   patientImage,
   isActive = true,
   onToggleActive,
   onNotificationPress,
   onLocationPress,
 }: HomeHeaderProps) => {
+  const { t } = useTranslation();
   return (
     <LinearGradient
       colors={['#7625D7', '#591CA2', '#3E1371']}
@@ -46,14 +48,14 @@ const HomeHeader = ({
         {/* Top Section - Medical Center Name & Notification */}
         <View style={styles.topRow}>
           <View style={styles.centerInfoContainer}>
-            <Text style={styles.centerName}>{centerName}</Text>
+            <Text style={styles.centerName}>{t(centerName)}</Text>
             <TouchableOpacity
               style={styles.locationButton}
               onPress={onLocationPress}
               activeOpacity={0.7}
             >
               <Ionicons name="location" size={14} color={colors.white} />
-              <Text style={styles.locationText}>{location}</Text>
+              <Text style={styles.locationText}>{t(location)}</Text>
             </TouchableOpacity>
           </View>
 
@@ -80,21 +82,14 @@ const HomeHeader = ({
               ) : (
                 <View style={[styles.avatar, styles.avatarPlaceholder]}>
                   <Text style={styles.avatarText}>
-                    {patientName?.charAt(3) || 'D'}
+                    {t(patientName)?.charAt(3) || 'D'}
                   </Text>
                 </View>
               )}
               {isActive && (
                 <View style={styles.activeIndicator}>
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      color: colors.white,
-                      fontSize: 10,
-                      fontWeight: '600',
-                    }}
-                  >
-                    Active
+                  <Text style={styles.activeIndicatorText}>
+                    {t('active')}
                   </Text>
                 </View>
               )}
@@ -102,8 +97,8 @@ const HomeHeader = ({
 
             {/* Doctor Details */}
             <View style={styles.patientDetails}>
-              <Text style={styles.patientName}>{patientName}</Text>
-              <Text style={styles.patientSpecialty}>{patientSpecialty}</Text>
+              <Text style={styles.patientName}>{t(patientName)}</Text>
+              <Text style={styles.patientSpecialty}>{t(patientSpecialty)}</Text>
             </View>
           </View>
 
@@ -208,6 +203,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  activeIndicatorText: {
+    textAlign: 'center',
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: '600',
   },
   patientDetails: {
     flex: 1,

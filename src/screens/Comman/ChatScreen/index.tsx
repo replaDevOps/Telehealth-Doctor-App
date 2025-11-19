@@ -27,6 +27,7 @@ import { Message, Service } from '../../../types/chat.types';
 import { AIChatHistoryBottomSheet } from '@components/molecules/AIChatHistoryBottomSheet';
 import PrescriptionBottomSheet from '@components/molecules/PrescriptionBottomSheet';
 import usePrescriptionStore from '@store/usePrescriptionStore';
+import { useTranslation } from 'react-i18next';
 
 // ---------- Main Component ----------
 export function ChatScreen({ navigation, route }) {
@@ -34,6 +35,7 @@ export function ChatScreen({ navigation, route }) {
   const chatType = route?.params?.chatType || 'patient'; // 'patient' | 'ai'
   const fromHistory = route?.params?.fromHistory || false;
   const patientInfo = route?.params?.patientInfo || DEFAULT_PATIENT_INFO;
+  const { t } = useTranslation();
 
   // ---------- State ----------
   const [message, setMessage] = useState('');
@@ -100,6 +102,15 @@ export function ChatScreen({ navigation, route }) {
   useEffect(() => {
     setMessages(initialMessages);
   }, [initialMessages]);
+
+  const handleEndSeassion = () => {
+    setModalVisible(true);
+    if (writePrescription) {
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
+    }
+  };
 
   // Load AI chat history when component mounts
   useEffect(() => {
@@ -301,7 +312,7 @@ export function ChatScreen({ navigation, route }) {
             style={styles.consultButton}
             onPress={handleAIChatHistory}
           >
-            <Text style={styles.consultButtonText}>AI Chat History</Text>
+            <Text style={styles.consultButtonText}>{t('ai_chat_history')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -338,6 +349,7 @@ export function ChatScreen({ navigation, route }) {
         onClose={handleCloseModal}
         onGetPrescription={handleGetPrescription}
         writePrescription={writePrescription}
+        endSession={handleEndSeassion}
       />
 
       <AIChatHistoryBottomSheet

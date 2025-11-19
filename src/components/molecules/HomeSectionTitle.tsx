@@ -2,6 +2,7 @@ import { mvs } from '@config/metrices';
 import { colors } from '../../styles/colors';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface HomeSectionTitleProps {
   title: string;
@@ -9,17 +10,15 @@ interface HomeSectionTitleProps {
   onActionPress?: () => void;
 }
 
-const HomeSectionTitle = ({
-  title,
-  actionText = 'View all',
-  onActionPress,
-}: HomeSectionTitleProps) => {
+const HomeSectionTitle = ({ title, onActionPress }: HomeSectionTitleProps) => {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
       {onActionPress && (
         <TouchableOpacity onPress={onActionPress} activeOpacity={0.7}>
-          <Text style={styles.actionText}>{actionText}</Text>
+          <Text style={styles.actionText}>{t('view_all')}</Text>
         </TouchableOpacity>
       )}
     </View>

@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import ConsultationCard from '../../molecules/ConsultationCard';
 import { mvs } from '../../../config/metrices';
 import HomeSectionTitle from '../HomeSectionTitle';
+import { useTranslation } from 'react-i18next';
 
 interface Consultation {
   id: string;
@@ -17,6 +18,8 @@ interface Consultation {
   gender: string;
   age: string;
   status: string;
+  unitOfDuration: string;
+  unitOfTime: string;
 }
 
 interface RecentConsultationsProps {
@@ -32,11 +35,12 @@ const RecentConsultations = ({
   onViewPrescription,
   onViewChat,
 }: RecentConsultationsProps) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       {onViewAll && (
         <HomeSectionTitle
-          title="Recent Consultations"
+          title={t('recent_consultations')}
           onActionPress={onViewAll}
         />
       )}
@@ -48,7 +52,9 @@ const RecentConsultations = ({
           patientImage={consultation.patientImage}
           ServiceName={consultation.ServiceName}
           date={consultation.date}
+          unitOfDuration={consultation.unitOfDuration}
           time={consultation.time}
+          unitOfTime={consultation.unitOfTime}
           duration={consultation.duration}
           type={consultation.type}
           amount={consultation.amount}

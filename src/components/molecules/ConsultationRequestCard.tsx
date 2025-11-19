@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
+import { useTranslation } from 'react-i18next';
 
 export type ConsultationType = 'chat' | 'video' | 'audio';
 
@@ -38,6 +39,7 @@ const ConsultationRequestCard = ({
 }: ConsultationRequestCardProps) => {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const progress = useRef(new Animated.Value(1)).current;
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Animate progress bar
@@ -78,13 +80,13 @@ const ConsultationRequestCard = ({
   const getConsultationLabel = () => {
     switch (consultationType) {
       case 'video':
-        return 'Video';
+        return t('video');
       case 'audio':
-        return 'Audio';
+        return t('audio');
       case 'chat':
-        return 'Chat';
+        return t('chat');
       default:
-        return 'Chat';
+        return t('chat');
     }
   };
 
@@ -123,7 +125,7 @@ const ConsultationRequestCard = ({
           <View style={styles.patientDetails}>
             <Text style={styles.patientName}>{patientName}</Text>
             <Text style={styles.patientInfo}>
-              {patientGender}, {patientAge} Year old
+              {patientGender}, {patientAge} {t('year_old')}
             </Text>
           </View>
           <Text style={styles.timerText}>{timeLeft}s</Text>
@@ -136,14 +138,14 @@ const ConsultationRequestCard = ({
             onPress={onDecline}
             activeOpacity={0.7}
           >
-            <Text style={styles.declineButtonText}>Decline</Text>
+            <Text style={styles.declineButtonText}>{t('decline')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.acceptButton}
             onPress={onAccept}
             activeOpacity={0.7}
           >
-            <Text style={styles.acceptButtonText}>Accept</Text>
+            <Text style={styles.acceptButtonText}>{t('accept')}</Text>
           </TouchableOpacity>
         </View>
       </View>
