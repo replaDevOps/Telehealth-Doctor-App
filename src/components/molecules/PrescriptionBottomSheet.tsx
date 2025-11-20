@@ -17,7 +17,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import usePrescriptionStore from '../../store/usePrescriptionStore';
 import { MedicationCard } from './MedicationCard';
-import { InfoSection } from '@components/common';
+import { CheckboxWithText, InfoSection } from '@components/common';
 import { PATIENT_DATA } from '@constants';
 import { useTranslation } from 'react-i18next';
 
@@ -53,6 +53,8 @@ const PrescriptionBottomSheet = ({
   const [diagnosisSummary, setDiagnosisSummary] = useState('');
   const [treatmentName, setTreatmentName] = useState('');
   const [treatmentNotes, setTreatmentNotes] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
+  const [error, setError] = useState(false);
 
   const [medications, setMedications] = useState<Medication[]>([
     {
@@ -302,6 +304,16 @@ const PrescriptionBottomSheet = ({
                 />
               ))}
             </View>
+            <CheckboxWithText
+              isChecked={isChecked}
+              error={error}
+              onToggle={() => {
+                setIsChecked(!isChecked);
+                if (error) setError(false);
+              }}
+            >
+              {t('confirm_prescription_is_accurate')}
+            </CheckboxWithText>
 
             {/* Buttons */}
             <View style={styles.buttonContainer}>
@@ -315,7 +327,9 @@ const PrescriptionBottomSheet = ({
                 style={styles.submitButton}
                 onPress={handleSendPrescription}
               >
-                <Text style={styles.submitButtonText}>{t('send_prescription')}</Text>
+                <Text style={styles.submitButtonText}>
+                  {t('send_prescription')}
+                </Text>
               </TouchableOpacity>
             </View>
           </ScrollView>

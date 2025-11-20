@@ -6,22 +6,26 @@ import { colors } from './src/styles/colors';
 import { setGlobalFont } from './src/utils/overrideText';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import './src/config/i18n';
+import { Provider as PaperProvider } from 'react-native-paper'; // ← Import here
 
 setGlobalFont();
 
 const App = () => {
   return (
     <SafeAreaProvider>
-      <StatusBar
-        backgroundColor="transparent"
-        translucent={false}
-        barStyle="dark-content"
-      />
-      <GestureHandlerRootView style={styles.rootView}>
-        {/* <SafeAreaView style={styles.safeArea}> */}
-        <AppNavigator />
-        {/* </SafeAreaView> */}
-      </GestureHandlerRootView>
+      <PaperProvider>
+        {/* ← Wrap everything once here */}
+        <StatusBar
+          backgroundColor="transparent"
+          translucent={false}
+          barStyle="dark-content"
+        />
+        <GestureHandlerRootView style={styles.rootView}>
+          {/* <SafeAreaView style={styles.safeArea}> */}
+          <AppNavigator />
+          {/* </SafeAreaView> */}
+        </GestureHandlerRootView>
+      </PaperProvider>
     </SafeAreaProvider>
   );
 };

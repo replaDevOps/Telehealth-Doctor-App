@@ -154,7 +154,7 @@ export const HomeScreen = ({ navigation }) => {
           onViewAll={() => navigation.navigate('History')}
           onViewPrescription={id => {
             console.log('View prescription:', id);
-            navigation.navigate('PrescriptionDetail', { id });
+            navigation.navigate('Prescription', { id });
           }}
           onViewChat={id => {
             console.log('View chat:', id);

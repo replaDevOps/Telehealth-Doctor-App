@@ -18,7 +18,9 @@ const StatsCard = ({ title, value }: StatsCardProps) => {
       <View style={[styles.iconContainer]}>
         <TotalConsultationSvg />
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} numberOfLines={1}>
+        {title}
+      </Text>
       <Text style={styles.value}>{value}</Text>
     </View>
   );

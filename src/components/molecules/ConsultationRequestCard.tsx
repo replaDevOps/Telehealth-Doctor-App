@@ -135,7 +135,6 @@ const ConsultationRequestCard = ({
               {t('year_old')}
             </Text>
           </View>
-          <Text style={styles.timerText}>{timeLeft}s</Text>
         </View>
 
         {/* Action Buttons */}

@@ -33,7 +33,7 @@ export const MainNavigator = () => {
     >
       <Stack.Screen name="EntryPoint" component={CustomTabBar} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
-      <Stack.Screen name="PrescriptionScreen" component={PrescriptionScreen} />
+      <Stack.Screen name="Prescription" component={PrescriptionScreen} />
       <Stack.Screen name="AudioConsultation" component={AudioConsultation} />
       <Stack.Screen name="VideoConsultation" component={VideoConsultation} />
     </Stack.Navigator>
