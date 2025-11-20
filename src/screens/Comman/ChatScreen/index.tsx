@@ -103,14 +103,12 @@ export function ChatScreen({ navigation, route }) {
     setMessages(initialMessages);
   }, [initialMessages]);
 
-  const handleEndSeassion = () => {
-    setModalVisible(true);
-    if (writePrescription) {
-      setTimeout(() => {
-        navigation.goBack();
-      }, 2000);
-    }
-  };
+  const handleEndSeassion = useCallback(() => {
+    setTimeout(() => {
+      setModalVisible(false);
+      navigation.goBack();
+    }, 2000);
+  }, [navigation]);
 
   // Load AI chat history when component mounts
   useEffect(() => {
@@ -349,9 +347,8 @@ export function ChatScreen({ navigation, route }) {
         onClose={handleCloseModal}
         onGetPrescription={handleGetPrescription}
         writePrescription={writePrescription}
-        endSession={handleEndSeassion}
+        onEndSession={handleEndSeassion} // <-- matches modal prop
       />
-
       <AIChatHistoryBottomSheet
         visible={aiHistoryVisible}
         onClose={() => setAiHistoryVisible(false)}

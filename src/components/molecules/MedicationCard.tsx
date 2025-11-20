@@ -230,8 +230,14 @@ const styles = StyleSheet.create({
   },
   rightIcons: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   toggleIcon: { fontSize: 16, color: '#666' },
-  removeButton: { fontSize: 24, color: '#EF4444' },
-
+  removeButton: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.red,
+    borderRadius: 12,
+  },
   /* ---- Buttons ---- */
   buttonContainer: {
     flexDirection: 'row',

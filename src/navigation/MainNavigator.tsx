@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomTabBar from './bottomTab';
-import { HomeScreen } from '@screens';
+import { HomeScreen, NotificationScreen } from '@screens';
 import { HistoryScreen } from '@screens/ManageHistory';
 import {
   ChangePassword,
@@ -44,6 +44,7 @@ export const HomeNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="Notification" component={NotificationScreen} />
     </Stack.Navigator>
   );
 };

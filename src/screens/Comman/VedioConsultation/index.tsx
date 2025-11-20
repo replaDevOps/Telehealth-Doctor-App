@@ -45,6 +45,15 @@ export function VideoConsultation({ navigation, route }) {
     state => state.resetPrescription,
   );
 
+  const handleEndSeassion = useCallback(() => {
+    // close modal first (so modal disappears)
+
+    setTimeout(() => {
+      setModalVisible(false);
+      navigation.goBack();
+    }, 2000);
+  }, [navigation]);
+
   useEffect(() => {
     return () => {
       console.log(
@@ -230,6 +239,7 @@ export function VideoConsultation({ navigation, route }) {
           onClose={handleClose}
           onGetPrescription={handleGetPrescription}
           writePrescription={writePrescription}
+          onEndSession={handleEndSeassion}
         />
         <PrescriptionBottomSheet
           visible={visible}

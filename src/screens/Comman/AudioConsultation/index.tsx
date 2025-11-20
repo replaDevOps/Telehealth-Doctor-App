@@ -45,6 +45,15 @@ export function AudioConsultation({ navigation, route }) {
     state => state.resetPrescription,
   );
 
+  const handleEndSeassion = useCallback(() => {
+    // close modal first (so modal disappears)
+
+    setTimeout(() => {
+      setModalVisible(false);
+      navigation.goBack();
+    }, 2000);
+  }, [navigation]);
+
   useEffect(() => {
     return () => {
       console.log(
@@ -200,6 +209,7 @@ export function AudioConsultation({ navigation, route }) {
             onClose={handleClose}
             onGetPrescription={handleGetPrescription}
             writePrescription={writePrescription}
+            onEndSession={handleEndSeassion} // <-- matches modal prop
           />
           <PrescriptionBottomSheet
             visible={visible}

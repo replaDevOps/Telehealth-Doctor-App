@@ -134,6 +134,11 @@
   "ai_chat_history": "سجل الدردشة بالذكاء الاصطناعي",
   "male": "ذكر",
   "female": "أنثى",
-  "other": "أخرى"
-
+  "other": "أخرى",
+  "connecting_with_patient_please_wait":"جاري التواصل مع المريض، الرجاء الانتظار...",
+   "notifications": "الإشعارات",
+  "no_notifications_yet": "لا توجد إشعارات بعد",
+  "no_notifications_message": "ترقبوا المزيد! ستظهر التحديثات والتنبيهات الهامة هنا.",
+  "hr": "ساعة",
+  "mins": "دقائق"
 }

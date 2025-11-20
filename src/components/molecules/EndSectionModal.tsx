@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -19,7 +19,7 @@ interface ConsultationEndedModalProps {
   onClose: () => void;
   onGetPrescription: () => void;
   writePrescription?: boolean;
-  endSeassion: () => void;
+  onEndSession: () => void; // <-- consistent, clear prop name
 }
 
 const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
@@ -27,21 +27,23 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   onClose,
   onGetPrescription,
   writePrescription,
-  endSeassion,
+  onEndSession,
 }) => {
   const { t } = useTranslation();
   const [consultationEnded, setConsultationEnded] = useState(false);
 
   // Reset state when modal becomes visible
-  React.useEffect(() => {
+  useEffect(() => {
     if (visible) {
       setConsultationEnded(false);
     }
   }, [visible]);
 
+  // Called when user taps "End Consultation" button
   const handleEndConsultation = () => {
     setConsultationEnded(true);
-    endSeassion;
+    // call parent callback immediately
+    onEndSession();
   };
 
   const handleClose = () => {
@@ -58,35 +60,28 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Close Icon */}
           <TouchableOpacity style={styles.closeIcon} onPress={handleClose}>
             <Text style={styles.closeText}>×</Text>
           </TouchableOpacity>
 
           {writePrescription || consultationEnded ? (
             <View>
-              {/* Title */}
               <Text style={styles.title}>{t('consultation_ended')}</Text>
-              {/* Description */}
               <Text style={styles.description}>
                 {t('this_consultation_has_ended')}
               </Text>
             </View>
           ) : (
             <View>
-              {/* Title */}
               <Text style={styles.title}>{t('no_prescription_added')}</Text>
-
-              {/* Description */}
               <Text style={styles.description}>
                 {t('no_prescription_message')}
               </Text>
 
-              {/* Buttons */}
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.closeButton}
-                  onPress={handleEndConsultation}
+                  onPress={handleEndConsultation} // <-- calls parent
                 >
                   <Text style={styles.closeButtonText}>
                     {t('end_consultation')}
@@ -109,7 +104,6 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
     </Modal>
   );
 };
-
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,

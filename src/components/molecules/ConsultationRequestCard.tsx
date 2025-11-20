@@ -23,6 +23,7 @@ interface ConsultationRequestCardProps {
   treatmentType?: string;
   onAccept: () => void;
   onDecline: () => void;
+  isLoading?: boolean;
 }
 
 const TIMER_DURATION = 60; // seconds
@@ -36,6 +37,7 @@ const ConsultationRequestCard = ({
   treatmentType = 'Acne Treatment',
   onAccept,
   onDecline,
+  isLoading = false,
 }: ConsultationRequestCardProps) => {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const progress = useRef(new Animated.Value(1)).current;
@@ -63,6 +65,10 @@ const ConsultationRequestCard = ({
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleAccept = () => {
+    onAccept();
+  };
 
   const getConsultationIcon = () => {
     switch (consultationType) {
@@ -125,7 +131,8 @@ const ConsultationRequestCard = ({
           <View style={styles.patientDetails}>
             <Text style={styles.patientName}>{patientName}</Text>
             <Text style={styles.patientInfo}>
-              {patientGender}, {patientAge} {t('year_old')}
+              {t(patientGender?.toLowerCase()) || patientGender}, {patientAge}{' '}
+              {t('year_old')}
             </Text>
           </View>
           <Text style={styles.timerText}>{timeLeft}s</Text>
@@ -134,16 +141,18 @@ const ConsultationRequestCard = ({
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={styles.declineButton}
+            style={[styles.declineButton, isLoading && styles.disabledButton]}
             onPress={onDecline}
             activeOpacity={0.7}
+            disabled={isLoading}
           >
             <Text style={styles.declineButtonText}>{t('decline')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={onAccept}
+            style={[styles.acceptButton, isLoading && styles.disabledButton]}
+            onPress={handleAccept}
             activeOpacity={0.7}
+            disabled={isLoading}
           >
             <Text style={styles.acceptButtonText}>{t('accept')}</Text>
           </TouchableOpacity>
@@ -273,6 +282,9 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 18,
     fontWeight: '500',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   timerBarContainer: {
     height: 5,

@@ -134,6 +134,12 @@
   "ai_chat_history": "AI Chat History",
   "male": "Male",
   "female": "female",
-  "other": "Other"
+  "other": "Other",
+  "connecting_with_patient_please_wait":"Connecting with patient, please wait...",
+  "notifications": "Notifications",
+  "no_notifications_yet": "No Notifications Yet",
+  "no_notifications_message": "Stay tuned! Important updates and alerts will appear here.",
+  "hr": "hr",
+  "mins": "mins"
 
 }

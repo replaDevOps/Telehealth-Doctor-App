@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -6,11 +6,15 @@ import {
   Animated,
   ScrollView,
   StatusBar,
+  ActivityIndicator,
+  Text,
 } from 'react-native';
 import ConsultationRequestCard, {
   ConsultationType,
 } from '../../molecules/ConsultationRequestCard';
 import { mvs } from '../../../config/metrices';
+import { colors } from '../../../styles/colors';
+import { useTranslation } from 'react-i18next';
 
 export interface ConsultationRequest {
   id: string;
@@ -30,6 +34,8 @@ interface ConsultationRequestModalProps {
   onClose: () => void;
 }
 
+const LOADING_DURATION = 3000;
+
 const ConsultationRequestModal = ({
   visible,
   requests,
@@ -39,6 +45,9 @@ const ConsultationRequestModal = ({
 }: ConsultationRequestModalProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingRequestId, setLoadingRequestId] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     console.log('Modal visible:', visible);
@@ -77,6 +86,17 @@ const ConsultationRequestModal = ({
     }
   }, [visible, requests]);
 
+  const handleAccept = (requestId: string) => {
+    setIsLoading(true);
+    setLoadingRequestId(requestId);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setLoadingRequestId(null);
+      onAccept(requestId);
+    }, LOADING_DURATION);
+  };
+
   if (!visible || requests.length === 0) {
     return null;
   }
@@ -97,6 +117,19 @@ const ConsultationRequestModal = ({
         {/* Blurred Overlay Background */}
         <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} />
 
+        {/* Full-Screen Loading Overlay */}
+        {isLoading && (
+          <View style={styles.fullScreenLoadingOverlay}>
+            <View style={styles.loadingContent}>
+              <ActivityIndicator size="large" color={colors.white} />
+              <Text style={styles.loadingText}>
+                {t('connecting_with_patient_please_wait') ||
+                  'Connecting with patient, please wait...'}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Content Container */}
         <Animated.View
           style={[
@@ -112,6 +145,7 @@ const ConsultationRequestModal = ({
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             bounces={false}
+            scrollEnabled={!isLoading}
           >
             {requests.map(request => (
               <View key={request.id} style={styles.cardWrapper}>
@@ -122,8 +156,9 @@ const ConsultationRequestModal = ({
                   patientGender={request.patientGender}
                   consultationType={request.consultationType}
                   treatmentType={request.treatmentType}
-                  onAccept={() => onAccept(request.id)}
+                  onAccept={() => handleAccept(request.id)}
                   onDecline={() => onDecline(request.id)}
+                  isLoading={isLoading && loadingRequestId === request.id}
                 />
               </View>
             ))}
@@ -143,7 +178,25 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: '#15002E80',
+  },
+  fullScreenLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#15002E80',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  loadingContent: {
+    alignItems: 'center',
+    gap: mvs(16),
+  },
+  loadingText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    paddingHorizontal: mvs(40),
   },
   contentWrapper: {
     width: '100%',

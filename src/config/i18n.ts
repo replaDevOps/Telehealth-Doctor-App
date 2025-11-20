@@ -6,7 +6,7 @@ import ar from '../locales/ar/translation.json';
 i18n
   .use(initReactI18next)
   .init({
-    compatibilityJSON: 'v3',
+    compatibilityJSON: 'v4',
     resources: {
       en: {
         translation: en,
@@ -15,10 +15,10 @@ i18n
         translation: ar,
       },
     },
-    lng: 'en', // if you're using a language detector, do not define the lng option
+    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
-      escapeValue: false, // react already safes from xss
+      escapeValue: false, 
     },
   });
 

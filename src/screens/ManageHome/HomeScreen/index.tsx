@@ -65,6 +65,10 @@ export const HomeScreen = ({ navigation }) => {
     }
   }, [isActive]);
 
+  const handleNotification = () => {
+    navigation.navigate('Notification');
+  };
+
   const handleAcceptRequest = (requestId: string) => {
     console.log('Accepting request:', requestId);
     setShowRequestModal(false);
@@ -138,7 +142,7 @@ export const HomeScreen = ({ navigation }) => {
         patientImage={patient}
         isActive={isActive}
         onToggleActive={handleToggleActive}
-        onNotificationPress={() => console.log('Notifications pressed')}
+        onNotificationPress={handleNotification}
         onLocationPress={() => console.log('Location pressed')}
       />
 
