@@ -58,7 +58,9 @@
   "passwords_do_not_match": "كلمات المرور غير متطابقة.",
   "save": "حفظ",
   "eng": "انجليزي",
-  "history": "التاريخ",
+  "history": "السجل",
+  "setting": "الإعدادات"
+,
   "search_by_patient_name": "البحث عن طريق اسم المريض",
   "no_patients_found": "لم يتم العثور على مرضى مطابقين",
   "chat_with_vena_ai": "الدردشة مع الذكاء الاصطناعي فينا",
@@ -155,5 +157,8 @@
   "doctors_signature": "توقيع الطبيب",
   "download_prescription": "تحميل الوصفة الطبية",
   "downloading": "جاري التحميل...",
-  "confirm_prescription_is_accurate":"أؤكد صحة هذه الوصفة. تم تطبيق توقيعي الرقمي."
+  "confirm_prescription_is_accurate":"أؤكد صحة هذه الوصفة. تم تطبيق توقيعي الرقمي.",
+  "home": "الرئيسية",
+  "ai_history":"عرض سجل الدردشة بالذكاء الاصطناعي"
+
 }

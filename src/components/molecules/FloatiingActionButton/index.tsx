@@ -11,6 +11,7 @@ import Animated, {
 import { mvs } from '@config/metrices';
 import { styles } from './style';
 import { colors } from '../../../styles/colors';
+import { useTranslation } from 'react-i18next';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -74,6 +75,7 @@ export const FloatingActionButton = ({
   onAIChatPress,
 }) => {
   const isExpanded = useSharedValue(false);
+  const { t } = useTranslation();
 
   const toggleFab = () => {
     isExpanded.value = !isExpanded.value;
@@ -109,14 +111,14 @@ export const FloatingActionButton = ({
         index={1}
         icon="add"
         onPress={handlePrescriptionPress}
-        label="Write Prescription"
+        label={t('write_prescription')}
       />
       <AnimatedFabButton
         isExpanded={isExpanded}
         index={2}
         icon="chatbox-ellipses-outline"
         onPress={handleAIChatPress}
-        label="View AI Chat History"
+        label={t('ai_history')}
       />
 
       {/* Main FAB Toggle Button */}

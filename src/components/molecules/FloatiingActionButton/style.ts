@@ -64,10 +64,11 @@ export const styles = StyleSheet.create({
   },
   fabLabel: {
     color: colors.text,
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     padding:8,
     backgroundColor:colors.white,
     borderRadius:8,
+    overflow:"hidden"
   },
 });

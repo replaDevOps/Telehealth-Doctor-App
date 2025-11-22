@@ -155,6 +155,10 @@
   "doctors_signature": "Doctor's Signature",
   "download_prescription": "Download Prescription",
   "downloading": "Downloading...",
-  "confirm_prescription_is_accurate":"I confirm this prescription is accurate. My digital signature is applied."
+  "confirm_prescription_is_accurate":"I confirm this prescription is accurate. My digital signature is applied.",
+  "home": "Home",
+  "ai_history":"View AI Chat History"
+
+
 
 }

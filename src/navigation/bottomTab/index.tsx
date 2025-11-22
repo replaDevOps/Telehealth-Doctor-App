@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -28,6 +29,7 @@ export type TabParamList = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function CustomTabBar() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -56,18 +58,18 @@ export default function CustomTabBar() {
           switch (route.name) {
             case 'Home':
               SvgComponent = focused ? FHomeSvg : HomeSvg;
-              label = 'Home';
+              label = t('home');
               break;
 
             case 'History':
               SvgComponent = focused ? fHistorySvg : HistorySvg;
 
-              label = 'History';
+              label = t('history');
               break;
             case 'Setting':
               SvgComponent = focused ? fSettingSvg : SettingSvg;
 
-              label = 'Setting';
+              label = t('setting');
               break;
           }
           return (
