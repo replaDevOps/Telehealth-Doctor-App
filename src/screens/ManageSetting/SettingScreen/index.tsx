@@ -10,7 +10,6 @@ import { ProfileSvg, LogoutSvg } from '@assets/icons';
 import style from './style';
 import { mvs } from '@config/metrices';
 import { InfoSection } from '@components/common';
-import { PERSONAL_DATA, WORKING_HOURS_DATA } from '@constants';
 import { useTranslation } from 'react-i18next';
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
@@ -34,7 +33,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
           onPress: () => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'SignIn' }],
+              routes: [{ name: 'Auth' }],
             });
           },
         },

@@ -258,13 +258,15 @@ const styles = StyleSheet.create({
 
   // Info Bar
   infoBar: {
-    backgroundColor: '#7625D7',
+    backgroundColor: colors.primary,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: mvs(10),
     paddingHorizontal: mvs(16),
     gap: mvs(16),
+    borderTopRightRadius: mvs(10),
+    borderTopLeftRadius: mvs(10),
   },
   ServiceName: {
     fontSize: 15,
