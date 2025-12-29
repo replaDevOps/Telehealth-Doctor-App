@@ -1,54 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Alert } from 'react-native';
 import { KeyboardAvoidScrollview } from '../../../components/common/keyboard-avoid-scrollview';
-import { LogoSvg } from '../../../assets/icons';
 import { Header2 } from '../../../components/common/Header2';
-import CustomText from '../../../components/common/CustomText';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './style';
+import { changePassword } from '../../../services/api';
 
-export const ChangePassword = ({ navigation }) => {
-  const [password, setPassword] = useState('');
+export const ChangePassword = ({ navigation }: { navigation: any }) => {
+  const [newPassword, setNewPassword] = useState('');
   const [oldPassword, setOldPassword] = useState('');
-
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const validatePassword = (password: string) => {
-    // Example: Password must be at least 8 characters, include a number and a special character
-    const passwordRegex =
-      /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
-    return passwordRegex.test(password);
-  };
-
-  const handleSave = () => {
+  const handleSave = async () => {
     setError('');
 
-    if (!password || !confirmPassword) {
-      setError('Both fields are required.');
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setError('All fields are required.');
       return;
     }
 
-    // if (!validatePassword(password)) {
-    //   setError(
-    //     'Password must be at least 8 characters long and include a number and a special character.',
-    //   );
-    //   return;
-    // }
-
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('Password created:', password);
+    try {
+      await changePassword({
+        oldPassword,
+        newPassword,
+        confirmPassword,
+      });
+      Alert.alert('Success', 'Password changed successfully');
       navigation.goBack();
-    }, 1000);
+    } catch (err: any) {
+      console.error('Change password error:', err);
+      Alert.alert('Error', err?.response?.data?.message || err?.message || 'Failed to change password');
+    }
   };
 
   return (
@@ -69,8 +58,8 @@ export const ChangePassword = ({ navigation }) => {
             <CustomTextInput
               label="New Password"
               placeholder="Enter new password"
-              value={password}
-              onChangeText={setPassword}
+              value={newPassword}
+              onChangeText={setNewPassword}
               secureTextEntry={true}
               errorMessage={error}
             />
@@ -88,3 +77,4 @@ export const ChangePassword = ({ navigation }) => {
     </KeyboardAvoidScrollview>
   );
 };
+

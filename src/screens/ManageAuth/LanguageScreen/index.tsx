@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from './styles';
 import { Header2 } from '../../../components/common/Header2';
 import CustomText from '../../../components/common/CustomText';
@@ -15,13 +16,26 @@ export function LanguageScreen() {
   const navigation = useNavigation();
   const [selectedLang, setSelectedLang] = useState<'en' | 'ar'>('en');
 
-  const handleNext = () => {
+  const handleNext = async () => {
     console.log('Selected Language:', selectedLang);
 
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Auth', { screen: 'Onboarding' });
+    try {
+      // Save selected language to AsyncStorage
+      await AsyncStorage.setItem('selectedLanguage', selectedLang);
+      
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Auth', { screen: 'Onboarding' });
+      }
+    } catch (error) {
+      console.error('Error saving language selection:', error);
+      // Still navigate even if save fails
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Auth', { screen: 'Onboarding' });
+      }
     }
   };
 

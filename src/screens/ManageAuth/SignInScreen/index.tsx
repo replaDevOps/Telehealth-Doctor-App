@@ -18,8 +18,12 @@ import { styles } from './style';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import parsePhoneNumberFromString from 'libphonenumber-js';
+import { login } from '../../../services/api/authService';
+import { useAuthStore, User } from '../../../store';
+import { Toast } from 'toastify-react-native';
 
 export function SignInScreen({ navigation }) {
+  const { login: setAuth } = useAuthStore();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -27,30 +31,111 @@ export function SignInScreen({ navigation }) {
   const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [countryCode, setCountryCode] = useState('PK');
+  const [loading, setLoading] = useState(false);
 
   const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
   const formattedPhone = phoneNumber
     ? `+${phoneNumber.countryCallingCode}${phoneNumber.nationalNumber}`
     : `+${phone}`;
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
+    // Clear previous errors
+    setPhoneError('');
+    setPasswordError('');
+    setErrorMessage('');
+    
     let valid = true;
 
     // Phone validation
-    if (!phone.trim() || !isPhoneValid) {
-      setPhoneError('Invalid phone number');
+    if (!phone.trim()) {
+      setPhoneError('Phone number is required');
       valid = false;
-    } else setPhoneError('');
+    } else {
+      setPhoneError('');
+    }
 
     // Password validation
     if (!password.trim()) {
       setPasswordError('Password is required');
       valid = false;
-    } else setPasswordError('');
+    } else {
+      setPasswordError('');
+    }
 
-    // Final navigation
-    if (valid) {
-      navigation.navigate('Main', { screen: 'Home' });
+    if (!valid) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Call login API
+      const response = await login({
+        phoneNo: phone.trim(),
+        password: password.trim(),
+      });
+
+      console.log('Login response:', response);
+
+      // API response structure: { status: true, message: "...", user: { id, name, email, type, token, refreshToken } }
+      if (response.status === true && response.user) {
+        const userInfo = response.user;
+        
+        // Extract token and refreshToken from user object
+        const token = userInfo.token;
+        const refreshToken = userInfo.refreshToken;
+        
+        if (!token) {
+          throw new Error('Token not found in response');
+        }
+
+        // Map API response to User interface
+        const userData: User = {
+          id: String(userInfo.id),
+          email: userInfo.email || '',
+          name: userInfo.name || '',
+          role: 'doctor',
+          phone: userInfo.phoneNo || phone.trim(),
+        };
+
+        // Store user, token, and refreshToken in auth store
+        setAuth(userData, token, refreshToken);
+
+        // Navigate to main screen
+        navigation.replace('Main', { screen: 'Home' });
+        
+        // Show success message after navigation (to avoid blocking navigation)
+        // Using setTimeout to ensure navigation happens first
+        setTimeout(() => {
+          try {
+            const successMsg = response.message || 'Login successful';
+            Toast.success(successMsg);
+          } catch (toastError) {
+            console.log('Toast error (non-critical):', toastError);
+          }
+        }, 100);
+      } else {
+        // If status is false or user is missing
+        throw new Error(response.message || 'Login failed. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const errorMsg = 
+        error?.response?.data?.data?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Login failed. Please check your credentials and try again.';
+      setErrorMessage(errorMsg);
+      // Only show error toast if it's a real error (not success message)
+      if (!errorMsg.toLowerCase().includes('successful')) {
+        try {
+          Toast.error(errorMsg);
+        } catch (toastError) {
+          console.log('Toast error (non-critical):', toastError);
+        }
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,7 +195,12 @@ export function SignInScreen({ navigation }) {
           />
 
           {/* Sign In Button */}
-          <CustomButton title="Sign In" onPress={handleSignIn} />
+          <CustomButton
+            title={loading ? 'Signing In...' : 'Sign In'}
+            onPress={handleSignIn}
+            disabled={loading}
+            loading={loading}
+          />
 
           {/* Sign Up Link */}
           <View style={styles.signinRow}>

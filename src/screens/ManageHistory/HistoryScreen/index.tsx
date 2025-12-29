@@ -6,11 +6,24 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { Header2 } from '@components/common/Header2';
-import { CONSULTATION_REQUESTS } from '@constants';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
+
+import { useDashboardStore } from '../../../store';
+import { useEffect } from 'react';
 
 export function HistoryScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { allConsultations, fetchAllConsultations } = useDashboardStore();
+
+
+  useEffect(() => {
+    fetchAllConsultations();
+  }, [fetchAllConsultations]);
+
+  const filteredConsultations = allConsultations.filter(item =>
+    item.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.sevviceName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -23,7 +36,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
         <Ionicons name="search" size={20} color={colors.secondaryText} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by doctor or clinic name..."
+          placeholder="Search by patient or service name..."
           placeholderTextColor={colors.secondaryText}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -34,8 +47,10 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Consultations */}
         <RecentConsultations
-          consultations={CONSULTATION_REQUESTS}
+          consultations={filteredConsultations}
+          emptyMessage="No consultations found."
           onViewPrescription={id => {
+
             console.log('View prescription:', id);
             navigation.navigate('PrescriptionDetail', { id });
           }}
@@ -48,3 +63,4 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
     </SafeAreaView>
   );
 }
+

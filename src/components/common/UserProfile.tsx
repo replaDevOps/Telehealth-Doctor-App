@@ -7,10 +7,13 @@ import {
   Alert,
 } from 'react-native';
 import React, { useState, useCallback } from 'react';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary, ImageLibraryOptions } from 'react-native-image-picker';
 import { mvs } from '../../config/metrices';
 import { colors } from '../../styles/colors';
 import { EditSvg } from '../../assets/icons';
+
+import { updateProfileImage } from '../../services/api';
+import { useProfileStore } from '../../store';
 
 interface UserProfileProps {
   profileImage?: string;
@@ -21,12 +24,20 @@ const UserProfile: React.FC<UserProfileProps> = ({
   profileImage: initialProfileImage = '',
   onImageSelected,
 }) => {
+  const { refreshProfile } = useProfileStore();
   const [profileImage, setProfileImage] = useState(initialProfileImage);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Sync with prop changes
+  React.useEffect(() => {
+    if (initialProfileImage) {
+      setProfileImage(initialProfileImage);
+    }
+  }, [initialProfileImage]);
+
   const openImagePicker = useCallback(() => {
-    const options = {
-      mediaType: 'photo' as const,
+    const options: ImageLibraryOptions = {
+      mediaType: 'photo',
       quality: 0.8,
     };
 
@@ -44,22 +55,21 @@ const UserProfile: React.FC<UserProfileProps> = ({
       const uri = response.assets?.[0]?.uri;
       if (!uri) return;
 
-      // ----> Simulate upload – replace with your real mutation <----
       setIsUploading(true);
       try {
-        // Example: await uploadToBackend(uri);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // demo delay
-
+        await updateProfileImage(uri);
         setProfileImage(uri);
         onImageSelected?.(uri);
-      } catch (e) {
+        await refreshProfile();
+      } catch (e: any) {
         console.error('Upload failed', e);
-        Alert.alert('Upload failed', 'Please try again.');
+        Alert.alert('Upload failed', e?.response?.data?.message || e?.message || 'Please try again.');
       } finally {
         setIsUploading(false);
       }
     });
-  }, [onImageSelected]);
+  }, [onImageSelected, refreshProfile]);
+
 
   const imageSource = profileImage
     ? { uri: profileImage }

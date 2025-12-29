@@ -33,7 +33,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   phoneError,
   errorMessage,
   editable = true,
-  maxLength = 11,
+  maxLength,
   onValidationChange,
   initialValue = '',
   CustomStyle,
@@ -65,10 +65,16 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   }, [phone, countryCode]);
 
   useEffect(() => {
-    if (value && phoneInput.current) {
-      const valid = phoneInput.current.isValidNumber(value);
-      setIsValid(valid === true);
-      onValidationChange?.(valid && value.trim() !== '');
+    // Commented out number validation for now
+    // if (value && phoneInput.current) {
+    //   const valid = phoneInput.current.isValidNumber(value);
+    //   setIsValid(valid === true);
+    //   onValidationChange?.(valid && value.trim() !== '');
+    // }
+    // Always set as valid when there's a value
+    if (value) {
+      setIsValid(true);
+      onValidationChange?.(value.trim() !== '');
     }
   }, [value, selectedCountryCode]);
 
@@ -77,10 +83,13 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
     setHasBeenTouched(true);
     hasUserTypedRef.current = true;
 
-    if (phoneInput.current) {
-      const valid = phoneInput.current.isValidNumber(text);
-      setIsValid(valid === true);
-    }
+    // Commented out number validation for now
+    // if (phoneInput.current) {
+    //   const valid = phoneInput.current.isValidNumber(text);
+    //   setIsValid(valid === true);
+    // }
+    // Always set as valid when there's text
+    setIsValid(text.trim() !== '');
   };
 
   const handleFormattedTextChange = (formattedText: string) => {
@@ -93,9 +102,14 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
 
     safeSetPhone(digitsOnly);
 
-    if (formattedText && phoneInput.current) {
-      const valid = phoneInput.current.isValidNumber(formattedText);
-      setIsValid(valid === true);
+    // Commented out number validation for now
+    // if (formattedText && phoneInput.current) {
+    //   const valid = phoneInput.current.isValidNumber(formattedText);
+    //   setIsValid(valid === true);
+    // }
+    // Always set as valid when there's formatted text
+    if (formattedText) {
+      setIsValid(true);
     }
   };
 
@@ -104,15 +118,23 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
     safeSetCountryCode(country.cca2);
     setHasBeenTouched(true);
 
-    if (value.trim() && phoneInput.current) {
-      const valid = phoneInput.current.isValidNumber(value);
-      setIsValid(valid === true);
+    // Commented out number validation for now
+    // if (value.trim() && phoneInput.current) {
+    //   const valid = phoneInput.current.isValidNumber(value);
+    //   setIsValid(valid === true);
+    // }
+    // Always set as valid when there's a value
+    if (value.trim()) {
+      setIsValid(true);
     }
   };
 
-  const hasError =
-    ((phoneError || errorMessage) && hasBeenTouched) ||
-    (!isValid && hasBeenTouched && value);
+  // Commented out number validation for now
+  // const hasError =
+  //   ((phoneError || errorMessage) && hasBeenTouched) ||
+  //   (!isValid && hasBeenTouched && value);
+  const hasError = (phoneError || errorMessage) && hasBeenTouched;
+  // Removed: (!isValid && hasBeenTouched && value)
 
   return (
     <View>
@@ -138,7 +160,6 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
           textInputProps={{
             placeholderTextColor: colors.gray,
             editable: editable,
-            maxLength,
           }}
           onChangeText={handleTextChange}
           onChangeCountry={handleCountryChange}

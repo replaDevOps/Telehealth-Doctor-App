@@ -19,6 +19,7 @@ import {
   ProfileSetting,
   RefundRequest2,
   SettingScreen,
+  SignatureScreen,
 } from '@screens/ManageSetting';
 import {
   CardDetails,
@@ -130,6 +131,7 @@ export const SettingNavigator = () => {
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
       <Stack.Screen name="FAQs" component={FAQs} />
       <Stack.Screen name="RefundRequest2" component={RefundRequest2} />
+      <Stack.Screen name="SignatureScreen" component={SignatureScreen} />
     </Stack.Navigator>
   );
 };

@@ -4,24 +4,32 @@ import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
-import { doctor, RecommandImage } from '@assets/images';
+import { doctor } from '@assets/images';
 import { ConsultationRequest } from '@components/molecules';
 import HomeHeader from '@components/molecules/HomeHeadder';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
 import ConsultationRequestModal from '@components/molecules/Organisms/ConsultationRequestModal';
-import { CONSULTATION_REQUESTS } from '@constants';
+
+import { useDashboardStore, useProfileStore } from '../../../store';
 
 export const HomeScreen = ({ navigation }) => {
+  const { profileData } = useProfileStore();
+  const { stats, recentConsultations, fetchDashboardData } = useDashboardStore();
+
   const [isActive, setIsActive] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [consultationRequests, setConsultationRequests] = useState<
     ConsultationRequest[]
   >([]);
 
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
   // Simulate incoming consultation requests when doctor is active
   useEffect(() => {
     if (isActive) {
-      // Simulate incoming request after 3 seconds
+      // (Keep existing simulation logic or remove it if not needed, for now I'll keep it)
       const timer = setTimeout(() => {
         const mockRequests: ConsultationRequest[] = [
           {
@@ -29,29 +37,17 @@ export const HomeScreen = ({ navigation }) => {
             patientName: 'Patient 1',
             patientAge: 21,
             patientImage: doctor,
-
             patientGender: 'Female',
             consultationType: 'chat',
-            treatmentType: 'Acne Treatment',
-          },
-          {
-            id: 'req-2',
-            patientName: 'Patient 2',
-            patientAge: 21,
-            patientImage: doctor,
-
-            patientGender: 'Female',
-            consultationType: 'audio',
             treatmentType: 'Acne Treatment',
           },
         ];
         setConsultationRequests(mockRequests);
         setShowRequestModal(true);
-      }, 2000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     } else {
-      // Close modal and clear requests when doctor goes offline
       setShowRequestModal(false);
       setConsultationRequests([]);
     }
@@ -59,51 +55,15 @@ export const HomeScreen = ({ navigation }) => {
 
   const handleAcceptRequest = (requestId: string) => {
     console.log('Accepting request:', requestId);
-
-    // Remove the accepted request from the list
     setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
-
-    // If no more requests, close modal
     if (consultationRequests.length === 1) {
       setShowRequestModal(false);
-    }
-
-    // Navigate to consultation screen
-    const request = consultationRequests.find(req => req.id === requestId);
-    if (request) {
-      switch (request.consultationType) {
-        case 'video':
-          navigation.navigate('VideoCall', { requestId });
-          break;
-        case 'audio':
-          navigation.navigate('AudioCall', { requestId });
-          break;
-        case 'chat':
-          navigation.navigate('ChatScreen', {
-            chatType: 'doctor',
-            doctorInfo: {
-              id: 'doctor_1',
-              name: 'Dr. Sultan Khan',
-              avatar: 'https://i.pravatar.cc/150?img=12',
-            },
-            clinicInfo: {
-              name: 'Eden Medical Center',
-              location: 'Makkah, Saudi Arabia, 2.2km',
-              image: RecommandImage,
-            },
-          });
-          break;
-      }
     }
   };
 
   const handleDeclineRequest = (requestId: string) => {
     console.log('Declining request:', requestId);
-
-    // Remove the declined request from the list
     setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
-
-    // If no more requests, close modal
     if (consultationRequests.length === 1) {
       setShowRequestModal(false);
     }
@@ -111,12 +71,7 @@ export const HomeScreen = ({ navigation }) => {
 
   const handleToggleActive = (value: boolean) => {
     setIsActive(value);
-
-    // Optionally call API to update doctor availability
-    // updateDoctorAvailability(value);
-
     if (!value) {
-      // Close modal when going offline
       setShowRequestModal(false);
       setConsultationRequests([]);
     }
@@ -128,9 +83,9 @@ export const HomeScreen = ({ navigation }) => {
       <HomeHeader
         centerName="Eden Medical Center"
         location="Makkah"
-        doctorName="Dr. Sultan Khan"
-        doctorSpecialty="Dermatologist"
-        doctorImage={doctor}
+        doctorName={profileData?.name || 'Dr. Sultan Khan'}
+        doctorSpecialty={profileData?.specialization || 'Dermatologist'}
+        doctorImage={profileData?.image ? { uri: profileData.image } : doctor}
         isActive={isActive}
         onToggleActive={handleToggleActive}
         onNotificationPress={() => console.log('Notifications pressed')}
@@ -139,11 +94,14 @@ export const HomeScreen = ({ navigation }) => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Stats Row */}
-        <StatsRow totalConsultations={142} thisMonth={28} />
+        <StatsRow
+          totalConsultations={stats?.totalConsultations || 0}
+          thisMonth={stats?.thisMonth || 0}
+        />
 
         {/* Recent Consultations */}
         <RecentConsultations
-          consultations={CONSULTATION_REQUESTS}
+          consultations={recentConsultations}
           onViewAll={() => navigation.navigate('History')}
           onViewPrescription={id => {
             console.log('View prescription:', id);
@@ -167,6 +125,7 @@ export const HomeScreen = ({ navigation }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
