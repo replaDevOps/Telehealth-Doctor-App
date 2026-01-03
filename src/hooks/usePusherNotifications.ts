@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
 import { pusherService } from '../services/pusher/PusherService';
-import { useAuthStore } from '../store';
+import { useAuthStore, useDashboardStore } from '../store';
+import { useNotificationStore } from '../store/useNotificationStore';
+import { useConsultationRequestStore } from '../store/useConsultationRequestStore';
+import { ConsultationRequest } from '../components/molecules/Organisms/ConsultationRequestModal';
 import { Toast } from 'toastify-react-native';
 
 /**
@@ -51,35 +53,127 @@ export const usePusherNotifications = () => {
     const receiveMessageChannelName = `received-message${doctorID}`;
 
     // Handler for notification-send-doctor event
-    const handleNotification = (data: any) => {
+    const handleNotification = async (data: any) => {
       console.log('Doctor notification received:', data);
-      Alert.alert("Message received alert:\n" + JSON.stringify(data));
-      // Show toast notification
-      if (data?.message || data?.title) {
-        Toast.info(data.message || data.title);
+      
+      // Refresh notifications from API
+      try {
+        const { refreshNotifications } = useNotificationStore.getState();
+        await refreshNotifications();
+        console.log('✅ Notifications refreshed after Pusher event');
+      } catch (error) {
+        console.error('❌ Error refreshing notifications:', error);
       }
+      
+      // Show toast notification - ensure we extract a string value
+      let notificationMessage = 'New notification received';
+      
+      if (typeof data === 'string') {
+        notificationMessage = data;
+      } else if (data && typeof data === 'object') {
+        // Extract string from various possible fields
+        notificationMessage = 
+          data?.description || 
+          data?.message || 
+          data?.title || 
+          data?.body || 
+          data?.type ||
+          (data?.notification ? (typeof data.notification === 'string' ? data.notification : data.notification?.description || data.notification?.message || data.notification?.title) : null) ||
+          'New notification received';
+      }
+      
+      // Ensure it's a string, not an object
+      if (typeof notificationMessage !== 'string') {
+        notificationMessage = JSON.stringify(notificationMessage);
+      }
+      
+      Toast.info(notificationMessage);
     };
 
     // Handler for consultation-doctor event
     const handleConsultationUpdate = (data: any) => {
       console.log('Consultation update received:', data);
-      Alert.alert("Message received alert:\n" + JSON.stringify(data));
-      // Show toast notification
-      if (data?.message || data?.status) {
-        Toast.info(data.message || `Consultation ${data.status}`);
+      
+      // Extract consultation data from Pusher event
+      const consultation = data?.consultation || data;
+      
+      if (!consultation || !consultation.id) {
+        console.warn('Invalid consultation data received:', data);
+        return;
       }
+      
+      // Map consultation type (Chat/Video/Audio) to ConsultationType
+      const consultationTypeMap: Record<string, ConsultationRequest['consultationType']> = {
+        'Chat': 'chat',
+        'Video': 'video',
+        'Audio': 'audio',
+        'chat': 'chat',
+        'video': 'video',
+        'audio': 'audio',
+      };
+      
+      const consultationType = consultationTypeMap[consultation.type] || 'chat';
+      
+      // Try to get patient info from dashboard store (if consultation was already fetched)
+      const { recentConsultations, allConsultations } = useDashboardStore.getState();
+      const existingConsultation = [...recentConsultations, ...allConsultations].find(
+        (cons: any) => String(cons.id) === String(consultation.id)
+      );
+      
+      // Extract patient info from existing consultation or use placeholders
+      const patientName = existingConsultation?.patientName || 
+        (consultation.patient?.name) || 
+        `Patient ${consultation.patientID}` || 
+        'Patient';
+      
+      const patientAge = existingConsultation?.age ? 
+        parseInt(existingConsultation.age.replace(/\D/g, '')) || 25 : 25;
+      
+      const patientGender = (existingConsultation?.gender || consultation.patient?.gender || 'Male') as 'Male' | 'Female';
+      
+      const treatmentType = existingConsultation?.sevviceName || 
+        (consultation.service?.name) || 
+        `Service ${consultation.serviceID}` || 
+        'Consultation';
+      
+      const patientImage = existingConsultation?.patientImage || 
+        (consultation.patient?.image ? { uri: consultation.patient.image } : undefined);
+      
+      // Create consultation request object
+      const consultationRequest: ConsultationRequest = {
+        id: String(consultation.id),
+        patientName: patientName,
+        patientAge: patientAge,
+        patientGender: patientGender,
+        consultationType: consultationType,
+        treatmentType: treatmentType,
+        patientImage: patientImage,
+        patientID: consultation.patientID || existingConsultation?.patientID, // Store patientID
+      };
+      
+      // Add consultation request to store (this will trigger modal to show)
+      const { addRequest } = useConsultationRequestStore.getState();
+      addRequest(consultationRequest);
+      
+      // Refresh dashboard to get updated consultation data with patient info
+      const { fetchDashboardData } = useDashboardStore.getState();
+      fetchDashboardData().catch(err => console.error('Error refreshing dashboard:', err));
+      
+      // Show toast notification
+      const consultationMessage = data?.message || 
+        (consultation.status ? `New ${consultation.type} consultation request` : null) || 
+        'New consultation request received';
+      Toast.info(consultationMessage);
     };
 
     // Handler for message-sent event
     const handleMessageSent = (data: any) => {
       console.log('Message sent alert:', data);
-      Alert.alert("Message sent alert:\n" + JSON.stringify(data));
     };
 
     // Handler for message-received event
     const handleMessageReceived = (data: any) => {
       console.log('Message received alert:', data);
-      Alert.alert("Message received alert:\n" + JSON.stringify(data));
     };
 
     // Bind events

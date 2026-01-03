@@ -11,18 +11,19 @@ import RecentConsultations from '@components/molecules/Organisms/RecentConsultat
 import ConsultationRequestModal from '@components/molecules/Organisms/ConsultationRequestModal';
 import { updateOnlineStatus } from '../../../services/api/dashboardService';
 
-import { useDashboardStore, useProfileStore, useNotificationStore } from '../../../store';
+import { useDashboardStore, useProfileStore, useNotificationStore, useConsultationRequestStore, useAuthStore } from '../../../store';
+import { useNotificationCount } from '../../../hooks/useNotificationCount';
+import { acceptConsultation } from '../../../services/api/chatConsultationService';
+import { Toast } from 'toastify-react-native';
 
 export const HomeScreen = ({ navigation }) => {
   const { profileData } = useProfileStore();
   const { stats, recentConsultations, fetchDashboardData, isLoading } = useDashboardStore();
-  const { unreadCount, fetchNotifications } = useNotificationStore();
+  const { fetchNotifications } = useNotificationStore();
+  const { notificationCount } = useNotificationCount();
+  const { requests: consultationRequests, removeRequest, clearAll: clearAllRequests } = useConsultationRequestStore();
 
   const [isActive, setIsActive] = useState(false);
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [consultationRequests, setConsultationRequests] = useState<
-    ConsultationRequest[]
-  >([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -36,47 +37,94 @@ export const HomeScreen = ({ navigation }) => {
     }
   }, [profileData]);
 
-  // Simulate incoming consultation requests when doctor is active
+  // Clear requests when doctor goes offline
   useEffect(() => {
-    if (isActive) {
-      // (Keep existing simulation logic or remove it if not needed, for now I'll keep it)
-      const timer = setTimeout(() => {
-        const mockRequests: ConsultationRequest[] = [
-          {
-            id: 'req-1',
-            patientName: 'Patient 1',
-            patientAge: 21,
-            patientImage: doctor,
-            patientGender: 'Female',
-            consultationType: 'chat',
-            treatmentType: 'Acne Treatment',
-          },
-        ];
-        setConsultationRequests(mockRequests);
-        setShowRequestModal(true);
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    } else {
-      setShowRequestModal(false);
-      setConsultationRequests([]);
+    if (!isActive) {
+      clearAllRequests();
     }
-  }, [isActive]);
+  }, [isActive, clearAllRequests]);
 
-  const handleAcceptRequest = (requestId: string) => {
-    console.log('Accepting request:', requestId);
-    setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
-    if (consultationRequests.length === 1) {
-      setShowRequestModal(false);
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      console.log('Accepting consultation request:', requestId);
+      
+      // Call acceptConsultation API
+      await acceptConsultation({ id: requestId });
+      
+      // Find the consultation request to get patient info and type
+      const consultationRequest = consultationRequests.find(req => req.id === requestId);
+      
+      // Remove request from store
+      removeRequest(requestId);
+      
+      // Refresh dashboard to show updated consultations
+      fetchDashboardData();
+      
+      Toast.success('Consultation accepted successfully');
+      
+      // Wait a bit for toast to show, then navigate
+      setTimeout(() => {
+        // Get patientID from consultation request or from recent consultations after refresh
+        const consultation = recentConsultations.find(cons => cons.id === requestId);
+        const patientID = consultationRequest?.patientID || consultation?.patientID;
+        const consultationType = consultationRequest?.consultationType || consultation?.type || 'chat';
+        
+        // Get user ID for WebRTC
+        const { user } = useAuthStore.getState();
+        const doctorID = user?.id;
+        const userId = doctorID ? `doctor_${doctorID}` : `doctor_${Date.now()}`;
+        
+        const patientInfo = consultationRequest ? {
+          id: patientID,
+          name: consultationRequest.patientName,
+          image: consultationRequest.patientImage,
+        } : (consultation ? {
+          id: consultation.patientID,
+          name: consultation.patientName,
+          image: consultation.patientImage,
+        } : null);
+        
+        // Navigate based on consultation type
+        if (consultationType === 'audio') {
+          navigation.navigate('AudioConsultation', {
+            consultationId: `consultation_${requestId}`,
+            userId: userId,
+            isInitiator: false, // Doctor joins, patient initiates
+            patientInfo: patientInfo,
+          });
+        } else if (consultationType === 'video') {
+          navigation.navigate('VideoConsultation', {
+            consultationId: `consultation_${requestId}`,
+            userId: userId,
+            isInitiator: false, // Doctor joins, patient initiates
+            patientInfo: patientInfo,
+          });
+        } else {
+          // Default to ChatScreen for chat consultations
+          navigation.navigate('ChatScreen', {
+            id: requestId,
+            consultationId: requestId,
+            patientID: patientID,
+            patientInfo: patientInfo,
+            chatType: 'doctor',
+            fromHistory: false,
+          });
+        }
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error accepting consultation:', error);
+      const errorMessage = 
+        error?.response?.data?.message || 
+        error?.message || 
+        'Failed to accept consultation';
+      Toast.error(errorMessage);
     }
   };
 
   const handleDeclineRequest = (requestId: string) => {
-    console.log('Declining request:', requestId);
-    setConsultationRequests(prev => prev.filter(req => req.id !== requestId));
-    if (consultationRequests.length === 1) {
-      setShowRequestModal(false);
-    }
+    console.log('Declining consultation request:', requestId);
+    // Remove request from store
+    removeRequest(requestId);
   };
 
   const handleToggleActive = async (value: boolean) => {
@@ -88,9 +136,8 @@ export const HomeScreen = ({ navigation }) => {
       await updateOnlineStatus(value);
       
       if (!value) {
-        // Close modal when going offline
-        setShowRequestModal(false);
-        setConsultationRequests([]);
+        // Clear requests when going offline
+        clearAllRequests();
       }
     } catch (error: any) {
       // Revert the toggle if API call fails
@@ -119,7 +166,7 @@ export const HomeScreen = ({ navigation }) => {
         onToggleActive={handleToggleActive}
         onNotificationPress={() => navigation.navigate('NotificationScreen')}
         onLocationPress={() => console.log('Location pressed')}
-        notificationCount={unreadCount}
+        notificationCount={notificationCount}
       />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -158,13 +205,13 @@ export const HomeScreen = ({ navigation }) => {
         />
       </ScrollView>
 
-      {/* Consultation Request Modal */}
+      {/* Consultation Request Modal - Shows when requests are available from Pusher */}
       <ConsultationRequestModal
-        visible={showRequestModal && consultationRequests.length > 0}
+        visible={consultationRequests.length > 0 && isActive}
         requests={consultationRequests}
         onAccept={handleAcceptRequest}
         onDecline={handleDeclineRequest}
-        onClose={() => setShowRequestModal(false)}
+        onClose={() => clearAllRequests()}
       />
     </View>
   );

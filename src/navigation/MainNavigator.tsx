@@ -67,6 +67,8 @@ export const MainNavigator = () => {
       <Stack.Screen name="CardDetails" component={CardDetails} />
       <Stack.Screen name="Refund" component={RefundRequest} />
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="AudioConsultation" component={AudioConsultation} />
+      <Stack.Screen name="VideoConsultation" component={VideoConsultation} />
       <ClinicStack.Screen name="CheckoutScreen" component={CheckoutScreen} />
       <ClinicStack.Screen name="CartScreen" component={CartScreen} />
       <ClinicStack.Screen

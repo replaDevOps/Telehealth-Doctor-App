@@ -17,12 +17,18 @@ interface ConsultationEndedModalProps {
   visible: boolean;
   onClose: () => void;
   onGetPrescription: () => void;
+  isDoctor?: boolean;
+  onAddPrescription?: () => void;
+  onEndConsultation?: () => void;
 }
 
 const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   visible,
   onClose,
   onGetPrescription,
+  isDoctor = false,
+  onAddPrescription,
+  onEndConsultation,
 }) => {
   return (
     <Modal
@@ -39,29 +45,55 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
           </TouchableOpacity>
 
           {/* Title */}
-          <Text style={styles.title}>Consultation Ended</Text>
+          <Text style={styles.title}>
+            {'Consultation Ended'}
+          </Text>
 
           {/* Description */}
           <Text style={styles.description}>
-            The consultation has ended. The doctor has shared your prescription.
-            You can download it now or anytime from your history.
+            {isDoctor
+              ? 'The consultation has ended. Your prescription will be sent to the patient.'
+              : 'The consultation has ended. The doctor has shared your prescription. You can download it now or anytime from your history.'}
           </Text>
 
           {/* Buttons */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.prescriptionButton}
-              onPress={onGetPrescription}
-            >
-              <Text style={styles.prescriptionButtonText}>
-                Get Prescription
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {isDoctor ? (
+            onAddPrescription && onEndConsultation ? (
+              // Show action buttons when doctor is trying to end consultation (back navigation)
+              <View style={styles.buttonColumn}>
+                <TouchableOpacity
+                  style={styles.prescriptionButton}
+                  onPress={onAddPrescription}
+                >
+                  <Text style={styles.prescriptionButtonText}>
+                    Add Prescription
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.endButton}
+                  onPress={onEndConsultation}
+                >
+                  <Text style={styles.endButtonText}>End Consultation</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                  <Text style={styles.closeButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              // Show only Close button when consultation has already ended
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            )
+          ) : (
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
     </Modal>
@@ -71,7 +103,7 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: '#15002E80',
+    backgroundColor: 'rgba(21, 0, 46, 0.5)', // Muted purple overlay
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -80,43 +112,42 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 20,
     padding: 24,
-    alignItems: 'center',
-
+    alignItems: 'flex-start',
     position: 'relative',
   },
   closeIcon: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: 16,
+    right: 16,
     width: 32,
     height: 32,
-    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
   },
   closeText: {
-    fontSize: 28,
+    fontSize: 24,
     color: colors.text,
     fontWeight: '400',
-    marginBottom: mvs(10),
-    position: 'absolute',
-    top: -12,
-    right: 5,
+    lineHeight: 24,
   },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: 12,
+    marginTop: 8,
     textAlign: 'center',
+    width: '100%',
   },
   description: {
     fontSize: 14,
     color: colors.secondaryText,
-    textAlign: 'center',
+    textAlign: 'left',
     lineHeight: 20,
     marginBottom: 24,
+    paddingHorizontal: 0,
+    width: '100%',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -124,9 +155,14 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
   },
+  buttonColumn: {
+    flexDirection: 'column',
+    gap: 12,
+    width: '100%',
+  },
   closeButton: {
-    flex: 1,
-    paddingVertical: 12,
+    width: '100%',
+    paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: colors.gray,
     alignItems: 'center',
@@ -139,13 +175,25 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   prescriptionButton: {
-    flex: 1,
-    paddingVertical: 12,
+    width: '100%',
+    paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: colors.primary,
     alignItems: 'center',
   },
   prescriptionButtonText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  endButton: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: colors.red,
+    alignItems: 'center',
+  },
+  endButtonText: {
     color: colors.white,
     fontSize: 15,
     fontWeight: '600',

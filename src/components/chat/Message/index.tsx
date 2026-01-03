@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, ActivityIndicator } from 'react-native';
+import FastImage from '@d11/react-native-fast-image';
 import { Suggestion } from '../Suggestion';
 import { Message as MessageType, Service } from '../../../types/chat.types';
 import { styles } from './style';
@@ -15,10 +16,10 @@ export const Message: React.FC<MessageProps> = ({
   showAvatar,
   handleServicePress,
 }) => {
+  const [loadingImages, setLoadingImages] = useState<{ [key: number]: boolean }>({});
   const isUser = msg.type === 'user';
   const hasText = msg.text && msg.text.trim().length > 0;
   const hasImages = msg.images && msg.images.length > 0;
-
   return (
     <View style={styles.messageContainer}>
       {/* Bot Message */}
@@ -31,9 +32,50 @@ export const Message: React.FC<MessageProps> = ({
             {showAvatar && msg.user && (
               <Text style={styles.senderName}>{msg.user.name}</Text>
             )}
-            {hasText && (
+            {(hasText || hasImages) && (
               <View style={styles.botMessage}>
-                <Text style={styles.botMessageText}>{msg.text}</Text>
+                {hasText && (
+                  <Text style={styles.botMessageText}>{msg.text}</Text>
+                )}
+                {hasImages && (
+                  <View style={styles.botImagesRow}>
+                    {msg.images?.map((img, i) => {
+                      const imageUri = typeof img === 'string' ? img : img?.uri;
+                      const isUploading = typeof img === 'object' && img?.isUploading;
+                      const isLoading = loadingImages[i] || false;
+                      
+                      // If URI doesn't start with http or file://, prepend BASE_URL
+                      const fullImageUri = imageUri && !imageUri.startsWith('http') && !imageUri.startsWith('file://')
+                        ? `https://telehealth.repla-projects.com/${imageUri}`
+                        : imageUri;
+
+                      const handleLoadStart = () => {
+                        setLoadingImages(prev => ({ ...prev, [i]: true }));
+                      };
+
+                      const handleLoadEnd = () => {
+                        setLoadingImages(prev => ({ ...prev, [i]: false }));
+                      };
+                      return (
+                        <View key={`img-${i}`} style={styles.imageContainer}>
+                          <FastImage
+                            source={{ uri: fullImageUri }}
+                            style={styles.uploadedImage}
+                            resizeMode={FastImage.resizeMode.cover}
+                            onLoadStart={handleLoadStart}
+                            onLoadEnd={handleLoadEnd}
+                            onError={handleLoadEnd}
+                          />
+                          {(isUploading || isLoading) && (
+                            <View style={styles.uploadingOverlay}>
+                              <ActivityIndicator size="small" color="#fff" />
+                            </View>
+                          )}
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
               </View>
             )}
             {msg.suggestions && (
@@ -65,17 +107,38 @@ export const Message: React.FC<MessageProps> = ({
               {hasImages && (
                 <View style={styles.imagesRow}>
                   {msg.images?.map((img, i) => {
-                    console.log(`Image ${i}:`, img);
-                    console.log(`Image ${i} type:`, typeof img);
-                    console.log(`Image ${i} has uri:`, img?.uri);
-                    console.log(`Image ${i} uri type:`, typeof img?.uri);
+                    const imageUri = typeof img === 'string' ? img : img?.uri;
+                    const isUploading = typeof img === 'object' && img?.isUploading;
+                    const isLoading = loadingImages[i] || false;
+                    
+                    // If URI doesn't start with http or file://, prepend BASE_URL
+                    const fullImageUri = imageUri && !imageUri.startsWith('http') && !imageUri.startsWith('file://')
+                      ? `https://telehealth.repla-projects.com/${imageUri}`
+                      : imageUri;
 
+                    const handleLoadStart = () => {
+                      setLoadingImages(prev => ({ ...prev, [i]: true }));
+                    };
+
+                    const handleLoadEnd = () => {
+                      setLoadingImages(prev => ({ ...prev, [i]: false }));
+                    };
                     return (
-                      <Image
-                        key={`img-${i}`}
-                        source={img}
-                        style={styles.uploadedImage}
-                      />
+                      <View key={`img-${i}`} style={styles.imageContainer}>
+                        <FastImage
+                          source={{ uri: fullImageUri }}
+                          style={styles.uploadedImage}
+                          resizeMode={FastImage.resizeMode.cover}
+                          onLoadStart={handleLoadStart}
+                          onLoadEnd={handleLoadEnd}
+                          onError={handleLoadEnd}
+                        />
+                        {(isUploading || isLoading) && (
+                          <View style={styles.uploadingOverlay}>
+                            <ActivityIndicator size="small" color="#fff" />
+                          </View>
+                        )}
+                      </View>
                     );
                   })}
                 </View>

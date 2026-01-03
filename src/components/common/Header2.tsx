@@ -27,6 +27,7 @@ interface Header2Props {
   showLanguage?: boolean;
   showCart?: boolean;
   cartCount?: number;
+  notificationCount?: number;
   handleNotification?: () => void;
   handleDownload?: () => void;
   handleSave?: () => void;
@@ -48,6 +49,7 @@ const Header2: React.FC<Header2Props> = ({
   showLanguage = false,
   showCart = false,
   cartCount = 0,
+  notificationCount = 0,
   handleNotification = () => {},
   handleDownload = () => {},
   handleSave,
@@ -127,8 +129,15 @@ const Header2: React.FC<Header2Props> = ({
           <Ionicons name="create" size={25} color={colors.black} />
         </TouchableOpacity>
       ) : showNotification ? (
-        <TouchableOpacity style={styles.icon} onPress={handleNotification}>
-          <Ionicons name="notifications" size={25} color={colors.black} />
+        <TouchableOpacity style={styles.headerButton} onPress={handleNotification}>
+          <View style={styles.cartContainer}>
+            <Ionicons name="notifications" size={25} color={colors.black} />
+            {notificationCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{notificationCount}</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       ) : (
         <View style={styles.emptySpace} />

@@ -5,10 +5,15 @@ export interface Notification {
   id: number;
   title?: string;
   message?: string;
+  description?: string;
   type?: string;
   read?: boolean;
+  is_read?: boolean;
+  dateTime?: string;
   created_at?: string;
   updated_at?: string;
+  time?: string;
+  date?: string;
   [key: string]: any;
 }
 
@@ -34,12 +39,11 @@ export const getAllNotifications = async (): Promise<NotificationsResponse> => {
     const response = await apiClient.get<NotificationsResponse>(
       API.NOTIFICATIONS.VIEW_ALL,
     );
-    console.log('Get All Notifications:', response.data);
+    console.log('Get All Notifications Response:', response.data);
     
-    // Handle different response structures
-    const responseData = response.data?.data || response.data || response;
-    
-    return responseData;
+    // The API returns { success: true, data: [...] }
+    // Return the full response structure
+    return response.data as NotificationsResponse;
   } catch (error: any) {
     console.error('Get All Notifications Error:', error);
     const errorMessage =

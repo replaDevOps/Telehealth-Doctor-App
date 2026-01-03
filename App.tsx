@@ -24,7 +24,9 @@ const App = () => {
         barStyle="dark-content"
       />
       {/* <SafeAreaView style={styles.safeArea}> */}
-      <AppContent />
+      <NotificationCountProvider>
+        <AppContent />
+      </NotificationCountProvider>
       {/* </SafeAreaView> */}
     </SafeAreaProvider>
   );

@@ -14,6 +14,18 @@ interface ChatHeaderProps {
   fromHistory: boolean;
   handleGoBack: () => void;
   handleEndConsultation: () => void;
+  consultationData?: {
+    patient?: {
+      name?: string;
+      image?: string;
+    };
+    service?: {
+      name?: string;
+      duration?: number;
+    };
+    type?: string;
+    code?: string;
+  } | null;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -23,7 +35,42 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   fromHistory,
   handleGoBack,
   handleEndConsultation,
+  consultationData,
 }) => {
+  // Extract patient and service info from consultation data
+  const patientName = consultationData?.patient?.name || 'Patient';
+  const serviceName = consultationData?.service?.name || '';
+  const consultationType = consultationData?.type || '';
+  const consultationCode = consultationData?.code || '';
+  const serviceDuration = consultationData?.service?.duration;
+  
+  // Build subtitle: "Code | Service Name | Type | Duration"
+  const buildSubtitle = () => {
+    if (!consultationData) {
+      return consultationTime;
+    }
+    
+    const parts: string[] = [];
+    // Add code if available
+    if (consultationCode) {
+      parts.push(consultationCode);
+    }
+    // Add service name if available
+    if (serviceName) {
+      parts.push(serviceName);
+    }
+    // Add type if available
+    if (consultationType) {
+      parts.push(consultationType);
+    }
+    // Add duration if available
+    if (serviceDuration) {
+      parts.push(`${serviceDuration} min`);
+    }
+    
+    return parts.length > 0 ? parts.join(' | ') : consultationTime;
+  };
+
   return chatType === 'ai' ? (
     <Header2 title="Chat" showCart logo />
   ) : (
@@ -33,13 +80,13 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </TouchableOpacity>
 
       <View style={styles.doctorHeaderCenter}>
-        <Text style={styles.doctorName}>{doctorInfo.name}</Text>
+        <Text style={styles.doctorName}>{patientName}</Text>
         <Text style={styles.consultationTime}>
-          {doctorInfo.serviceName || consultationTime}
+          {buildSubtitle()}
         </Text>
       </View>
 
-      {!doctorInfo.serviceName && !fromHistory && (
+      {!fromHistory && (
         <TouchableOpacity
           style={styles.endButton}
           onPress={handleEndConsultation}

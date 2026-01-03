@@ -18,6 +18,7 @@ import { ClinicProfile } from '@assets/images';
 import AboutClinic from '@components/molecules/AboutCard';
 import ConsultDoctorBottomSheet from '@components/molecules/ConsultDoctorBottomSheet';
 import { styles } from './style';
+import { useNotificationCount } from '../../../hooks/useNotificationCount';
 
 import {
   SERVICES,
@@ -26,6 +27,7 @@ import {
 } from '@constants/appData';
 export const ClinicDetailScreen = ({ navigation, route }) => {
   const { clinic } = route.params;
+  const { notificationCount } = useNotificationCount();
   const [activeTab, setActiveTab] = useState('Services');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -94,7 +96,7 @@ export const ClinicDetailScreen = ({ navigation, route }) => {
           onBackPress={() => navigation.goBack()}
           onSharePress={() => console.log('Share pressed')}
           onNotificationPress={() => navigation.navigate('Notifications')}
-          notificationCount={3}
+          notificationCount={notificationCount}
         />
 
         {/* Clinic Information */}

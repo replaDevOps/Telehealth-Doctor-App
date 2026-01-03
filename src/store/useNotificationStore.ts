@@ -44,16 +44,46 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     try {
       const response = await getAllNotifications();
       
-      // Handle different response structures
-      const notificationsList = response.data || response.notifications || [];
+      // Handle API response structure: { success: true, data: [...] }
+      // response is { success: true, data: [...] }
+      // So response.data is the array of notifications
+      const notificationsList = Array.isArray(response.data) 
+        ? response.data 
+        : (Array.isArray(response.notifications) ? response.notifications : []);
       
-      // Calculate unread count
-      const unreadCount = notificationsList.filter(
-        (notif: Notification) => !notif.read,
+      console.log('Notifications list from API:', notificationsList);
+      
+      // Map API response to notification format
+      // API structure: { id, type, description, dateTime }
+      const mappedNotifications: Notification[] = notificationsList.map((item: any) => {
+        const mapped = {
+          id: item.id,
+          title: item.type || item.title || 'Notification',
+          message: item.description || item.message || item.body || item.content || '',
+          description: item.description,
+          type: item.type,
+          // Default to unread (false) if read status is not provided
+          read: item.read !== undefined ? item.read : (item.is_read !== undefined ? item.is_read : false),
+          is_read: item.read !== undefined ? item.read : (item.is_read !== undefined ? item.is_read : false),
+          dateTime: item.dateTime,
+          created_at: item.dateTime || item.created_at || item.time || item.date,
+          updated_at: item.updated_at,
+          time: item.dateTime || item.created_at || item.time || item.date,
+          // Keep all original fields for backward compatibility
+          ...item,
+        };
+        return mapped;
+      });
+      
+      console.log('Mapped notifications:', mappedNotifications);
+      
+      // Calculate unread count (notifications without read status are considered unread)
+      const unreadCount = mappedNotifications.filter(
+        (notif: Notification) => !notif.read && !notif.is_read,
       ).length;
 
       set({
-        notifications: notificationsList,
+        notifications: mappedNotifications,
         unreadCount,
         isLoading: false,
         lastFetched: Date.now(),

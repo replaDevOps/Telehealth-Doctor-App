@@ -115,9 +115,9 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
   // Map notifications to display format
   const mappedNotifications: NotificationItem[] = notifications.map((item: any) => ({
     id: item.id,
-    title: item.title || 'Notification',
-    message: item.message || item.body || item.content || '',
-    time: item.created_at || item.time || item.date || '',
+    title: item.title || item.type || 'Notification',
+    message: item.message || item.description || item.body || item.content || '',
+    time: item.dateTime || item.created_at || item.time || item.date || '',
     read: item.read !== false && item.is_read !== false,
     is_read: item.read !== false && item.is_read !== false,
   }));

@@ -8,11 +8,27 @@ export interface ChatMessage {
   consultationID?: number;
   senderID?: number;
   recipientID?: number;
+  patientID?: number;
+  doctorID?: number;
   message?: string;
   file?: string;
   fileType?: string;
+  dateTime?: string;
+  seen?: boolean;
   created_at?: string;
   updated_at?: string;
+  sender?: {
+    id: number;
+    name: string;
+    image?: string;
+    type: 'patient' | 'doctor';
+  };
+  recipient?: {
+    id: number;
+    name: string;
+    image?: string;
+    type: 'patient' | 'doctor';
+  };
   [key: string]: any;
 }
 
@@ -35,7 +51,7 @@ export interface PrescriptionRequest {
 }
 
 export interface SendMessageRequest {
-  recipientID: number | string;
+  recipientID: number | string; // Patient ID (when sending from doctor app)
   consultationID: number | string;
   message: string;
   file?: {
@@ -54,6 +70,7 @@ export interface ConsultationMessagesResponse {
   status?: boolean;
   data?: ChatMessage[] | any; // Can be messages array or consultation object
   messages?: ChatMessage[]; // Messages array in the response
+  consultation?: any; // Consultation data object (contains patient, service, type, code, etc.)
   message?: string;
 }
 
@@ -92,11 +109,16 @@ export const getConsultationMessages = async (
     const responseData = response.data as any;
     const messagesData = responseData?.messages || responseData?.data || [];
     const messagesArray = Array.isArray(messagesData) ? messagesData : [];
+    
+    // Extract consultation data (if data is an object, not an array)
+    const consultationData = !Array.isArray(responseData?.data) && responseData?.data ? responseData.data : null;
 
     return {
       success: responseData?.success ?? true,
       status: responseData?.status ?? true,
       data: messagesArray,
+      messages: messagesArray,
+      consultation: consultationData, // Include consultation data (has patientID)
       message: responseData?.message,
     };
   } catch (error: any) {
@@ -190,8 +212,9 @@ export const sendMessage = async (
     }
 
     // Create FormData
+    // Note: recipientID is the patient ID (when sending from doctor app)
     const formData = new FormData();
-    formData.append('recipientID', String(messageData.recipientID));
+    formData.append('recipientID', String(messageData.recipientID)); // Patient ID
     formData.append('consultationID', String(messageData.consultationID));
     formData.append('message', messageData.message);
 

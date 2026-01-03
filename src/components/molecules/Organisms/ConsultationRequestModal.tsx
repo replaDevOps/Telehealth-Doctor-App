@@ -20,6 +20,7 @@ export interface ConsultationRequest {
   patientGender: 'Male' | 'Female';
   consultationType: ConsultationType;
   treatmentType?: string;
+  patientID?: string | number; // Add patientID to store
 }
 
 interface ConsultationRequestModalProps {
