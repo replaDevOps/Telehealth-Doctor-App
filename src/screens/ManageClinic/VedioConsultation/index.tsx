@@ -10,24 +10,56 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { RTCView } from 'react-native-webrtc';
 import { colors } from '../../../styles/colors';
-import { doctor } from '@assets/images';
+import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
 import { styles } from './style';
+import { useWebRTC } from '../../../hooks/useWebRTC';
+import { Toast } from 'toastify-react-native';
 
 export function VideoConsultation({ navigation, route }) {
-  const doctorInfo = route?.params?.doctorInfo || {
-    name: 'Dr. Yasmin Chowdhury',
-    avatar: doctor,
-    specialization: 'Dermatologist',
+  const patientInfo = route?.params?.patientInfo || route?.params?.doctorInfo || {
+    name: 'Patient',
+    avatar: patient,
+    specialization: 'Patient',
   };
 
-  const [callStatus, setCallStatus] = useState('Connecting....');
+  // Get consultation parameters from route
+  const consultationId = route?.params?.consultationId || `consultation_${Date.now()}`;
+  const userId = route?.params?.userId || `doctor_${Date.now()}`;
+  const isInitiator = route?.params?.isInitiator ?? false; // Doctor typically joins, not initiates
+  const signalingServerUrl = route?.params?.signalingServerUrl || 'http://192.168.1.100:3001';
+
   const [callDuration, setCallDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
-  const [isCameraOn, setIsCameraOn] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Initialize WebRTC for video call
+  const {
+    localStream,
+    remoteStream,
+    isConnected,
+    isConnecting,
+    isMuted,
+    isVideoOff,
+    isReady,
+    error,
+    toggleMute,
+    toggleVideo,
+    switchCamera,
+    startCall,
+    endCall,
+    joinCall,
+  } = useWebRTC({
+    userId,
+    roomId: consultationId,
+    isVideoEnabled: true,
+    isAudioEnabled: true,
+    signalingServerUrl,
+  });
+
+  // Keep speaker state locally
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
 
   const handleGetPrescription = () => {
     setModalVisible(false);
@@ -37,21 +69,48 @@ export function VideoConsultation({ navigation, route }) {
 
   const handleClose = () => {
     setModalVisible(false);
+    endCall();
+    navigation.goBack();
   };
 
+  // Start/join call when WebRTC is ready
   useEffect(() => {
-    // Simulate connecting to call
-    const connectTimer = setTimeout(() => {
-      setCallStatus('Connected');
-    }, 3000);
+    if (isReady) {
+      const initCall = async () => {
+        try {
+          if (isInitiator) {
+            await startCall();
+          } else {
+            await joinCall();
+          }
+        } catch (err) {
+          console.error('Error initializing call:', err);
+          Toast.error('Failed to connect to call');
+        }
+      };
 
-    return () => clearTimeout(connectTimer);
+      initCall();
+    }
+  }, [isReady, isInitiator]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      endCall();
+    };
   }, []);
 
+  // Show error toast
   useEffect(() => {
-    // Start call duration timer when connected
+    if (error) {
+      Toast.error(error);
+    }
+  }, [error]);
+
+  // Start call duration timer when connected
+  useEffect(() => {
     let interval;
-    if (callStatus === 'Connected') {
+    if (isConnected) {
       interval = setInterval(() => {
         setCallDuration(prev => prev + 1);
       }, 1000);
@@ -60,7 +119,7 @@ export function VideoConsultation({ navigation, route }) {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [callStatus]);
+  }, [isConnected]);
 
   const formatDuration = seconds => {
     const mins = Math.floor(seconds / 60);
@@ -69,23 +128,21 @@ export function VideoConsultation({ navigation, route }) {
   };
 
   const handleEndCall = () => {
+    endCall();
     setModalVisible(true);
-  };
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
   };
 
   const toggleSpeaker = () => {
     setIsSpeakerOn(!isSpeakerOn);
+    // TODO: Implement native speaker toggle
   };
 
-  const toggleCamera = () => {
-    setIsCameraOn(!isCameraOn);
-  };
-
-  const switchCamera = () => {
-    console.log('Switch camera');
+  // Determine call status
+  const getCallStatus = () => {
+    if (error && !isConnected) return 'Failed';
+    if (isConnecting) return 'Connecting...';
+    if (isConnected) return formatDuration(callDuration);
+    return 'Connecting...';
   };
 
   return (
@@ -96,34 +153,47 @@ export function VideoConsultation({ navigation, route }) {
         translucent
       />
 
-      {/* Full Screen Background Image */}
-      <ImageBackground
-        source={doctorInfo.avatar}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        {/* Dark Overlay */}
-        <View style={styles.overlay} />
+      {/* Full Screen Remote Video or Placeholder */}
+      {remoteStream ? (
+        <>
+          <RTCView
+            streamURL={remoteStream.toURL()}
+            style={styles.backgroundImage}
+            objectFit="cover"
+            mirror={false}
+          />
+          {/* Dark Overlay for better text visibility */}
+          <View style={styles.overlay} />
+        </>
+      ) : (
+        <ImageBackground
+          source={patientInfo.avatar}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          <View style={styles.overlay} />
+        </ImageBackground>
+      )}
 
-        {/* Content */}
+      {/* Content */}
+      <View style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Doctor Info at Top */}
+          {/* Patient Info at Top */}
           <View style={styles.topSection}>
-            <Text style={styles.doctorName}>{doctorInfo.name}</Text>
+            <Text style={styles.doctorName}>{patientInfo.name}</Text>
             <Text style={styles.callStatus}>
-              {callStatus === 'Connected'
-                ? formatDuration(callDuration)
-                : callStatus}
+              {getCallStatus()}
             </Text>
           </View>
 
-          {/* Small Doctor Preview (Picture-in-Picture) - Only when connected */}
-          {callStatus === 'Connected' && (
+          {/* Small Local Video (Picture-in-Picture) - Only when connected */}
+          {isConnected && localStream && !isVideoOff && (
             <View style={styles.pipContainer}>
-              <Image
-                source={doctorInfo.avatar}
+              <RTCView
+                streamURL={localStream.toURL()}
                 style={styles.pipImage}
-                resizeMode="cover"
+                objectFit="cover"
+                mirror={true}
               />
             </View>
           )}
@@ -164,12 +234,12 @@ export function VideoConsultation({ navigation, route }) {
             <TouchableOpacity
               style={[
                 styles.controlButton,
-                !isCameraOn && styles.controlButtonActive,
+                isVideoOff && styles.controlButtonActive,
               ]}
-              onPress={toggleCamera}
+              onPress={toggleVideo}
             >
               <Ionicons
-                name={isCameraOn ? 'videocam' : 'videocam-off'}
+                name={!isVideoOff ? 'videocam' : 'videocam-off'}
                 size={24}
                 color={colors.white}
               />
@@ -196,13 +266,13 @@ export function VideoConsultation({ navigation, route }) {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
+      </View>
 
-        <ConsultationEndedModal
-          visible={modalVisible}
-          onClose={handleClose}
-          onGetPrescription={handleGetPrescription}
-        />
-      </ImageBackground>
+      <ConsultationEndedModal
+        visible={modalVisible}
+        onClose={handleClose}
+        onGetPrescription={handleGetPrescription}
+      />
     </View>
   );
 }

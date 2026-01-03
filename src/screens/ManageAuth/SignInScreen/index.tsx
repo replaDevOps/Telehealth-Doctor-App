@@ -19,11 +19,12 @@ import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import parsePhoneNumberFromString from 'libphonenumber-js';
 import { login } from '../../../services/api/authService';
-import { useAuthStore, User } from '../../../store';
+import { useAuthStore, User, useProfileStore } from '../../../store';
 import { Toast } from 'toastify-react-native';
 
 export function SignInScreen({ navigation }) {
   const { login: setAuth } = useAuthStore();
+  const { fetchProfile } = useProfileStore();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -67,7 +68,8 @@ export function SignInScreen({ navigation }) {
     }
 
     setLoading(true);
-
+    console.log('Phone:', phone);
+    console.log('Password:', password);
     try {
       // Call login API
       const response = await login({
@@ -100,6 +102,14 @@ export function SignInScreen({ navigation }) {
 
         // Store user, token, and refreshToken in auth store
         setAuth(userData, token, refreshToken);
+
+        // Fetch profile data after successful login
+        try {
+          await fetchProfile();
+        } catch (profileError) {
+          console.error('Failed to fetch profile after login:', profileError);
+          // Don't block navigation if profile fetch fails
+        }
 
         // Navigate to main screen
         navigation.replace('Main', { screen: 'Home' });

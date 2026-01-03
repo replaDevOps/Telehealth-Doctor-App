@@ -4,8 +4,16 @@ import { StatusBar, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/root-navigation';
 import { colors } from './src/styles/colors';
 import { setGlobalFont } from './src/utils/overrideText';
+import { usePusherNotifications } from './src/hooks/usePusherNotifications';
 
 setGlobalFont();
+
+const AppContent = () => {
+  // Setup Pusher notifications
+  usePusherNotifications();
+
+  return <AppNavigator />;
+};
 
 const App = () => {
   return (
@@ -16,7 +24,7 @@ const App = () => {
         barStyle="dark-content"
       />
       {/* <SafeAreaView style={styles.safeArea}> */}
-      <AppNavigator />
+      <AppContent />
       {/* </SafeAreaView> */}
     </SafeAreaProvider>
   );

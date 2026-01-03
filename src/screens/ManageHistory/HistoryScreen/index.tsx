@@ -1,6 +1,6 @@
 /* HistoryScreen.tsx */
 import React, { useState } from 'react';
-import { View, TextInput, ScrollView, StatusBar } from 'react-native';
+import { View, TextInput, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 
 export function HistoryScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const { allConsultations, fetchAllConsultations } = useDashboardStore();
+  const { allConsultations, fetchAllConsultations, isLoading } = useDashboardStore();
 
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
   }, [fetchAllConsultations]);
 
   const filteredConsultations = allConsultations.filter(item =>
-    item.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.sevviceName.toLowerCase().includes(searchQuery.toLowerCase())
+    (item.patientName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+    (item.sevviceName?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -48,15 +48,28 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
         {/* Consultations */}
         <RecentConsultations
           consultations={filteredConsultations}
+          isLoading={isLoading}
           emptyMessage="No consultations found."
           onViewPrescription={id => {
-
             console.log('View prescription:', id);
             navigation.navigate('PrescriptionDetail', { id });
           }}
           onViewChat={id => {
             console.log('View chat:', id);
-            navigation.navigate('Chat', { id });
+            // Find the consultation data to pass patient info
+            const consultation = allConsultations.find(cons => cons.id === id);
+            navigation.navigate('ChatScreen', { 
+              id,
+              consultationId: id,
+              patientID: consultation?.patientID,
+              patientInfo: consultation ? {
+                id: consultation.patientID,
+                name: consultation.patientName,
+                image: consultation.patientImage,
+              } : null,
+              chatType: 'doctor',
+              fromHistory: true,
+            });
           }}
         />
       </ScrollView>

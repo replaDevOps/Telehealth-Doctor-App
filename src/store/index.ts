@@ -3,6 +3,7 @@ export { useAppointmentStore } from './useAppointmentStore';
 export { useUserStore } from './useUserStore';
 export { useProfileStore } from './useProfileStore';
 export { useDashboardStore } from './useDashboardStore';
+export { useNotificationStore } from './useNotificationStore';
 export type { User } from './useAuthStore';
 
 export type { Appointment } from './useAppointmentStore';

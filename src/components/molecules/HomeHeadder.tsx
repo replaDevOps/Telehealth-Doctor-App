@@ -22,6 +22,7 @@ interface HomeHeaderProps {
   onToggleActive?: (value: boolean) => void;
   onNotificationPress?: () => void;
   onLocationPress?: () => void;
+  notificationCount?: number;
 }
 
 const HomeHeader = ({
@@ -34,6 +35,7 @@ const HomeHeader = ({
   onToggleActive,
   onNotificationPress,
   onLocationPress,
+  notificationCount = 0,
 }: HomeHeaderProps) => {
   return (
     <LinearGradient
@@ -62,11 +64,20 @@ const HomeHeader = ({
             onPress={onNotificationPress}
             activeOpacity={0.7}
           >
-            <Ionicons
-              name="notifications-outline"
-              size={24}
-              color={colors.black}
-            />
+            <View style={styles.notificationIconContainer}>
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color={colors.black}
+              />
+              {notificationCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {notificationCount > 99 ? '99+' : notificationCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -164,6 +175,28 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  notificationIconContainer: {
+    position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: colors.red,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  notificationBadgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   doctorCard: {
     borderRadius: 16,

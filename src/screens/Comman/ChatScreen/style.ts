@@ -64,4 +64,39 @@ export const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
       },
+      loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 40,
+      },
+      loadingText: {
+        marginTop: 12,
+        fontSize: 14,
+        color: colors.secondaryText,
+      },
+      emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 40,
+        paddingVertical: 60,
+      },
+      emptyIcon: {
+        fontSize: 64,
+        marginBottom: 16,
+      },
+      emptyTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: colors.text,
+        marginBottom: 8,
+        textAlign: 'center',
+      },
+      emptyMessage: {
+        fontSize: 14,
+        color: colors.secondaryText,
+        textAlign: 'center',
+        lineHeight: 20,
+      },
 });

@@ -20,12 +20,14 @@ import {
   RefundRequest2,
   SettingScreen,
   SignatureScreen,
+  NotificationScreen,
 } from '@screens/ManageSetting';
 import {
   CardDetails,
   ChatScreen,
   RefundRequest,
   PrescriptionScreen,
+  PrescriptionDetail,
   CartScreen,
 } from '@screens/Comman';
 
@@ -64,6 +66,7 @@ export const MainNavigator = () => {
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
       <Stack.Screen name="CardDetails" component={CardDetails} />
       <Stack.Screen name="Refund" component={RefundRequest} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
       <ClinicStack.Screen name="CheckoutScreen" component={CheckoutScreen} />
       <ClinicStack.Screen name="CartScreen" component={CartScreen} />
       <ClinicStack.Screen
@@ -80,6 +83,7 @@ export const HomeNavigator = () => {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="NearbyClinics" component={NearbyClinics} />
       <Stack.Screen name="SelectLocation" component={SelectLocation} />
+      <Stack.Screen name="PrescriptionDetail" component={PrescriptionDetail} />
     </Stack.Navigator>
   );
 };
@@ -119,6 +123,8 @@ export const HistoryNavigator = () => {
       initialRouteName="HistoryScreen"
     >
       <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
+      <Stack.Screen name="PrescriptionDetail" component={PrescriptionDetail} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };
@@ -132,6 +138,7 @@ export const SettingNavigator = () => {
       <Stack.Screen name="FAQs" component={FAQs} />
       <Stack.Screen name="RefundRequest2" component={RefundRequest2} />
       <Stack.Screen name="SignatureScreen" component={SignatureScreen} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
     </Stack.Navigator>
   );
 };

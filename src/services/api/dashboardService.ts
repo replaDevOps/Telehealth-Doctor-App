@@ -29,3 +29,16 @@ export const getAllConsultations = async () => {
         throw error;
     }
 };
+
+export const updateOnlineStatus = async (onlineStatus: boolean) => {
+    try {
+        const response = await apiClient.post(API.DASHBOARD.UPDATE_ONLINE_STATUS, {
+            online_status: onlineStatus,
+        });
+        console.log('Update Online Status:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Update Online Status Error:', error);
+        throw error;
+    }
+};

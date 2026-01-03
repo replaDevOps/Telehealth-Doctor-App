@@ -6,67 +6,77 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface ConsultationCardProps {
   sevviceName: string;
-  patientName: string;
+  patientName?: string;
   patientImage?: any;
   date: string;
   time: string;
-  gender: string;
+  gender?: string;
+  age?: string;
   duration: string;
   type: 'chat' | 'video' | 'audio';
-  amount: string;
+  amount?: string;
+  code?: string;
+  status?: string;
   onViewPrescription?: () => void;
   onViewChat?: () => void;
 }
 
 const ConsultationCard = ({
   sevviceName = 'Service Name',
-  patientName,
+  patientName = 'Unknown Patient',
   patientImage,
   date,
   time,
   duration,
   type,
-  amount,
+  amount = '',
   gender = 'Male',
+  age = '',
+  code = '',
+  status = '',
   onViewPrescription,
   onViewChat,
 }: ConsultationCardProps) => {
-  const isChat = type === 'chat';
+  // Format patient info: Gender and Age
+  const patientInfo = [gender, age ? `${age} Year` : ''].filter(Boolean).join(', ');
+
+  // Get status color
+  const getStatusColor = (status: string) => {
+    const lowerStatus = status.toLowerCase();
+    if (lowerStatus === 'paid' || lowerStatus === 'completed') return colors.green;
+    if (lowerStatus === 'pending') return colors.yellow;
+    if (lowerStatus === 'cancelled' || lowerStatus === 'rejected') return colors.red;
+    return colors.secondaryText;
+  };
 
   return (
     <View style={styles.card}>
-      {/* Date Header */}
-      <View style={styles.dateHeader}>
-        <Text style={styles.dateText}>{date}</Text>
+      {/* Header with Code, Type, and Duration */}
+      <View style={styles.infoBar}>
+        <Text style={styles.codeText}>{code ? `#${code}` : ''}</Text>
+        <View style={styles.serviceType}>
+          <View style={styles.typeContainer}>
+            <Ionicons
+              name={
+                type === 'video'
+                  ? 'videocam'
+                  : type === 'chat'
+                  ? 'chatbubble'
+                  : 'mic'
+              }
+              size={14}
+              color={colors.white}
+            />
+            <Text style={styles.typeText}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+          </View>
+          <View style={styles.timeContainer}>
+            <Ionicons name="time-outline" size={16} color={colors.white} />
+            <Text style={styles.timeText}>{duration}</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.cardContent}>
-        {/* Consultation Info Bar */}
-        <View style={styles.infoBar}>
-          <View>
-            <Text style={styles.serviceName}>{sevviceName}</Text>
-          </View>
-          <View style={styles.serviceType}>
-            <View style={styles.timeContainer}>
-              <Ionicons name="time-outline" size={16} color={colors.white} />
-              <Text style={styles.timeText}>{time}</Text>
-            </View>
-            <View style={styles.typeContainer}>
-              <Ionicons
-                name={
-                  type === 'video'
-                    ? 'videocam'
-                    : type === 'chat'
-                    ? 'chatbubble'
-                    : 'mic'
-                }
-                size={14}
-                color={colors.white}
-              />
-              <Text style={styles.typeText}>{duration}</Text>
-            </View>
-          </View>
-        </View>
 
         {/* Patient Info */}
         <View style={styles.patientSection}>
@@ -76,43 +86,53 @@ const ConsultationCard = ({
             ) : (
               <View style={styles.patientImagePlaceholder}>
                 <Text style={styles.patientInitial}>
-                  {patientName.charAt(0)}
+                  {patientName?.charAt(0)?.toUpperCase() || '?'}
                 </Text>
               </View>
             )}
-            <View>
-              <Text style={styles.patientName}>{patientName}</Text>
-              <Text style={styles.patientGender}>{gender}</Text>
+            <View style={styles.patientDetails}>
+              <Text style={styles.patientName}>{patientName || 'Unknown Patient'}</Text>
+              <Text style={styles.patientGender}>{patientInfo || ''}</Text>
             </View>
           </View>
           <Text style={styles.amount}>{amount}</Text>
         </View>
 
-        {/* Action Buttons - Conditional Rendering */}
+        {/* Service and Status Row */}
+        <View style={styles.serviceStatusRow}>
+          <View style={styles.serviceInfo}>
+            <Text style={styles.serviceLabel}>Service</Text>
+            <Text style={styles.serviceValue} numberOfLines={1}>{sevviceName}</Text>
+          </View>
+          {status && (
+            <>
+              <View style={styles.separator} />
+              <View style={styles.statusInfo}>
+                <Text style={styles.statusLabel}>Status</Text>
+                <Text style={[styles.statusValue, { color: getStatusColor(status) }]}>
+                  {status}
+                </Text>
+              </View>
+            </>
+          )}
+        </View>
+
+        {/* Action Buttons - Always show both */}
         <View style={styles.actionButtons}>
-          {/* Always show View Prescription */}
           <TouchableOpacity
-            style={[
-              isChat
-                ? styles.prescriptionButtonChat
-                : styles.prescriptionButtonFull,
-            ]}
+            style={styles.chatButton}
+            onPress={onViewChat}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.chatButtonText}>View Chat</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.prescriptionButton}
             onPress={onViewPrescription}
             activeOpacity={0.7}
           >
             <Text style={styles.prescriptionButtonText}>View Prescription</Text>
           </TouchableOpacity>
-
-          {/* Only show View Chat if type is 'chat' */}
-          {isChat && (
-            <TouchableOpacity
-              style={styles.chatButton}
-              onPress={onViewChat}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.chatButtonText}>View Chat</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </View>
     </View>
@@ -135,16 +155,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.gray,
   },
-  dateHeader: {
-    backgroundColor: colors.white,
-    paddingVertical: mvs(8),
-    paddingHorizontal: mvs(16),
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: '500',
-  },
   infoBar: {
     backgroundColor: '#7625D7',
     flexDirection: 'row',
@@ -152,15 +162,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: mvs(16),
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    gap: mvs(16),
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  serviceName: {
+  codeText: {
     fontSize: 15,
     fontWeight: '600',
     color: colors.white,
   },
-  serviceType: { flexDirection: 'row', alignItems: 'center', gap: mvs(12) },
+  serviceType: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: mvs(16) 
+  },
   timeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -191,6 +205,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: mvs(12),
+    flex: 1,
+  },
+  patientDetails: {
+    flex: 1,
   },
   patientImage: {
     width: 40,
@@ -225,14 +243,50 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.black,
   },
+  serviceStatusRow: {
+    flexDirection: 'row',
+    paddingHorizontal: mvs(16),
+    paddingBottom: mvs(12),
+    alignItems: 'flex-start',
+  },
+  serviceInfo: {
+    flex: 1,
+  },
+  serviceLabel: {
+    fontSize: 12,
+    color: colors.secondaryText,
+    marginBottom: mvs(4),
+  },
+  serviceValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text,
+  },
+  separator: {
+    width: 1,
+    height: 40,
+    backgroundColor: colors.border,
+    marginHorizontal: mvs(12),
+  },
+  statusInfo: {
+    alignItems: 'flex-end',
+  },
+  statusLabel: {
+    fontSize: 12,
+    color: colors.secondaryText,
+    marginBottom: mvs(4),
+  },
+  statusValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
   actionButtons: {
     flexDirection: 'row',
     gap: mvs(12),
     paddingHorizontal: mvs(16),
     paddingBottom: mvs(16),
   },
-  // Full width for prescription when no chat button
-  prescriptionButtonFull: {
+  chatButton: {
     flex: 1,
     backgroundColor: colors.white,
     borderWidth: 1,
@@ -241,28 +295,19 @@ const styles = StyleSheet.create({
     paddingVertical: mvs(10),
     alignItems: 'center',
   },
-  // Half width when chat button is present
-  prescriptionButtonChat: {
-    flex: 1,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingVertical: mvs(10),
-    alignItems: 'center',
-  },
-  prescriptionButtonText: {
+  chatButtonText: {
     fontSize: 14,
     fontWeight: '500',
+    color: colors.text,
   },
-  chatButton: {
+  prescriptionButton: {
     flex: 1,
     backgroundColor: '#7625D7',
     borderRadius: 8,
     paddingVertical: mvs(10),
     alignItems: 'center',
   },
-  chatButtonText: {
+  prescriptionButtonText: {
     color: colors.white,
     fontSize: 14,
     fontWeight: '500',

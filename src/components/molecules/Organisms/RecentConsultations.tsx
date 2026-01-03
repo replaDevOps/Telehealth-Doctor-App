@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import ConsultationCard from '../../molecules/ConsultationCard';
 import { mvs } from '../../../config/metrices';
 import HomeSectionTitle from '../HomeSectionTitle';
@@ -7,19 +7,20 @@ import { colors } from '../../../styles/colors';
 
 interface Consultation {
   id: string;
-  patientName: string;
+  patientName?: string;
   patientImage?: any;
-  sevviceName: string;
-  date: string;
-  time: string;
-  duration: string;
+  sevviceName?: string;
+  date?: string;
+  time?: string;
+  duration?: string;
   type: 'chat' | 'video' | 'audio';
-  amount: string;
-  gender: string;
+  amount?: string;
+  gender?: string;
 }
 
 interface RecentConsultationsProps {
   consultations: Consultation[];
+  isLoading?: boolean;
   onViewAll?: () => void;
   onViewPrescription?: (id: string) => void;
   onViewChat?: (id: string) => void;
@@ -28,6 +29,7 @@ interface RecentConsultationsProps {
 
 const RecentConsultations = ({
   consultations,
+  isLoading = false,
   onViewAll,
   onViewPrescription,
   onViewChat,
@@ -41,19 +43,27 @@ const RecentConsultations = ({
           onActionPress={onViewAll}
         />
       )}
-      {consultations && consultations.length > 0 ? (
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>Loading consultations...</Text>
+        </View>
+      ) : consultations && consultations.length > 0 ? (
         consultations.map(consultation => (
           <ConsultationCard
             key={consultation.id}
             patientName={consultation.patientName}
             patientImage={consultation.patientImage}
-            sevviceName={consultation.sevviceName}
-            date={consultation.date}
-            time={consultation.time}
-            duration={consultation.duration}
+            sevviceName={consultation.sevviceName || 'Service Name'}
+            date={consultation.date || ''}
+            time={consultation.time || ''}
+            duration={consultation.duration || '0 min'}
             type={consultation.type}
             amount={consultation.amount}
             gender={consultation.gender}
+            age={consultation.age}
+            code={consultation.code}
+            status={consultation.status}
             onViewPrescription={() => onViewPrescription?.(consultation.id)}
             onViewChat={() => onViewChat?.(consultation.id)}
           />
@@ -80,6 +90,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   emptyText: {
+    fontSize: 14,
+    color: colors.secondaryText,
+    fontWeight: '500',
+  },
+  loadingContainer: {
+    padding: mvs(40),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: mvs(12),
     fontSize: 14,
     color: colors.secondaryText,
     fontWeight: '500',
