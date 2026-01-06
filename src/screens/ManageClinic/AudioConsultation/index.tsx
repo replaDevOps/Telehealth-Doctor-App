@@ -30,6 +30,8 @@ export function AudioConsultation({ navigation, route }) {
 
   const [callDuration, setCallDuration] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const CONSULTATION_MAX_DURATION = 30 * 60; // 30 minutes in seconds
+  const [remainingSeconds, setRemainingSeconds] = useState(CONSULTATION_MAX_DURATION);
 
   // Initialize WebRTC for audio-only call
   const {
@@ -126,6 +128,34 @@ export function AudioConsultation({ navigation, route }) {
     endCall();
     setModalVisible(true);
   };
+
+  // Auto-disconnect after 30 minutes (works for both patient and doctor)
+  useEffect(() => {
+    if (!isConnected) {
+      // Reset timer when disconnected
+      setRemainingSeconds(CONSULTATION_MAX_DURATION);
+      return;
+    }
+
+    // Reset timer when call connects
+    setRemainingSeconds(CONSULTATION_MAX_DURATION);
+
+    const timer = setInterval(() => {
+      setRemainingSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          console.log('⏰ [AudioConsultation] 30 minutes elapsed, auto-ending call');
+          // Auto-end the call and show modal
+          endCall();
+          setModalVisible(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isConnected, endCall]);
 
   const toggleSpeaker = () => {
     // Note: Speaker toggle would need native module integration
