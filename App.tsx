@@ -5,6 +5,7 @@ import AppNavigator from './src/navigation/root-navigation';
 import { colors } from './src/styles/colors';
 import { setGlobalFont } from './src/utils/overrideText';
 import { usePusherNotifications } from './src/hooks/usePusherNotifications';
+import { NotificationCountProvider } from './src/context/NotificationCountContext';
 
 setGlobalFont();
 

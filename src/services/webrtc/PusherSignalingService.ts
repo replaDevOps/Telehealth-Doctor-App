@@ -23,6 +23,7 @@ class PusherSignalingService {
     private roomId: string | null = null;
     private userId: string | null = null;
     private channel: any = null;
+    private channelName: string | null = null;
     private remoteUserId: string | null = null;
 
     /**
@@ -66,6 +67,27 @@ class PusherSignalingService {
     }
 
     /**
+     * Extract numeric consultation ID from roomId
+     * Handles formats like: "consultation_2", "consultation2", "2"
+     */
+    private extractConsultationId(roomId: string | null | undefined): number | null {
+        if (!roomId) {
+            return null;
+        }
+        // Try to extract numeric ID from various formats
+        const match = roomId.match(/(\d+)$/);
+        if (match) {
+            return parseInt(match[1], 10);
+        }
+        // If roomId is already a number, parse it directly
+        const numericId = parseInt(roomId, 10);
+        if (!isNaN(numericId)) {
+            return numericId;
+        }
+        return null;
+    }
+
+    /**
      * Join a consultation room (subscribe to private channel)
      */
     joinRoom(roomId: string): void {
@@ -75,11 +97,22 @@ class PusherSignalingService {
         }
 
         this.roomId = roomId;
-        const channelName = `private-webrtc-consultation${roomId}`;
+        // Extract numeric consultation ID and use backend format: webrtc-consultation{id}
+        const consultationId = this.extractConsultationId(roomId);
+        if (!consultationId) {
+            console.error('❌ [PusherSignaling] Invalid roomId format:', roomId);
+            return;
+        }
 
-        console.log(`📡 [PusherSignaling] Joining room: ${roomId} (channel: ${channelName})`);
+        // Backend uses format: webrtc-consultation{id} (PUBLIC channel - no authorization needed)
+        const channelName = `webrtc-consultation${consultationId}`;
 
-        // Subscribe to private channel
+        console.log(`📡 [PusherSignaling] Joining room: ${roomId} (consultationID: ${consultationId}, channel: ${channelName})`);
+
+        // Store channel name for bind() calls
+        this.channelName = channelName;
+
+        // Subscribe to public channel (no authorization required)
         this.channel = pusherService.subscribe(channelName);
 
         // Setup event listeners
@@ -92,59 +125,73 @@ class PusherSignalingService {
      * Setup all signaling event listeners
      */
     private setupEventListeners() {
-        if (!this.channel) return;
+        if (!this.channel || !this.channelName) return;
+
+        // Helper to extract payload
+        const getPayload = (data: any) => {
+            return (data && data.data) ? data.data : data;
+        };
 
         // Handle offer from remote peer
-        pusherService.bind(this.channel, 'webrtc-offer', (data: any) => {
-            console.log('📥 [PusherSignaling] Received offer from:', data.from);
-            if (data.from !== this.userId && data.offer) {
-                this.remoteUserId = data.from;
-                this.callbacks.onOffer?.(data.offer, data.from);
+        pusherService.bind(this.channelName, 'webrtc-offer', (data: any) => {
+            console.log('📥 [PusherSignaling] Received offer:', data);
+            const payload = getPayload(data);
+            if (payload.from !== this.userId && payload.offer) {
+                this.remoteUserId = payload.from;
+                this.callbacks.onOffer?.(payload.offer, payload.from);
             }
         });
 
         // Handle answer from remote peer
-        pusherService.bind(this.channel, 'webrtc-answer', (data: any) => {
-            console.log('📥 [PusherSignaling] Received answer from:', data.from);
-            if (data.from !== this.userId && data.answer) {
-                this.callbacks.onAnswer?.(data.answer, data.from);
+        pusherService.bind(this.channelName, 'webrtc-answer', (data: any) => {
+            console.log('📥 [PusherSignaling] Received answer:', data);
+            const payload = getPayload(data);
+            if (payload.from !== this.userId && payload.answer) {
+                this.callbacks.onAnswer?.(payload.answer, payload.from);
             }
         });
 
         // Handle ICE candidate from remote peer
-        pusherService.bind(this.channel, 'webrtc-ice-candidate', (data: any) => {
-            console.log('📥 [PusherSignaling] Received ICE candidate from:', data.from);
-            if (data.from !== this.userId && data.candidate) {
-                this.callbacks.onIceCandidate?.(data.candidate, data.from);
+        pusherService.bind(this.channelName, 'webrtc-ice-candidate', (data: any) => {
+            console.log('📥 [PusherSignaling] Received ICE candidate:', data);
+            const payload = getPayload(data);
+            if (payload.from !== this.userId && payload.candidate) {
+                this.callbacks.onIceCandidate?.(payload.candidate, payload.from);
             }
         });
 
         // Handle call started event
-        pusherService.bind(this.channel, 'webrtc-call-started', (data: any) => {
-            console.log('📞 [PusherSignaling] Call started by:', data.initiator);
-            if (data.initiator !== this.userId) {
-                this.remoteUserId = data.initiator;
-                this.callbacks.onUserJoined?.(data.initiator);
+        pusherService.bind(this.channelName, 'webrtc-call-started', (data: any) => {
+            console.log('📞 [PusherSignaling] Call started event data:', data);
+            const payload = getPayload(data);
+            const initiator = payload.initiator || payload.from;
+            if (initiator && initiator !== this.userId) {
+                this.remoteUserId = initiator;
+                this.callbacks.onUserJoined?.(initiator);
             }
         });
 
         // Handle call ended event
-        pusherService.bind(this.channel, 'webrtc-call-ended', (data: any) => {
-            console.log('📞 [PusherSignaling] Call ended by:', data.endedBy);
-            this.callbacks.onCallEnded?.(data.endedBy || 'unknown');
+        pusherService.bind(this.channelName, 'webrtc-call-ended', (data: any) => {
+            console.log('📞 [PusherSignaling] Call ended event received:', data);
+            const payload = getPayload(data);
+            const endedBy = payload.endedBy || payload.from || 'unknown';
+            console.log('📞 [PusherSignaling] Call ended by:', endedBy);
+            this.callbacks.onCallEnded?.(endedBy);
         });
 
         // Handle call rejected event
-        pusherService.bind(this.channel, 'webrtc-call-rejected', (data: any) => {
+        pusherService.bind(this.channelName, 'webrtc-call-rejected', (data: any) => {
             console.log('❌ [PusherSignaling] Call rejected');
             this.callbacks.onCallRejected?.();
         });
 
         // Handle user left event
-        pusherService.bind(this.channel, 'webrtc-user-left', (data: any) => {
+        pusherService.bind(this.channelName, 'webrtc-user-left', (data: any) => {
             console.log('👋 [PusherSignaling] User left:', data.userId);
-            if (data.userId !== this.userId) {
-                this.callbacks.onUserLeft?.(data.userId);
+            const payload = getPayload(data);
+            if (payload.userId !== this.userId) {
+                this.callbacks.onUserLeft?.(payload.userId);
             }
         });
     }
@@ -154,9 +201,13 @@ class PusherSignalingService {
      */
     leaveRoom(): void {
         if (this.roomId) {
-            const channelName = `private-webrtc-consultation${this.roomId}`;
-            pusherService.unsubscribe(channelName);
+            const consultationId = this.extractConsultationId(this.roomId);
+            if (consultationId) {
+                const channelName = `webrtc-consultation${consultationId}`;
+                pusherService.unsubscribe(channelName);
+            }
             this.channel = null;
+            this.channelName = null;
             this.roomId = null;
             console.log('👋 [PusherSignaling] Left room');
         }
@@ -172,14 +223,18 @@ class PusherSignalingService {
         }
 
         console.log('📤 [PusherSignaling] Sending offer to:', to);
-        
+
         // Import webrtcService dynamically to avoid circular dependencies
         const { sendWebRTCOffer } = await import('../api/webrtcService');
-        
+
         try {
-            const consultationID = parseInt(this.roomId.replace('consultation_', ''));
+            const consultationID = this.extractConsultationId(this.roomId);
+            if (!consultationID) {
+                throw new Error('Invalid consultation ID');
+            }
             await sendWebRTCOffer({
                 consultationID: consultationID,
+                from: this.userId,
                 to: to,
                 offer: offer,
             });
@@ -200,13 +255,17 @@ class PusherSignalingService {
         }
 
         console.log('📤 [PusherSignaling] Sending answer to:', to);
-        
+
         const { sendWebRTCAnswer } = await import('../api/webrtcService');
-        
+
         try {
-            const consultationID = parseInt(this.roomId.replace('consultation_', ''));
+            const consultationID = this.extractConsultationId(this.roomId);
+            if (!consultationID) {
+                throw new Error('Invalid consultation ID');
+            }
             await sendWebRTCAnswer({
                 consultationID: consultationID,
+                from: this.userId,
                 to: to,
                 answer: answer,
             });
@@ -226,11 +285,15 @@ class PusherSignalingService {
         }
 
         const { sendWebRTCIceCandidate } = await import('../api/webrtcService');
-        
+
         try {
-            const consultationID = parseInt(this.roomId.replace('consultation_', ''));
+            const consultationID = this.extractConsultationId(this.roomId);
+            if (!consultationID) {
+                return;
+            }
             await sendWebRTCIceCandidate({
                 consultationID: consultationID,
+                from: this.userId,
                 to: to,
                 candidate: candidate,
             });
@@ -243,21 +306,35 @@ class PusherSignalingService {
      * End the call
      */
     async endCall(): Promise<void> {
-        if (!this.roomId || !this.userId) {
+        // Store roomId and userId before leaveRoom() clears them
+        const currentRoomId = this.roomId;
+        const currentUserId = this.userId;
+
+        if (!currentRoomId || !currentUserId) {
+            console.log('📞 [PusherSignaling] No active call to end (roomId or userId missing)');
+            // Still try to leave room if we're subscribed to a channel
+            this.leaveRoom();
             return;
         }
 
         console.log('📞 [PusherSignaling] Ending call');
 
         const { endWebRTCCall } = await import('../api/webrtcService');
-        
+
         try {
-            const consultationID = parseInt(this.roomId.replace('consultation_', ''));
-            await endWebRTCCall(consultationID);
+            const consultationID = this.extractConsultationId(currentRoomId);
+            if (consultationID) {
+                // Notify backend that call has ended (this will notify the other side via Pusher)
+                await endWebRTCCall(consultationID, currentUserId);
+                console.log('✅ [PusherSignaling] Call ended notification sent to backend');
+            } else {
+                console.warn('⚠️ [PusherSignaling] Could not extract consultation ID from roomId:', currentRoomId);
+            }
         } catch (error) {
             console.error('❌ [PusherSignaling] Failed to end call:', error);
         }
 
+        // Leave room after notifying backend
         this.leaveRoom();
     }
 

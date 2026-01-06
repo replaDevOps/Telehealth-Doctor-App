@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, StatusBar, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, StatusBar, Alert, Platform, PermissionsAndroid } from 'react-native';
 import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
@@ -24,10 +24,13 @@ export const HomeScreen = ({ navigation }) => {
   const { requests: consultationRequests, removeRequest, clearAll: clearAllRequests } = useConsultationRequestStore();
 
   const [isActive, setIsActive] = useState(false);
+  const [hasAudioPermission, setHasAudioPermission] = useState(false);
+  const [hasVideoPermission, setHasVideoPermission] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
     fetchNotifications(); // Fetch notifications on mount
+    requestPermissions(); // Request media permissions
   }, [fetchDashboardData, fetchNotifications]);
 
   // Initialize isActive state based on profile status
@@ -43,6 +46,51 @@ export const HomeScreen = ({ navigation }) => {
       clearAllRequests();
     }
   }, [isActive, clearAllRequests]);
+
+  const requestPermissions = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const cameraGranted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: 'This app needs camera access for video consultations',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+
+        const audioGranted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: 'Microphone Permission',
+            message: 'This app needs microphone access for audio and video consultations',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+
+        console.log('📱 [Permissions] Camera:', cameraGranted);
+        console.log('📱 [Permissions] Audio:', audioGranted);
+
+        setHasAudioPermission(audioGranted === PermissionsAndroid.RESULTS.GRANTED);
+        setHasVideoPermission(
+          cameraGranted === PermissionsAndroid.RESULTS.GRANTED &&
+          audioGranted === PermissionsAndroid.RESULTS.GRANTED
+        );
+      } catch (err) {
+        console.warn('📱 [Permissions] Error requesting permissions:', err);
+        setHasAudioPermission(false);
+        setHasVideoPermission(false);
+      }
+    } else {
+      // iOS permissions are handled at runtime by the system
+      setHasAudioPermission(true);
+      setHasVideoPermission(true);
+    }
+  };
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
@@ -86,6 +134,12 @@ export const HomeScreen = ({ navigation }) => {
         
         // Navigate based on consultation type
         if (consultationType === 'audio') {
+          console.log('🎤 [Doctor] Navigating to AudioConsultation with params:', {
+            consultationId: `consultation_${requestId}`,
+            userId: userId,
+            isInitiator: false,
+            patientInfo: patientInfo,
+          });
           navigation.navigate('AudioConsultation', {
             consultationId: `consultation_${requestId}`,
             userId: userId,
@@ -93,6 +147,12 @@ export const HomeScreen = ({ navigation }) => {
             patientInfo: patientInfo,
           });
         } else if (consultationType === 'video') {
+          console.log('📹 [Doctor] Navigating to VideoConsultation with params:', {
+            consultationId: `consultation_${requestId}`,
+            userId: userId,
+            isInitiator: false,
+            patientInfo: patientInfo,
+          });
           navigation.navigate('VideoConsultation', {
             consultationId: `consultation_${requestId}`,
             userId: userId,
