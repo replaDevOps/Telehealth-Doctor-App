@@ -29,6 +29,7 @@ import { useAuthStore, useProfileStore } from '../../../store';
 import { useFocusEffect } from '@react-navigation/native';
 import { Toast } from 'toastify-react-native';
 import { pusherService } from '../../../services/pusher/PusherService';
+import { endConsultation } from '../../../services/api/webrtcService';
 
 // ---------- Main Component ----------
 export function ChatScreen({ navigation, route }) {
@@ -56,9 +57,13 @@ export function ChatScreen({ navigation, route }) {
   const [consultationData, setConsultationData] = useState<any>(null);
   const [prescriptionBottomSheetVisible, setPrescriptionBottomSheetVisible] = useState(false);
   const [endConsultationModalVisible, setEndConsultationModalVisible] = useState(false);
+  const [consultationWasEnded, setConsultationWasEnded] = useState(false); // Track if consultation was ended (use state for re-renders)
   const [flexToggle, setFlexToggle] = useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
+  const consultationStartTimeRef = useRef<number | null>(null); // Track when consultation started
+  const consultationEndedRef = useRef(false); // Prevent duplicate API calls
+  const chatTimerInitializedRef = useRef(false); // Track if timer was initialized
   const { user } = useAuthStore();
   const { profileData } = useProfileStore();
   const doctorID = user?.id;
@@ -185,20 +190,41 @@ export function ChatScreen({ navigation, route }) {
     }, [fetchMessages])
   );
 
-  // Timer for consultation - ends after 30 minutes (works for both doctor and patient)
+  // Track consultation start time
   useEffect(() => {
-    if (chatType !== 'doctor' || !isConsultationActive) return;
+    if (isConsultationActive && chatType === 'doctor' && consultationId && !consultationStartTimeRef.current) {
+      consultationStartTimeRef.current = Date.now();
+      console.log('📞 [ChatScreen] Consultation started, tracking duration');
+    }
+  }, [isConsultationActive, chatType, consultationId]);
+
+  // Timer for consultation - Countdown from 30 minutes (1800 seconds)
+  useEffect(() => {
+    if (chatType !== 'doctor' || !isConsultationActive) {
+      // Reset timer when consultation is not active
+      chatTimerInitializedRef.current = false;
+      setRemainingSeconds(CONSULTATION_DURATION);
+      return;
+    }
+
+    // Initialize timer once when consultation becomes active
+    if (!chatTimerInitializedRef.current) {
+      chatTimerInitializedRef.current = true;
+      setRemainingSeconds(CONSULTATION_DURATION);
+      console.log('⏰ [ChatScreen] Starting 30-minute countdown timer');
+    }
 
     const timer = setInterval(() => {
       setRemainingSeconds(prev => {
         if (prev <= 1) {
           clearInterval(timer);
           setIsConsultationActive(false);
-          // End consultation after 30 minutes - show ended modal
-          setModalVisible(true);
+          // Auto-end consultation at 30 minutes
+          console.log('⏰ [ChatScreen] 30 minutes elapsed, auto-ending consultation');
+          handleEndConsultationConfirm();
           return 0;
         }
-        return prev - 1;
+        return prev - 1; // Count down from 30:00 to 00:00
       });
     }, 1000);
 
@@ -374,11 +400,77 @@ export function ChatScreen({ navigation, route }) {
       console.error('Error binding to receiver channel:', err);
     }
 
+    // Listen for consultation-end event
+    const consultationEndChannelName = `webrtc-consultation${consultationId}`;
+    console.log('📞 [ChatScreen] Subscribing to consultation-end channel:', consultationEndChannelName);
+    
+    const handleConsultationEnd = (eventPayload: any) => {
+      console.log('📞 [ChatScreen] Consultation end event received (raw):', JSON.stringify(eventPayload, null, 2));
+      console.log('📞 [ChatScreen] Event payload type:', typeof eventPayload, 'has data property:', !!eventPayload?.data);
+      console.log('📞 [ChatScreen] Current state - isMounted:', isMounted, 'consultationEndedRef:', consultationEndedRef.current, 'consultationId:', consultationId, 'type:', typeof consultationId);
+      
+      if (!isMounted || consultationEndedRef.current) {
+        console.log('📞 [ChatScreen] Ignoring event - isMounted:', isMounted, 'consultationEndedRef:', consultationEndedRef.current);
+        return;
+      }
+
+      // Handle nested data structure: { data: { consultationID: ... } } or direct { consultationID: ... }
+      // Try multiple ways to extract the data
+      let data = eventPayload;
+      if (eventPayload?.data && typeof eventPayload.data === 'object') {
+        data = eventPayload.data;
+        console.log('📞 [ChatScreen] Using nested data structure');
+      } else {
+        console.log('📞 [ChatScreen] Using direct payload');
+      }
+      
+      const eventConsultationID = data?.consultationID || data?.id || eventPayload?.consultationID || eventPayload?.id;
+      const fromUser = (data?.from || eventPayload?.from || '').toString();
+      
+      console.log('📞 [ChatScreen] Extracted - eventConsultationID:', eventConsultationID, 'type:', typeof eventConsultationID, 'fromUser:', fromUser, 'consultationId:', consultationId, 'type:', typeof consultationId);
+      
+      // Check if this event is from the other side (patient), not from ourselves (doctor)
+      // If we (doctor) sent this event, ignore it
+      const isFromDoctor = fromUser && fromUser.startsWith('doctor_');
+      if (isFromDoctor) {
+        console.log('📞 [ChatScreen] Ignoring own event from:', fromUser);
+        return;
+      }
+
+      // Compare IDs - ensure both are converted to strings for reliable comparison
+      const eventIDStr = eventConsultationID?.toString() || '';
+      const consultationIDStr = consultationId?.toString() || '';
+      const idsMatch = eventIDStr && consultationIDStr && eventIDStr === consultationIDStr;
+      
+      console.log('📞 [ChatScreen] ID comparison - eventIDStr:', eventIDStr, 'consultationIDStr:', consultationIDStr, 'match:', idsMatch);
+
+      // If the other side (patient) ended the consultation, show the modal where doctor can add prescription
+      if (idsMatch) {
+        console.log('✅ [ChatScreen] Consultation ended by patient, showing modal with prescription option');
+        consultationEndedRef.current = true;
+        setIsConsultationActive(false);
+        setConsultationWasEnded(true); // Use state to trigger re-render
+        setModalVisible(false); // Close the simple ended modal
+        setEndConsultationModalVisible(true); // Show modal where doctor can add prescription (without End button)
+        Toast.info('Consultation ended by the patient. You can still add prescription.');
+      } else {
+        console.log('❌ [ChatScreen] Consultation ID mismatch - eventIDStr:', eventIDStr, 'consultationIDStr:', consultationIDStr);
+      }
+    };
+
+    try {
+      pusherService.bind(consultationEndChannelName, 'consultation-end', handleConsultationEnd);
+      console.log('✅ [ChatScreen] Bound to consultation-end event');
+    } catch (err) {
+      console.error('Error binding to consultation-end channel:', err);
+    }
+
     // Cleanup function
     return () => {
       isMounted = false;
       pusherService.unbind(senderChannelName, 'message-sent');
       pusherService.unbind(receiverChannelName, 'message-received');
+      pusherService.unbind(consultationEndChannelName, 'consultation-end');
       try {
         pusherService.unsubscribe(senderChannelName);
       } catch (err) {
@@ -388,6 +480,11 @@ export function ChatScreen({ navigation, route }) {
         pusherService.unsubscribe(receiverChannelName);
       } catch (err) {
         console.error('Error unsubscribing from receiver channel:', err);
+      }
+      try {
+        pusherService.unsubscribe(consultationEndChannelName);
+      } catch (err) {
+        console.error('Error unsubscribing from consultation-end channel:', err);
       }
     };
   }, [doctorID, consultationId, chatType, user, doctorInfo, patientInfo, fetchMessages, consultationData]);
@@ -623,11 +720,67 @@ export function ChatScreen({ navigation, route }) {
     Toast.success('Prescription added successfully');
   }, [consultationId]);
 
-  const handleEndConsultationConfirm = useCallback(() => {
-    setEndConsultationModalVisible(false);
-    setIsConsultationActive(false);
-    setModalVisible(true);
+  // Helper function to calculate duration
+  const calculateDuration = useCallback(() => {
+    if (!consultationStartTimeRef.current) return '0 min';
+    const durationMs = Date.now() - consultationStartTimeRef.current;
+    const durationMinutes = Math.floor(durationMs / 60000);
+    return `${durationMinutes} min`;
   }, []);
+
+  // Helper function to end consultation and notify the other side
+  const endConsultationAndNotify = useCallback(async () => {
+    if (consultationEndedRef.current || !consultationId || !isConsultationActive) {
+      return;
+    }
+
+    consultationEndedRef.current = true;
+    setConsultationWasEnded(true); // Use state to trigger re-render
+    setIsConsultationActive(false);
+
+    try {
+      const duration = calculateDuration();
+      // For doctor side: from = doctor_XX, to = patient_YY
+      const fromUserId = `doctor_${doctorID}`;
+      const toUserId = `patient_${consultationPatientID || patientID}`;
+
+      if (!fromUserId || !toUserId || !consultationPatientID) {
+        console.warn('⚠️ [ChatScreen] Missing user IDs, cannot notify other side:', { fromUserId, toUserId, doctorID, consultationPatientID, patientID });
+        return;
+      }
+
+      console.log('📞 [ChatScreen] Ending consultation and notifying other side:', {
+        consultationID: consultationId,
+        duration,
+        from: fromUserId,
+        to: toUserId,
+      });
+
+      await endConsultation({
+        consultationID: Number(consultationId),
+        duration,
+        from: fromUserId,
+        to: toUserId,
+        offer: { type: 'offer', sdp: '...' }, // Required by API
+      });
+
+      console.log('✅ [ChatScreen] Consultation ended successfully, other side notified');
+    } catch (error: any) {
+      console.error('❌ [ChatScreen] Error ending consultation:', error);
+      // Still show modal even if API call fails
+      Toast.error(error?.response?.data?.message || 'Failed to end consultation');
+    }
+  }, [consultationId, isConsultationActive, doctorID, consultationPatientID, patientID, calculateDuration]);
+
+  const handleEndConsultationConfirm = useCallback(async () => {
+    // Call API to notify other side (this sets consultationEndedRef.current = true and consultationWasEnded = true)
+    await endConsultationAndNotify();
+    
+    // After ending consultation, the modal will automatically update to show only "Add Prescription" button
+    // because consultationWasEnded state will be true, making onEndConsultation undefined
+    // No need to close and reopen - just keep the modal open with updated props
+    setIsConsultationActive(false);
+  }, [endConsultationAndNotify]);
 
   const handleGetPrescription = useCallback(() => {
     setModalVisible(false);
@@ -681,6 +834,7 @@ export function ChatScreen({ navigation, route }) {
         fromHistory={fromHistory}
         handleGoBack={handleGoBack}
         handleEndConsultation={handleEndConsultation}
+        isConsultationActive={isConsultationActive}
         consultationData={consultationData}
       />
 
@@ -734,11 +888,19 @@ export function ChatScreen({ navigation, route }) {
       />
       <ConsultationEndedModal
         visible={endConsultationModalVisible}
-        onClose={() => setEndConsultationModalVisible(false)}
+        onClose={() => {
+          setEndConsultationModalVisible(false);
+          // If consultation was ended, also close the chat
+          if (consultationWasEnded && !isConsultationActive) {
+            navigation.goBack();
+          }
+        }}
         onGetPrescription={handleGetPrescription}
         isDoctor={true}
         onAddPrescription={handleAddPrescription}
-        onEndConsultation={handleEndConsultationConfirm}
+        // Only show "End Consultation" button if consultation hasn't been ended yet
+        // If consultationWasEnded is true, it means consultation was already ended, so hide the End button
+        onEndConsultation={!consultationWasEnded ? handleEndConsultationConfirm : undefined}
       />
       <PrescriptionBottomSheet
         visible={prescriptionBottomSheetVisible}

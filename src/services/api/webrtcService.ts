@@ -92,3 +92,26 @@ export const endWebRTCCall = async (consultationID: number, from: string) => {
     throw error;
   }
 };
+
+/**
+ * End any type of consultation (Chat, Audio, Video)
+ * This API notifies the other side via Pusher event 'consultation-end'
+ */
+export interface EndConsultationRequest {
+  consultationID: number;
+  duration: string; // e.g., "20 min" or "30 min"
+  from: string; // e.g., "doctor_33" or "patient_62"
+  to: string; // e.g., "patient_62" or "doctor_33"
+  offer?: any; // Optional, for WebRTC compatibility
+}
+
+export const endConsultation = async (data: EndConsultationRequest) => {
+  try {
+    const response = await apiClient.post('/webrtc/consultation-end', data);
+    console.log('End consultation response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error ending consultation:', error);
+    throw error;
+  }
+};

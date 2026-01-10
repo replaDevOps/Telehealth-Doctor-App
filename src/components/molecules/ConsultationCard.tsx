@@ -12,7 +12,7 @@ interface ConsultationCardProps {
   time: string;
   gender?: string;
   age?: string;
-  duration: string;
+  duration?: string | null;
   type: 'chat' | 'video' | 'audio';
   amount?: string;
   code?: string;
@@ -69,10 +69,12 @@ const ConsultationCard = ({
             />
             <Text style={styles.typeText}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
           </View>
-          <View style={styles.timeContainer}>
-            <Ionicons name="time-outline" size={16} color={colors.white} />
-            <Text style={styles.timeText}>{duration}</Text>
-          </View>
+          {duration && duration.trim() !== '' && duration !== 'null' && duration.toLowerCase() !== 'null' && (
+            <View style={styles.timeContainer}>
+              <Ionicons name="time-outline" size={16} color={colors.white} />
+              <Text style={styles.timeText}>{duration}</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -117,17 +119,20 @@ const ConsultationCard = ({
           )}
         </View>
 
-        {/* Action Buttons - Always show both */}
+        {/* Action Buttons - Only show View Chat for chat consultations, always show View Prescription */}
         <View style={styles.actionButtons}>
+          {/* Only show View Chat button for chat type consultations */}
+          {type === 'chat' && onViewChat && (
+            <TouchableOpacity
+              style={styles.chatButton}
+              onPress={onViewChat}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.chatButtonText}>View Chat</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
-            style={styles.chatButton}
-            onPress={onViewChat}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.chatButtonText}>View Chat</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.prescriptionButton}
+            style={[styles.prescriptionButton, type === 'chat' && onViewChat ? {} : styles.prescriptionButtonFullWidth]}
             onPress={onViewPrescription}
             activeOpacity={0.7}
           >
@@ -306,6 +311,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: mvs(10),
     alignItems: 'center',
+  },
+  prescriptionButtonFullWidth: {
+    flex: 1,
+    width: '100%',
   },
   prescriptionButtonText: {
     color: colors.white,

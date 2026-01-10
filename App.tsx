@@ -6,6 +6,7 @@ import { colors } from './src/styles/colors';
 import { setGlobalFont } from './src/utils/overrideText';
 import { usePusherNotifications } from './src/hooks/usePusherNotifications';
 import { NotificationCountProvider } from './src/context/NotificationCountContext';
+import ToastManager from 'toastify-react-native';
 
 setGlobalFont();
 
@@ -13,7 +14,15 @@ const AppContent = () => {
   // Setup Pusher notifications
   usePusherNotifications();
 
-  return <AppNavigator />;
+  return (
+    <>
+      <AppNavigator />
+      <ToastManager
+        showProgressBar={false}
+        duration={3000}
+      />
+    </>
+  );
 };
 
 const App = () => {

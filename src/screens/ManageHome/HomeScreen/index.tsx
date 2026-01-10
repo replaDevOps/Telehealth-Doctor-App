@@ -213,12 +213,33 @@ export const HomeScreen = ({ navigation }) => {
     }
   };
 
+  // Get clinic name from profile data or use default
+  const clinicName = profileData?.clinic?.clinicName || 
+                     profileData?.clinic?.business_setting?.businessName || 
+                     'Medical Center';
+
+  // Get location/address from clinic business_setting or use default
+  // Combine address, city, and district if available
+  const getLocation = (): string => {
+    const businessSetting = profileData?.clinic?.business_setting;
+    if (!businessSetting) return 'Location';
+    
+    const parts: string[] = [];
+    if (businessSetting.address) parts.push(businessSetting.address);
+    if (businessSetting.city) parts.push(businessSetting.city);
+    if (businessSetting.district) parts.push(businessSetting.district);
+    
+    return parts.length > 0 ? parts.join(', ') : 'Location';
+  };
+
+  const location = getLocation();
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <HomeHeader
-        centerName="Eden Medical Center"
-        location="Makkah"
+        centerName={clinicName}
+        location={location}
         doctorName={profileData?.name || 'Dr. Sultan Khan'}
         doctorSpecialty={profileData?.specialization || 'Dermatologist'}
         doctorImage={profileData?.image ? { uri: profileData.image } : doctor}

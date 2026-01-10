@@ -28,10 +28,9 @@ export function SignInScreen({ navigation }) {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [phoneError, setPhoneError] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [passwordError, setPasswordError] = useState('');
-  const [countryCode, setCountryCode] = useState('PK');
+  const [countryCode, setCountryCode] = useState('SA');
   const [loading, setLoading] = useState(false);
 
   const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
@@ -40,14 +39,13 @@ export function SignInScreen({ navigation }) {
     : `+${phone}`;
 
   const handleSignIn = async () => {
-    // Clear previous errors
+    // Clear previous validation errors (user errors only)
     setPhoneError('');
     setPasswordError('');
-    setErrorMessage('');
     
     let valid = true;
 
-    // Phone validation
+    // Phone validation (user error - show under input)
     if (!phone.trim()) {
       setPhoneError('Phone number is required');
       valid = false;
@@ -55,7 +53,7 @@ export function SignInScreen({ navigation }) {
       setPhoneError('');
     }
 
-    // Password validation
+    // Password validation (user error - show under input)
     if (!password.trim()) {
       setPasswordError('Password is required');
       valid = false;
@@ -130,19 +128,28 @@ export function SignInScreen({ navigation }) {
       }
     } catch (error: any) {
       console.error('Login error:', error);
+      console.error('Login error response:', error?.response);
+      console.error('Login error data:', error?.response?.data);
+      
+      // Extract error message from various possible API error structures
+      // Structure 1: { status: 401, message: "...", data: { success: false, message: "...", error: "..." } }
+      // Structure 2: { data: { message: "..." } }
+      // Structure 3: { message: "..." }
       const errorMsg = 
-        error?.response?.data?.data?.message ||
-        error?.response?.data?.message ||
-        error?.message ||
+        error?.response?.data?.data?.error || // Most specific error message (e.g., "Invalid email, password, or user type")
+        error?.response?.data?.data?.message || // Message from nested data (e.g., "Unauthorized")
+        error?.response?.data?.message || // Message from data (e.g., "Unauthorized")
+        error?.response?.message || // Message from response (e.g., "Unauthorized")
+        error?.message || // General error message
         'Login failed. Please check your credentials and try again.';
-      setErrorMessage(errorMsg);
-      // Only show error toast if it's a real error (not success message)
-      if (!errorMsg.toLowerCase().includes('successful')) {
-        try {
-          Toast.error(errorMsg);
-        } catch (toastError) {
-          console.log('Toast error (non-critical):', toastError);
-        }
+      
+      console.log('Extracted error message:', errorMsg);
+      
+      // Show API error in toast
+      try {
+        Toast.error(errorMsg);
+      } catch (toastError) {
+        console.log('Toast error (non-critical):', toastError);
       }
     } finally {
       setLoading(false);
@@ -188,7 +195,6 @@ export function SignInScreen({ navigation }) {
               countryCode={countryCode}
               setCountryCode={setCountryCode}
               phoneError={phoneError}
-              errorMessage={errorMessage}
               onValidationChange={setIsPhoneValid}
               CustomStyle={{ backgroundColor: colors.white }}
             />
@@ -206,9 +212,8 @@ export function SignInScreen({ navigation }) {
 
           {/* Sign In Button */}
           <CustomButton
-            title={loading ? 'Signing In...' : 'Sign In'}
+            title="Sign In"
             onPress={handleSignIn}
-            disabled={loading}
             loading={loading}
           />
 

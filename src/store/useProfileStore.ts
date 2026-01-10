@@ -13,6 +13,42 @@ export interface WorkingHour {
   updated_at?: string;
 }
 
+export interface BusinessSetting {
+  id?: number;
+  clinicID?: number;
+  logo?: string;
+  coverImage?: string;
+  businessName?: string;
+  businessEmail?: string;
+  businessNumber?: string;
+  city?: string;
+  district?: string;
+  website?: string;
+  address?: string;
+  lat?: string;
+  long?: string;
+  about?: string;
+  chatConsultation?: boolean;
+  chatConsultationPrice?: string;
+  voiceConsultation?: boolean;
+  voiceConsultationPrice?: string;
+  videoConsultation?: boolean;
+  videoConsultationPrice?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Clinic {
+  id?: number;
+  code?: string;
+  name?: string;
+  email?: string;
+  clinicName?: string;
+  businessType?: string;
+  business_setting?: BusinessSetting;
+}
+
 export interface ProfileData {
   id?: number;
   code?: string;
@@ -28,7 +64,10 @@ export interface ProfileData {
   qualification?: string;
   experience?: string;
   signature?: string;
+  status?: string;
+  online_status?: boolean;
   working_hours?: WorkingHour[];
+  clinic?: Clinic;
   [key: string]: any;
 }
 
@@ -99,8 +138,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   },
 
   refreshProfile: async () => {
-    // Force refresh by clearing cache
-    set({ lastFetched: null });
+    // Force refresh by clearing cache and setting loading state
+    set({ lastFetched: null, isLoading: true });
     await get().fetchProfile();
   },
 }));

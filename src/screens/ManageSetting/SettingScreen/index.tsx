@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, Modal, ActivityIndicator, RefreshControl } from 'react-native';
 import UserProfile from '../../../components/common/UserProfile';
 import { Header2 } from '../../../components/common/Header2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -15,8 +15,9 @@ import style from './style';
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
   const { logout } = useAuthStore();
-  const { profileData, clearProfile, fetchProfile } = useProfileStore();
+  const { profileData, clearProfile, fetchProfile, refreshProfile, isLoading } = useProfileStore();
   const [profileImage, setProfileImage] = useState<string>('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Fetch profile on mount
   useEffect(() => {
@@ -35,6 +36,11 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
     setProfileImage(uri);
   };
 
+  const handleRefresh = async () => {
+    // Force refresh by clearing cache and fetching fresh data
+    await refreshProfile();
+  };
+
   const handleLogout = async () => {
     Alert.alert(
       'Log Out',
@@ -45,20 +51,28 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
           text: 'Log Out',
           style: 'destructive',
           onPress: async () => {
+            setIsLoggingOut(true);
             try {
               await logoutApi();
             } catch (error: any) {
+              // Even if API call fails, proceed with logout
               console.log('Logout API error:', error);
-            } finally {
-              logout();
-              clearProfile();
-              navigation.getParent()?.getParent()?.replace('Auth', { screen: 'SignIn' });
+            }
+            
+            // Clear stores and navigate
+            logout();
+            clearProfile();
+            navigation.getParent()?.getParent()?.replace('Auth', { screen: 'SignIn' });
+            
+            // Note: setIsLoggingOut(false) is not needed as component unmounts on navigation
+            // Show success message after navigation
+            setTimeout(() => {
               try {
                 Toast.success('Logged out successfully');
               } catch (toastError) {
                 console.log('Toast error (non-critical):', toastError);
               }
-            }
+            }, 100);
           },
         },
       ],
@@ -77,7 +91,18 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <Header2 title="Setting" />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={{ paddingBottom: 20 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={handleRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+          />
+        }
+      >
         <View style={style.container}>
           {/* User Profile Section */}
           <UserProfile
@@ -161,6 +186,19 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Loading Modal for Logout */}
+      <Modal
+        visible={isLoggingOut}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View style={style.loadingOverlay}>
+          <ActivityIndicator size="large" color={colors.white} />
+          <Text style={style.loadingText}>Logging Out...</Text>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     },
     signatureContainer: {
         width: '100%',
-        height: mvs(200),
+        height: mvs(300),
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#EFEFEF',
@@ -27,8 +27,8 @@ export const styles = StyleSheet.create({
         marginBottom: mvs(30),
     },
     signatureImage: {
-        width: '90%',
-        height: '90%',
+        width: '95%',
+        height: '95%',
     },
     placeholderContainer: {
         alignItems: 'center',
@@ -37,19 +37,5 @@ export const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 14,
         color: '#9CA3AF',
-    },
-    updateButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.primary,
-        paddingVertical: 16,
-        borderRadius: 12,
-        gap: 10,
-    },
-    updateButtonText: {
-        color: colors.white,
-        fontSize: 16,
-        fontWeight: '700',
     },
 });

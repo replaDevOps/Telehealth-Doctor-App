@@ -6,6 +6,7 @@ import {
   TouchableOpacityProps,
   TextProps,
   ViewStyle,
+  ActivityIndicator,
 } from 'react-native';
 import { colors } from '../../styles/colors';
 import { mvs } from '../../config/metrices';
@@ -14,17 +15,36 @@ interface CustomButtonProps extends TouchableOpacityProps {
   title: string;
   textStyle?: TextProps['style'];
   style?: ViewStyle;
+  loading?: boolean;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
   title,
   textStyle,
   style,
+  disabled,
+  loading,
   ...props
 }) => {
   return (
-    <TouchableOpacity style={[styles.button, style]} {...props}>
-      <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+    <TouchableOpacity
+      style={[styles.button, disabled && styles.disabledButton, style]}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {loading ? (
+        <ActivityIndicator size="small" color={colors.white} />
+      ) : (
+        <Text
+          style={[
+            styles.buttonText,
+            disabled && styles.disabledText,
+            textStyle,
+          ]}
+        >
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -38,11 +58,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: mvs(10),
   },
+  disabledButton: {
+    backgroundColor: colors.primaryTint || '#A78BFA',
+  },
   buttonText: {
     color: colors.white,
     fontSize: mvs(16),
     fontWeight: 'bold',
   },
+  disabledText: {},
 });
 
 export { CustomButton };

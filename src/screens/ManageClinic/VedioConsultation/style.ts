@@ -27,9 +27,28 @@ export const styles = StyleSheet.create({
       justifyContent: 'space-between',
     },
     topSection: {
-      alignItems: 'center',
       paddingTop: 20,
       paddingHorizontal: 20,
+      width: '100%',
+    },
+    topHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+    },
+    patientInfoColumn: {
+      flex: 1,
+      alignItems: 'flex-start',
+    },
+    prescriptionTopButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255, 255, 255, 0.25)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
     },
     doctorName: {
       fontSize: 22,

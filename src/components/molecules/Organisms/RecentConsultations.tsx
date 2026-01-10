@@ -35,12 +35,15 @@ const RecentConsultations = ({
   onViewChat,
   emptyMessage = 'No recent consultations found.',
 }: RecentConsultationsProps) => {
+  // Only show View All button when there are consultations
+  const hasConsultations = consultations && consultations.length > 0;
+  
   return (
     <View style={styles.container}>
       {onViewAll && (
         <HomeSectionTitle
           title="Recent Consultations"
-          onActionPress={onViewAll}
+          onActionPress={hasConsultations ? onViewAll : undefined}
         />
       )}
       {isLoading ? (

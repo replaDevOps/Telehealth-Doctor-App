@@ -58,8 +58,8 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
 
           {/* Buttons */}
           {isDoctor ? (
-            onAddPrescription && onEndConsultation ? (
-              // Show action buttons when doctor is trying to end consultation (back navigation)
+            onAddPrescription ? (
+              // Show prescription button (with optional end button if onEndConsultation is provided)
               <View style={styles.buttonColumn}>
                 <TouchableOpacity
                   style={styles.prescriptionButton}
@@ -69,18 +69,23 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                     Add Prescription
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.endButton}
-                  onPress={onEndConsultation}
-                >
-                  <Text style={styles.endButtonText}>End Consultation</Text>
-                </TouchableOpacity>
+                {onEndConsultation && (
+                  // Only show End Consultation button if handler is provided (doctor manually ending)
+                  <TouchableOpacity
+                    style={styles.endButton}
+                    onPress={onEndConsultation}
+                  >
+                    <Text style={styles.endButtonText}>End Consultation</Text>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                  <Text style={styles.closeButtonText}>Cancel</Text>
+                  <Text style={styles.closeButtonText}>
+                    {onEndConsultation ? 'Cancel' : 'Close'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ) : (
-              // Show only Close button when consultation has already ended
+              // Show only Close button when consultation has already ended and no prescription option
               <View style={styles.buttonRow}>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                   <Text style={styles.closeButtonText}>Close</Text>

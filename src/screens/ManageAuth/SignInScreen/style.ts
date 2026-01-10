@@ -181,5 +181,5 @@ export const styles = StyleSheet.create({
     color: colors.primary,
     textDecorationLine: 'underline',
   },
-  CheckBox:{ flexDirection: 'row', gap: mvs(5), alignItems: 'center' }
+  CheckBox:{ flexDirection: 'row', gap: mvs(5), alignItems: 'center' },
 });
