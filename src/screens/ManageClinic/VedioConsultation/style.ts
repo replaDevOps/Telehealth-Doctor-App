@@ -19,6 +19,12 @@ export const styles = StyleSheet.create({
       width: width,
       height: height,
     },
+    darkBackground: {
+      flex: 1,
+      width: width,
+      height: height,
+      backgroundColor: '#1a1a1a', // Dark background color
+    },
     overlay: {
       ...StyleSheet.absoluteFillObject,
     },
@@ -30,25 +36,24 @@ export const styles = StyleSheet.create({
       paddingTop: 20,
       paddingHorizontal: 20,
       width: '100%',
-    },
-    topHeaderRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      position: 'relative',
       alignItems: 'center',
-      width: '100%',
+      justifyContent: 'center',
     },
-    patientInfoColumn: {
-      flex: 1,
-      alignItems: 'flex-start',
+    patientInfoCenter: {
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     prescriptionTopButton: {
+      position: 'absolute',
+      right: 20,
+      top: 20,
       width: 44,
       height: 44,
       borderRadius: 22,
       backgroundColor: 'rgba(255, 255, 255, 0.25)',
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: 16,
     },
     doctorName: {
       fontSize: 22,

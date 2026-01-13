@@ -220,7 +220,7 @@ export function SignInScreen({ navigation }) {
           {/* Sign Up Link */}
           <View style={styles.signinRow}>
             <Text style={styles.TextContent}>Need Help? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <TouchableOpacity onPress={() => {}}>
               <Text style={styles.signinLink}>Contact admin</Text>
             </TouchableOpacity>
           </View>

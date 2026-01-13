@@ -37,7 +37,6 @@ const RecentConsultations = ({
 }: RecentConsultationsProps) => {
   // Only show View All button when there are consultations
   const hasConsultations = consultations && consultations.length > 0;
-  
   return (
     <View style={styles.container}>
       {onViewAll && (

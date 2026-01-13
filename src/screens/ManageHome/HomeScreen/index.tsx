@@ -139,12 +139,16 @@ export const HomeScreen = ({ navigation }) => {
             userId: userId,
             isInitiator: false,
             patientInfo: patientInfo,
+            patientID: patientID,
+            recipientID: patientID,
           });
           navigation.navigate('AudioConsultation', {
             consultationId: `consultation_${requestId}`,
             userId: userId,
             isInitiator: false, // Doctor joins, patient initiates
             patientInfo: patientInfo,
+            patientID: patientID, // Pass patientID directly for consultation end API
+            recipientID: patientID, // Alias for consistency
           });
         } else if (consultationType === 'video') {
           console.log('📹 [Doctor] Navigating to VideoConsultation with params:', {
@@ -152,12 +156,16 @@ export const HomeScreen = ({ navigation }) => {
             userId: userId,
             isInitiator: false,
             patientInfo: patientInfo,
+            patientID: patientID,
+            recipientID: patientID,
           });
           navigation.navigate('VideoConsultation', {
             consultationId: `consultation_${requestId}`,
             userId: userId,
             isInitiator: false, // Doctor joins, patient initiates
             patientInfo: patientInfo,
+            patientID: patientID, // Pass patientID directly for consultation end API
+            recipientID: patientID, // Alias for consistency
           });
         } else {
           // Default to ChatScreen for chat consultations

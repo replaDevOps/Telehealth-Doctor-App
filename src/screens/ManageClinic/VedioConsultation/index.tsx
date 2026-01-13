@@ -44,8 +44,11 @@ export function VideoConsultation({ navigation, route }) {
   const consultationStartTimeRef = useRef<number | null>(null);
   const consultationEndedRef = useRef(false);
   const timerInitializedRef = useRef(false);
-  const auth = useAuthStore(state => state.auth);
-  const doctorID = auth?.id;
+  const { user } = useAuthStore();
+  const doctorID = user?.id;
+  
+  // Extract patientID from route params - this should be passed when navigating to consultation
+  const patientID = route?.params?.patientID || route?.params?.patientInfo?.id;
 
   // Initialize WebRTC for video call
   const {
@@ -239,7 +242,10 @@ export function VideoConsultation({ navigation, route }) {
     setModalVisible(true);
 
     // Calculate duration and notify the other side
-    if (consultationID && consultationStartTimeRef.current && doctorID && recipientID) {
+    // Get recipient ID from multiple sources: recipientID, patientID, or patientInfo
+    const actualRecipientID = recipientID || patientID;
+    
+    if (consultationID && consultationStartTimeRef.current && doctorID && actualRecipientID) {
       try {
         const durationMs = Date.now() - consultationStartTimeRef.current;
         const durationMinutes = Math.floor(durationMs / 60000);
@@ -247,7 +253,7 @@ export function VideoConsultation({ navigation, route }) {
 
         // For doctor: from = doctor_XX, to = patient_YY
         const fromUserId = `doctor_${doctorID}`;
-        const toUserId = `patient_${recipientID}`;
+        const toUserId = `patient_${actualRecipientID}`;
 
         if (fromUserId && toUserId && !toUserId.includes('undefined')) {
           console.log('📞 [VideoConsultation] Ending consultation and notifying other side:', {
@@ -274,7 +280,7 @@ export function VideoConsultation({ navigation, route }) {
         Toast.error(error?.response?.data?.message || 'Failed to end consultation');
       }
     } else {
-      console.warn('⚠️ [VideoConsultation] Missing consultation data:', { consultationID, doctorID, recipientID, hasStartTime: !!consultationStartTimeRef.current });
+      console.warn('⚠️ [VideoConsultation] Missing consultation data:', { consultationID, doctorID, recipientID, patientID, actualRecipientID, hasStartTime: !!consultationStartTimeRef.current });
     }
 
     // End call locally after showing modal and making API call
@@ -283,7 +289,7 @@ export function VideoConsultation({ navigation, route }) {
       console.log('📞 [VideoConsultation] Calling endCall() after modal is shown');
       endCall();
     }, 300);
-  }, [consultationID, doctorID, recipientID, endCall]);
+  }, [consultationID, doctorID, recipientID, patientID, endCall]);
 
   // Auto-disconnect after 30 minutes - countdown timer (works for both patient and doctor)
   useEffect(() => {
@@ -349,7 +355,7 @@ export function VideoConsultation({ navigation, route }) {
           {/* Dark Overlay for better text visibility */}
           <View style={styles.overlay} />
         </>
-      ) : (
+      ) : patientInfo?.avatar && patientInfo.avatar !== null && patientInfo.avatar !== undefined ? (
         <ImageBackground
           source={patientInfo.avatar}
           style={styles.backgroundImage}
@@ -357,6 +363,10 @@ export function VideoConsultation({ navigation, route }) {
         >
           <View style={styles.overlay} />
         </ImageBackground>
+      ) : (
+        <View style={styles.darkBackground}>
+          <View style={styles.overlay} />
+        </View>
       )}
 
       {/* Content */}
@@ -364,24 +374,23 @@ export function VideoConsultation({ navigation, route }) {
         <SafeAreaView style={styles.safeArea}>
           {/* Patient Info at Top with Prescription Button */}
           <View style={styles.topSection}>
-            <View style={styles.topHeaderRow}>
-              <View style={styles.patientInfoColumn}>
-                <Text style={styles.doctorName}>{patientInfo.name}</Text>
-                <Text style={styles.callStatus}>
-                  {getCallStatus()}
-                </Text>
-              </View>
-              {/* Prescription Button - Only show for doctor and when connected */}
-              {!isInitiator && isConnected && (
-                <TouchableOpacity
-                  style={styles.prescriptionTopButton}
-                  onPress={handleAddPrescription}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="document-text" size={24} color={colors.white} />
-                </TouchableOpacity>
-              )}
+            {/* Centered Patient Info */}
+            <View style={styles.patientInfoCenter}>
+              <Text style={styles.doctorName}>{patientInfo.name}</Text>
+              <Text style={styles.callStatus}>
+                {getCallStatus()}
+              </Text>
             </View>
+            {/* Prescription Button - Positioned absolutely on the right */}
+            {!isInitiator && isConnected && (
+              <TouchableOpacity
+                style={styles.prescriptionTopButton}
+                onPress={handleAddPrescription}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="document-text" size={24} color={colors.white} />
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Small Local Video (Picture-in-Picture) - Only when connected */}

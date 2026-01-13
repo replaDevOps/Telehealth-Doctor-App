@@ -41,9 +41,12 @@ export function AudioConsultation({ navigation, route }) {
   const consultationStartTimeRef = useRef<number | null>(null);
   const consultationEndedRef = useRef(false);
   const timerInitializedRef = useRef(false);
-  const auth = useAuthStore(state => state.auth);
-  const doctorID = auth?.id;
+  const { user } = useAuthStore();
+  const doctorID = user?.id;
   const recipientID = route?.params?.recipientID; // Patient ID for doctor
+  
+  // Extract patientID from route params - this should be passed when navigating to consultation
+  const patientID = route?.params?.patientID || route?.params?.patientInfo?.id;
 
   // Initialize WebRTC for audio-only call
   const {
@@ -236,7 +239,10 @@ export function AudioConsultation({ navigation, route }) {
     setModalVisible(true);
 
     // Calculate duration and notify the other side
-    if (consultationID && consultationStartTimeRef.current && doctorID && recipientID) {
+    // Get recipient ID from multiple sources: recipientID, patientID, or patientInfo
+    const actualRecipientID = recipientID || patientID;
+    
+    if (consultationID && consultationStartTimeRef.current && doctorID && actualRecipientID) {
       try {
         const durationMs = Date.now() - consultationStartTimeRef.current;
         const durationMinutes = Math.floor(durationMs / 60000);
@@ -244,7 +250,7 @@ export function AudioConsultation({ navigation, route }) {
 
         // For doctor: from = doctor_XX, to = patient_YY
         const fromUserId = `doctor_${doctorID}`;
-        const toUserId = `patient_${recipientID}`;
+        const toUserId = `patient_${actualRecipientID}`;
 
         if (fromUserId && toUserId && !toUserId.includes('undefined')) {
           console.log('📞 [AudioConsultation] Ending consultation and notifying other side:', {
@@ -271,7 +277,7 @@ export function AudioConsultation({ navigation, route }) {
         Toast.error(error?.response?.data?.message || 'Failed to end consultation');
       }
     } else {
-      console.warn('⚠️ [AudioConsultation] Missing consultation data:', { consultationID, doctorID, recipientID, hasStartTime: !!consultationStartTimeRef.current });
+      console.warn('⚠️ [AudioConsultation] Missing consultation data:', { consultationID, doctorID, recipientID, patientID, actualRecipientID, hasStartTime: !!consultationStartTimeRef.current });
     }
 
     // End call locally after showing modal and making API call
@@ -280,7 +286,7 @@ export function AudioConsultation({ navigation, route }) {
       console.log('📞 [AudioConsultation] Calling endCall() after modal is shown');
       endCall();
     }, 300);
-  }, [consultationID, doctorID, recipientID, endCall]);
+  }, [consultationID, doctorID, recipientID, patientID, endCall]);
 
   // Auto-disconnect after 30 minutes - countdown timer (works for both patient and doctor)
   useEffect(() => {
@@ -334,95 +340,105 @@ export function AudioConsultation({ navigation, route }) {
         translucent
       />
 
-      {/* Full Screen Background Image */}
-      <ImageBackground
-        source={patientInfo.avatar}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        {/* Dark Overlay */}
-        <View style={styles.overlay} />
-        {/* Content */}
+      {/* Full Screen Background Image or Dark Background */}
+      {patientInfo?.avatar && patientInfo.avatar !== null && patientInfo.avatar !== undefined ? (
+        <ImageBackground
+          source={patientInfo.avatar}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          {/* Dark Overlay */}
+          <View style={styles.overlay} />
+        </ImageBackground>
+      ) : (
+        <View style={styles.darkBackground}>
+          {/* Dark Overlay */}
+          <View style={styles.overlay} />
+        </View>
+      )}
+      
+      {/* Content - Positioned absolutely over background */}
+      <View style={styles.contentContainer}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Patient Info at Top with Prescription Button */}
-          <View style={styles.topSection}>
-            <View style={styles.topHeaderRow}>
-              <View style={styles.patientInfoColumn}>
-                <Text style={styles.doctorName}>{patientInfo.name}</Text>
-                <Text style={styles.callStatus}>
-                  {getCallStatus()}
-                </Text>
-              </View>
-              {/* Prescription Button - Only show for doctor and when connected */}
-              {!isInitiator && isConnected && (
-                <TouchableOpacity
-                  style={styles.prescriptionTopButton}
-                  onPress={handleAddPrescription}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="document-text" size={24} color={colors.white} />
-                </TouchableOpacity>
-              )}
-            </View>
+        {/* Patient Info at Top with Prescription Button */}
+        <View style={styles.topSection}>
+          {/* Centered Patient Info */}
+          <View style={styles.patientInfoCenter}>
+            <Text style={styles.doctorName}>{patientInfo.name}</Text>
+            <Text style={styles.callStatus}>
+              {getCallStatus()}
+            </Text>
           </View>
-
-          {/* Call Controls at Bottom */}
-          <View style={styles.controlsContainer}>
-            {/* Speaker Button */}
+          {/* Prescription Button - Positioned absolutely on the right */}
+          {!isInitiator && isConnected && (
             <TouchableOpacity
-              style={[
-                styles.controlButton,
-                isSpeakerOn && styles.controlButtonActive,
-              ]}
-              onPress={toggleSpeaker}
+              style={styles.prescriptionTopButton}
+              onPress={handleAddPrescription}
+              activeOpacity={0.7}
             >
-              <Ionicons
-                name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
-                size={28}
-                color={colors.white}
-              />
+              <Ionicons name="document-text" size={24} color={colors.white} />
             </TouchableOpacity>
+          )}
+        </View>
 
-            {/* Mute Button */}
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                isMuted && styles.controlButtonActive,
-              ]}
-              onPress={toggleMute}
-            >
-              <Ionicons
-                name={isMuted ? 'mic-off' : 'mic'}
-                size={28}
-                color={colors.white}
-              />
-            </TouchableOpacity>
+        {/* Call Controls at Bottom */}
+        <View style={styles.controlsContainer}>
+          {/* Speaker Button */}
+          <TouchableOpacity
+            style={[
+              styles.controlButton,
+              isSpeakerOn && styles.controlButtonActive,
+            ]}
+            onPress={toggleSpeaker}
+          >
+            <Ionicons
+              name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
+              size={28}
+              color={colors.white}
+            />
+          </TouchableOpacity>
 
-            {/* End Call Button */}
-            <TouchableOpacity
-              style={styles.endCallButton}
-              onPress={handleEndCall}
-            >
-              <Ionicons name="close" size={32} color={colors.white} />
-            </TouchableOpacity>
-          </View>
+          {/* Mute Button */}
+          <TouchableOpacity
+            style={[
+              styles.controlButton,
+              isMuted && styles.controlButtonActive,
+            ]}
+            onPress={toggleMute}
+          >
+            <Ionicons
+              name={isMuted ? 'mic-off' : 'mic'}
+              size={28}
+              color={colors.white}
+            />
+          </TouchableOpacity>
+
+          {/* End Call Button */}
+          <TouchableOpacity
+            style={styles.endCallButton}
+            onPress={handleEndCall}
+          >
+            <Ionicons name="close" size={32} color={colors.white} />
+          </TouchableOpacity>
+        </View>
         </SafeAreaView>
-        <ConsultationEndedModal
-          visible={modalVisible}
-          onClose={handleClose}
-          onGetPrescription={handleGetPrescription}
-          isDoctor={true}
-          onAddPrescription={handleAddPrescription}
-          onEndConsultation={undefined} // No "End Consultation" button since call is already ended
-        />
-        <PrescriptionBottomSheet
-          visible={prescriptionBottomSheetVisible}
-          onClose={() => setPrescriptionBottomSheetVisible(false)}
-          onSave={handleSavePrescription}
-          consultationID={consultationID ? String(consultationID) : ''}
-          consultationData={null}
-        />
-      </ImageBackground>
+      </View>
+      
+      <ConsultationEndedModal
+        visible={modalVisible}
+        onClose={handleClose}
+        onGetPrescription={handleGetPrescription}
+        isDoctor={true}
+        onAddPrescription={handleAddPrescription}
+        onEndConsultation={undefined} // No "End Consultation" button since call is already ended
+      />
+      <PrescriptionBottomSheet
+        visible={prescriptionBottomSheetVisible}
+        onClose={() => setPrescriptionBottomSheetVisible(false)}
+        onSave={handleSavePrescription}
+        consultationID={consultationID ? String(consultationID) : ''}
+        consultationData={null}
+      />
     </View>
   );
 }
