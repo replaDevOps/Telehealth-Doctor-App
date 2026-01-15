@@ -126,10 +126,14 @@ export const HomeScreen = ({ navigation }) => {
           id: patientID,
           name: consultationRequest.patientName,
           image: consultationRequest.patientImage,
+          age: consultationRequest.patientAge ? String(consultationRequest.patientAge) : '',
+          gender: consultationRequest.patientGender || '',
         } : (consultation ? {
           id: consultation.patientID,
           name: consultation.patientName,
           image: consultation.patientImage,
+          age: consultation.age || '',
+          gender: consultation.gender || '',
         } : null);
         
         // Navigate based on consultation type

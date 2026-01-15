@@ -50,6 +50,26 @@ export function VideoConsultation({ navigation, route }) {
   // Extract patientID from route params - this should be passed when navigating to consultation
   const patientID = route?.params?.patientID || route?.params?.patientInfo?.id;
 
+  // Extract consultation ID from consultationId (format: "consultation_2" -> 2)
+  const consultationID = useMemo(() => {
+    if (!consultationId) return null;
+    const match = consultationId.toString().match(/consultation_(\d+)/);
+    return match ? Number(match[1]) : Number(consultationId);
+  }, [consultationId]);
+
+  // Construct consultationData from patientInfo for PrescriptionBottomSheet
+  const consultationData = useMemo(() => {
+    if (!patientInfo) return null;
+    return {
+      patient: {
+        name: patientInfo.name || 'Patient',
+        age: patientInfo.age || patientInfo.patientAge || '',
+        gender: patientInfo.gender || patientInfo.patientGender || '',
+        id: patientInfo.id || patientID,
+      },
+    };
+  }, [patientInfo, patientID]);
+
   // Initialize WebRTC for video call
   const {
     localStream,
@@ -164,13 +184,6 @@ export function VideoConsultation({ navigation, route }) {
       if (interval) clearInterval(interval);
     };
   }, [isConnected]);
-
-  // Extract consultation ID from consultationId (format: "consultation_2" -> 2)
-  const consultationID = useMemo(() => {
-    if (!consultationId) return null;
-    const match = consultationId.toString().match(/consultation_(\d+)/);
-    return match ? Number(match[1]) : Number(consultationId);
-  }, [consultationId]);
 
   // Listen for consultation-end event from other side
   useEffect(() => {
@@ -488,7 +501,7 @@ export function VideoConsultation({ navigation, route }) {
         onClose={() => setPrescriptionBottomSheetVisible(false)}
         onSave={handleSavePrescription}
         consultationID={consultationID ? String(consultationID) : ''}
-        consultationData={null}
+        consultationData={consultationData}
       />
     </View>
   );
