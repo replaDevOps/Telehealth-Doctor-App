@@ -1,6 +1,6 @@
 /* HistoryScreen.tsx */
-import React, { useState } from 'react';
-import { View, TextInput, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, ScrollView, StatusBar, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
@@ -9,16 +9,27 @@ import { Header2 } from '@components/common/Header2';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
 
 import { useDashboardStore } from '../../../store';
-import { useEffect } from 'react';
 
 export function HistoryScreen({ navigation }: { navigation: any }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
   const { allConsultations, fetchAllConsultations, isLoading } = useDashboardStore();
 
 
   useEffect(() => {
     fetchAllConsultations();
   }, [fetchAllConsultations]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchAllConsultations();
+    } catch (e) {
+      console.error('Failed to refresh consultations', e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const filteredConsultations = allConsultations.filter(item =>
     (item.patientName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
@@ -44,7 +55,18 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
       </View>
 
       {/* Content */}
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+          />
+        }
+      >
         {/* Consultations */}
         <RecentConsultations
           consultations={filteredConsultations}

@@ -73,7 +73,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     }
     // Add duration if available
     if (serviceDuration) {
-      parts.push(`${serviceDuration} min`);
+      parts.push(`${serviceDuration}`);
     }
     
     return parts.length > 0 ? parts.join(' | ') : consultationTime;

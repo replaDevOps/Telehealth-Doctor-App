@@ -37,6 +37,7 @@ const RecentConsultations = ({
 }: RecentConsultationsProps) => {
   // Only show View All button when there are consultations
   const hasConsultations = consultations && consultations.length > 0;
+  console.log('RecentConsultations consultations:', consultations);
   return (
     <View style={styles.container}>
       {onViewAll && (
@@ -52,23 +53,42 @@ const RecentConsultations = ({
         </View>
       ) : consultations && consultations.length > 0 ? (
         consultations.map(consultation => (
-          <ConsultationCard
-            key={consultation.id}
-            patientName={consultation.patientName}
-            patientImage={consultation.patientImage}
-            sevviceName={consultation.sevviceName || 'Service Name'}
-            date={consultation.date || ''}
-            time={consultation.time || ''}
-            duration={consultation.duration || '0 min'}
-            type={consultation.type}
-            amount={consultation.amount}
-            gender={consultation.gender}
-            age={consultation.age}
-            code={consultation.code}
-            status={consultation.status}
-            onViewPrescription={() => onViewPrescription?.(consultation.id)}
-            onViewChat={() => onViewChat?.(consultation.id)}
-          />
+          <View key={consultation.id}>
+            {(consultation.date || consultation.time) && (
+              <Text style={styles.dateAbove}>
+                {(() => {
+                  try {
+                    const d = consultation.date ? new Date(consultation.date) : null;
+                    const dateStr = d
+                      ? `${String(d.getMonth() + 1).padStart(2, '0')}/${String(
+                          d.getDate()
+                        ).padStart(2, '0')}/${d.getFullYear()}`
+                      : consultation.date || '';
+                    return `${dateStr}${consultation.time ? ` ${consultation.time}` : ''}`.trim();
+                  } catch (e) {
+                    return `${consultation.date || ''} ${consultation.time || ''}`.trim();
+                  }
+                })()}
+              </Text>
+            )}
+
+            <ConsultationCard
+              patientName={consultation.patientName}
+              patientImage={consultation.patientImage}
+              sevviceName={consultation.sevviceName || 'Service Name'}
+              date={consultation.date || ''}
+              time={consultation.time || ''}
+              duration={consultation.duration || '0 min'}
+              type={consultation.type}
+              amount={consultation.amount}
+              gender={consultation.gender}
+              age={consultation.age}
+              code={consultation.code}
+              status={consultation.status}
+              onViewPrescription={() => onViewPrescription?.(consultation.id)}
+              onViewChat={() => onViewChat?.(consultation.id)}
+            />
+          </View>
         ))
       ) : (
         <View style={styles.emptyContainer}>
@@ -105,6 +125,13 @@ const styles = StyleSheet.create({
     marginTop: mvs(12),
     fontSize: 14,
     color: colors.secondaryText,
+    fontWeight: '500',
+  },
+  dateAbove: {
+    fontSize: 14,
+    color: colors.secondaryText,
+    marginBottom: mvs(8),
+    marginLeft: mvs(6),
     fontWeight: '500',
   },
 });

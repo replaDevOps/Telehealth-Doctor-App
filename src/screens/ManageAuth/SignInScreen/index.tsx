@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -7,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
 import { CustomButton } from '../../../components/common/CustomButton';
@@ -32,6 +34,7 @@ export function SignInScreen({ navigation }) {
   const [passwordError, setPasswordError] = useState('');
   const [countryCode, setCountryCode] = useState('SA');
   const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
   const formattedPhone = phoneNumber
@@ -112,8 +115,24 @@ export function SignInScreen({ navigation }) {
         // Navigate to main screen
         navigation.replace('Main', { screen: 'Home' });
         
+        // Save credentials if remember me is checked
+        try {
+          if (remember) {
+            await AsyncStorage.setItem('rememberMePhone', phone.trim());
+            await AsyncStorage.setItem('rememberMePassword', password.trim());
+            await AsyncStorage.setItem('rememberMeCountryCode', countryCode);
+          } else {
+            await AsyncStorage.multiRemove([
+              'rememberMePhone',
+              'rememberMePassword',
+              'rememberMeCountryCode',
+            ]);
+          }
+        } catch (e) {
+          console.warn('Failed to persist credentials', e);
+        }
+
         // Show success message after navigation (to avoid blocking navigation)
-        // Using setTimeout to ensure navigation happens first
         setTimeout(() => {
           try {
             const successMsg = response.message || 'Login successful';
@@ -155,6 +174,26 @@ export function SignInScreen({ navigation }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadSaved = async () => {
+      try {
+        const savedPhone = await AsyncStorage.getItem('rememberMePhone');
+        const savedPassword = await AsyncStorage.getItem('rememberMePassword');
+        const savedCountry = await AsyncStorage.getItem('rememberMeCountryCode');
+        if (savedPhone) {
+          setPhone(savedPhone);
+          setRemember(true);
+        }
+        if (savedPassword) setPassword(savedPassword);
+        if (savedCountry) setCountryCode(savedCountry);
+      } catch (e) {
+        console.warn('Failed to load saved credentials', e);
+      }
+    };
+
+    loadSaved();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
@@ -209,6 +248,27 @@ export function SignInScreen({ navigation }) {
             secureTextEntry={true}
             errorMessage={passwordError}
           />
+
+          <View style={styles.PasswordRemember}>
+            <View style={styles.CheckBox}>
+              <TouchableOpacity
+                onPress={() => setRemember(!remember)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: remember }}
+              >
+                <Ionicons
+                  name={remember ? 'checkbox' : 'square-outline'}
+                  size={22}
+                  color={remember ? colors.primary : colors.border}
+                />
+              </TouchableOpacity>
+              <Text style={styles.TextContent}>Remember me</Text>
+            </View>
+
+            <TouchableOpacity onPress={() => {}}>
+              <Text style={styles.signinLink}>Forgot password?</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Sign In Button */}
           <CustomButton

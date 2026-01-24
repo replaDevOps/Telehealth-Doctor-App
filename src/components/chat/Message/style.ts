@@ -52,6 +52,7 @@ export const styles = StyleSheet.create({
       userMessage: {
         maxWidth: '80%',
         alignSelf: 'flex-end', // Make width adapt to content
+        flexShrink: 1,
       },
       userMessageText: {
         fontSize: 15,
@@ -59,6 +60,8 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.lightGray,
         padding: 12,
         borderRadius: 10,
+        alignSelf: 'flex-end',
+        flexShrink: 1,
       },
       imagesRow: {
         flexDirection: 'row',
@@ -101,6 +104,7 @@ export const styles = StyleSheet.create({
       botMessage: {
         maxWidth: '85%',
         alignSelf: 'flex-start', // Make width adapt to content
+        flexShrink: 1,
       },
       botMessageText: {
         backgroundColor: colors.primary,
@@ -109,6 +113,8 @@ export const styles = StyleSheet.create({
         fontSize: 15,
         color: '#fff',
         lineHeight: 20,
+        alignSelf: 'flex-start',
+        flexShrink: 1,
       },
       // Full Screen Image Modal Styles
       fullScreenModal: {

@@ -86,6 +86,11 @@ export function ChatScreen({ navigation, route }) {
 
   const showAvatar = chatType === 'doctor';
   const canSendMessages = !fromHistory;
+  
+  // Check if consultation has prescription
+  const hasPrescription = useMemo(() => {
+    return !!consultationData?.prescription || !!consultationData?.hasPrescription;
+  }, [consultationData]);
 
   // Transform API messages to Message format
   const transformApiMessages = useCallback((apiMessages: ChatMessage[]): Message[] => {
@@ -868,8 +873,9 @@ export function ChatScreen({ navigation, route }) {
         message={message}
         setMessage={setMessage}
         handleSend={handleSend}
-        handleImagePick={handleImagePick}
+        handleImagePick={handleAddPrescription}
         canSendMessages={canSendMessages}
+        showAddButton={!hasPrescription}
       />
 
       {/* Modals */}
@@ -885,6 +891,8 @@ export function ChatScreen({ navigation, route }) {
         onClose={handleCloseModal}
         onGetPrescription={handleGetPrescription}
         isDoctor={true}
+        hasPrescription={hasPrescription}
+        onAddPrescription={!hasPrescription ? handleAddPrescription : undefined}
       />
       <ConsultationEndedModal
         visible={endConsultationModalVisible}
@@ -897,7 +905,8 @@ export function ChatScreen({ navigation, route }) {
         }}
         onGetPrescription={handleGetPrescription}
         isDoctor={true}
-        onAddPrescription={handleAddPrescription}
+        hasPrescription={hasPrescription}
+        onAddPrescription={!hasPrescription ? handleAddPrescription : undefined}
         // Only show "End Consultation" button if consultation hasn't been ended yet
         // If consultationWasEnded is true, it means consultation was already ended, so hide the End button
         onEndConsultation={!consultationWasEnded ? handleEndConsultationConfirm : undefined}

@@ -6,6 +6,7 @@ import {
   ImageBackground,
   Image,
   StatusBar,
+  ImageSourcePropType,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -30,6 +31,40 @@ export function VideoConsultation({ navigation, route }) {
     specialization: 'Patient',
   };
 
+  const patientImageSource = useMemo<ImageSourcePropType | null>(() => {
+    const fallbackImage = patientInfo?.avatar || patient;
+
+    const mergeRemoteSource = (source: any) => {
+      if (!source) return null;
+      if (typeof source === 'number') return source;
+      if (typeof source === 'string') {
+        return { uri: source };
+      }
+      if (typeof source === 'object' && source?.uri) {
+        return { uri: source.uri };
+      }
+      return null;
+    };
+
+    const prioritizedSources = [
+      patientInfo?.avatar,
+      patientInfo?.image,
+      patientInfo?.profileImage,
+      patientInfo?.profile_image,
+      patientInfo?.imageUrl,
+      patientInfo?.imageURL,
+    ];
+
+    for (const source of prioritizedSources) {
+      const parsed = mergeRemoteSource(source);
+      if (parsed) {
+        return parsed;
+      }
+    }
+
+    return mergeRemoteSource(fallbackImage);
+  }, [patientInfo]);
+
   // Get consultation parameters from route
   const consultationId = route?.params?.consultationId || `consultation_${Date.now()}`;
   const userId = route?.params?.userId || `doctor_${Date.now()}`;
@@ -39,6 +74,8 @@ export function VideoConsultation({ navigation, route }) {
   const [callDuration, setCallDuration] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [prescriptionBottomSheetVisible, setPrescriptionBottomSheetVisible] = useState(false);
+  const [hasPrescription, setHasPrescription] = useState(false);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const CONSULTATION_MAX_DURATION = 30 * 60; // 30 minutes in seconds (1800 seconds)
   const [remainingSeconds, setRemainingSeconds] = useState(CONSULTATION_MAX_DURATION);
   const consultationStartTimeRef = useRef<number | null>(null);
@@ -56,6 +93,12 @@ export function VideoConsultation({ navigation, route }) {
     const match = consultationId.toString().match(/consultation_(\d+)/);
     return match ? Number(match[1]) : Number(consultationId);
   }, [consultationId]);
+
+  const aiChatConsultationId =
+    route?.params?.aiChatConsultationId ||
+    route?.params?.aiConsultationId ||
+    route?.params?.aiHistoryId ||
+    route?.params?.aiChatId;
 
   // Construct consultationData from patientInfo for PrescriptionBottomSheet
   const consultationData = useMemo(() => {
@@ -101,9 +144,39 @@ export function VideoConsultation({ navigation, route }) {
     navigation.navigate('PrescriptionScreen');
   };
 
-  const handleAddPrescription = useCallback(() => {
+  const handleAddPrescription = () => {
+    setIsActionMenuOpen(false);
     setPrescriptionBottomSheetVisible(true);
+  };
+
+  const toggleActionMenu = useCallback(() => {
+    setIsActionMenuOpen(prev => !prev);
   }, []);
+
+  const handleViewAiChatHistory = useCallback(() => {
+    setIsActionMenuOpen(false);
+    const historyId = aiChatConsultationId || consultationID;
+
+    if (historyId) {
+      const normalizedId = historyId.toString();
+      navigation.navigate('ChatScreen', {
+        chatType: 'ai',
+        fromHistory: true,
+        consultationId: normalizedId,
+        id: normalizedId,
+        patientInfo,
+        patientID,
+      });
+      return;
+    }
+
+    navigation.navigate('ChatScreen', {
+      chatType: 'ai',
+      fromHistory: true,
+      patientInfo,
+      patientID,
+    });
+  }, [aiChatConsultationId, consultationID, navigation, patientInfo, patientID]);
 
   const handleSavePrescription = useCallback(async (prescriptions: Array<{ name: string; description: string }>) => {
     if (!consultationID) {
@@ -117,6 +190,7 @@ export function VideoConsultation({ navigation, route }) {
         prescriptions,
       });
       Toast.success('Prescription added successfully');
+      setHasPrescription(true);
       setPrescriptionBottomSheetVisible(false);
     } catch (error: any) {
       console.error('Error adding prescription:', error);
@@ -164,6 +238,12 @@ export function VideoConsultation({ navigation, route }) {
       Toast.error(error);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (!isConnected && isActionMenuOpen) {
+      setIsActionMenuOpen(false);
+    }
+  }, [isConnected, isActionMenuOpen]);
 
   // Start call duration timer when connected
   useEffect(() => {
@@ -348,6 +428,8 @@ export function VideoConsultation({ navigation, route }) {
     return 'Connecting...';
   };
 
+  const shouldShowActionMenu = !isInitiator && isConnected;
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -368,9 +450,9 @@ export function VideoConsultation({ navigation, route }) {
           {/* Dark Overlay for better text visibility */}
           <View style={styles.overlay} />
         </>
-      ) : patientInfo?.avatar && patientInfo.avatar !== null && patientInfo.avatar !== undefined ? (
+      ) : patientImageSource ? (
         <ImageBackground
-          source={patientInfo.avatar}
+          source={patientImageSource}
           style={styles.backgroundImage}
           resizeMode="cover"
         >
@@ -394,16 +476,6 @@ export function VideoConsultation({ navigation, route }) {
                 {getCallStatus()}
               </Text>
             </View>
-            {/* Prescription Button - Positioned absolutely on the right */}
-            {!isInitiator && isConnected && (
-              <TouchableOpacity
-                style={styles.prescriptionTopButton}
-                onPress={handleAddPrescription}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="document-text" size={24} color={colors.white} />
-              </TouchableOpacity>
-            )}
           </View>
 
           {/* Small Local Video (Picture-in-Picture) - Only when connected */}
@@ -420,6 +492,76 @@ export function VideoConsultation({ navigation, route }) {
 
           {/* Call Controls at Bottom */}
           <View style={styles.controlsContainer}>
+            {shouldShowActionMenu && (
+              <View style={styles.quickActionWrapper}>
+                {isActionMenuOpen && (
+                  <View style={styles.actionMenu}>
+                    <TouchableOpacity
+                      style={styles.actionRow}
+                      onPress={handleViewAiChatHistory}
+                      activeOpacity={0.75}
+                    >
+                      <View style={styles.actionCircle}>
+                        <Ionicons
+                          name="chatbubble-ellipses"
+                          size={18}
+                          color={colors.white}
+                        />
+                      </View>
+                      <View style={styles.actionLabelBubble}>
+                        <Text style={styles.actionLabelText}>View AI Chat History</Text>
+                      </View>
+                    </TouchableOpacity>
+                    {!hasPrescription ? (
+                      <TouchableOpacity
+                        style={styles.actionRow}
+                        onPress={handleAddPrescription}
+                        activeOpacity={0.75}
+                      >
+                        <View style={styles.actionCircle}>
+                          <Ionicons
+                            name="add"
+                            size={20}
+                            color={colors.white}
+                          />
+                        </View>
+                        <View style={styles.actionLabelBubble}>
+                          <Text style={styles.actionLabelText}>Write Prescription</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={[styles.actionRow, styles.actionRowDisabled]}>
+                        <View
+                          style={[styles.actionCircle, styles.actionCircleSecondary]}
+                        >
+                          <Ionicons
+                            name="checkmark-done"
+                            size={18}
+                            color={colors.white}
+                          />
+                        </View>
+                        <View style={styles.actionLabelBubble}>
+                          <Text style={[styles.actionLabelText, styles.actionLabelTextDisabled]}>
+                            Prescription Sent
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={[styles.moreButton, isActionMenuOpen && styles.moreButtonActive]}
+                  onPress={toggleActionMenu}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons
+                    name={isActionMenuOpen ? 'close' : 'ellipsis-vertical'}
+                    size={24}
+                    color={colors.white}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
             {/* Speaker Button */}
             <TouchableOpacity
               style={[
@@ -493,7 +635,8 @@ export function VideoConsultation({ navigation, route }) {
         onClose={handleClose}
         onGetPrescription={handleGetPrescription}
         isDoctor={true}
-        onAddPrescription={handleAddPrescription}
+        hasPrescription={hasPrescription}
+        onAddPrescription={!hasPrescription ? handleAddPrescription : undefined}
         onEndConsultation={undefined} // No "End Consultation" button since call is already ended
       />
       <PrescriptionBottomSheet

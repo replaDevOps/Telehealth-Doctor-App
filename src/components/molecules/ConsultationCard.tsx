@@ -53,7 +53,10 @@ const ConsultationCard = ({
     <View style={styles.card}>
       {/* Header with Code, Type, and Duration */}
       <View style={styles.infoBar}>
-        <Text style={styles.codeText}>{code ? `#${code}` : ''}</Text>
+        <View style={styles.infoLeft}>
+          <Text style={styles.codeText}>{code ? `#${code}` : ''}</Text>
+
+        </View>
         <View style={styles.serviceType}>
           <View style={styles.typeContainer}>
             <Ionicons
@@ -174,6 +177,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.white,
+  },
+  infoLeft: {
+    flexDirection: 'column',
+    maxWidth: '60%'
+  },
+  dateText: {
+    color: colors.white,
+    fontSize: 12,
+    marginTop: 2,
+    opacity: 0.95,
   },
   serviceType: { 
     flexDirection: 'row', 

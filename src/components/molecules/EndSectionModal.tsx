@@ -20,6 +20,7 @@ interface ConsultationEndedModalProps {
   isDoctor?: boolean;
   onAddPrescription?: () => void;
   onEndConsultation?: () => void;
+  hasPrescription?: boolean;
 }
 
 const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
@@ -29,7 +30,28 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   isDoctor = false,
   onAddPrescription,
   onEndConsultation,
+  hasPrescription = false,
 }) => {
+  const shouldPromptForPrescription = isDoctor && !hasPrescription;
+
+  const titleText = shouldPromptForPrescription
+    ? 'No Prescription Added'
+    : 'Consultation Ended!';
+
+  const descriptionText = shouldPromptForPrescription
+    ? "You haven't created a prescription for this session. Are you sure you want to end the consultation without writing one?"
+    : isDoctor
+    ? 'The consultation has ended.'
+    : 'The consultation has ended. The doctor has shared your prescription. You can download it now or anytime from your history.';
+
+  const handleEndPress = () => {
+    if (onEndConsultation) {
+      onEndConsultation();
+    } else {
+      onClose();
+    }
+  };
+
   return (
     <Modal
       transparent
@@ -45,53 +67,30 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
           </TouchableOpacity>
 
           {/* Title */}
-          <Text style={styles.title}>
-            {'Consultation Ended'}
-          </Text>
+          <Text style={styles.title}>{titleText}</Text>
 
           {/* Description */}
-          <Text style={styles.description}>
-            {isDoctor
-              ? 'The consultation has ended. Your prescription will be sent to the patient.'
-              : 'The consultation has ended. The doctor has shared your prescription. You can download it now or anytime from your history.'}
-          </Text>
+          <Text style={styles.description}>{descriptionText}</Text>
 
           {/* Buttons */}
-          {isDoctor ? (
-            onAddPrescription ? (
-              // Show prescription button (with optional end button if onEndConsultation is provided)
-              <View style={styles.buttonColumn}>
-                <TouchableOpacity
-                  style={styles.prescriptionButton}
-                  onPress={onAddPrescription}
-                >
-                  <Text style={styles.prescriptionButtonText}>
-                    Add Prescription
-                  </Text>
-                </TouchableOpacity>
-                {onEndConsultation && (
-                  // Only show End Consultation button if handler is provided (doctor manually ending)
-                  <TouchableOpacity
-                    style={styles.endButton}
-                    onPress={onEndConsultation}
-                  >
-                    <Text style={styles.endButtonText}>End Consultation</Text>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                  <Text style={styles.closeButtonText}>
-                    {onEndConsultation ? 'Cancel' : 'Close'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              // Show only Close button when consultation has already ended and no prescription option
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                  <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            )
+          {shouldPromptForPrescription ? (
+            <View style={styles.primaryActionRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.secondaryActionButton]}
+                onPress={handleEndPress}
+              >
+                <Text style={[styles.actionButtonText, styles.secondaryActionText]}>
+                  End Consultation
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.primaryActionButton]}
+                onPress={onAddPrescription || onClose}
+                disabled={!onAddPrescription}
+              >
+                <Text style={styles.primaryActionText}>Write Prescription</Text>
+              </TouchableOpacity>
+            </View>
           ) : (
             <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
@@ -160,11 +159,6 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
   },
-  buttonColumn: {
-    flexDirection: 'column',
-    gap: 12,
-    width: '100%',
-  },
   closeButton: {
     width: '100%',
     paddingVertical: 14,
@@ -179,26 +173,35 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  prescriptionButton: {
+  primaryActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     width: '100%',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
     paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
+    borderRadius: 16,
     alignItems: 'center',
   },
-  prescriptionButtonText: {
-    color: colors.white,
+  secondaryActionButton: {
+    backgroundColor: 'rgba(118, 37, 215, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(118, 37, 215, 0.2)',
+  },
+  actionButtonText: {
     fontSize: 15,
     fontWeight: '600',
   },
-  endButton: {
-    width: '100%',
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: colors.red,
-    alignItems: 'center',
+  secondaryActionText: {
+    color: colors.secondaryText,
   },
-  endButtonText: {
+  primaryActionButton: {
+    backgroundColor: colors.primary,
+    borderWidth: 0,
+  },
+  primaryActionText: {
     color: colors.white,
     fontSize: 15,
     fontWeight: '600',

@@ -81,7 +81,7 @@ export const usePusherNotifications = () => {
           (data?.notification ? (typeof data.notification === 'string' ? data.notification : data.notification?.description || data.notification?.message || data.notification?.title) : null) ||
           'New notification received';
       }
-      
+      console.log('Notification message to display:', notificationMessage);
       // Ensure it's a string, not an object
       if (typeof notificationMessage !== 'string') {
         notificationMessage = JSON.stringify(notificationMessage);
@@ -161,8 +161,8 @@ export const usePusherNotifications = () => {
       
       // Show toast notification
       const consultationMessage = data?.message || 
-        (consultation.status ? `New ${consultation.type} consultation request` : null) || 
-        'New consultation request received';
+        (consultation.status ? `A new consultation is available.` : null) || 
+        'A new consultation is available.';
       Toast.info(consultationMessage);
     };
 

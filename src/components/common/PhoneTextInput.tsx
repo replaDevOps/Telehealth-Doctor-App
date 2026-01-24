@@ -129,11 +129,8 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
     }
   };
 
-  // Commented out number validation for now
-  // const hasError =
-  //   ((phoneError || errorMessage) && hasBeenTouched) ||
-  //   (!isValid && hasBeenTouched && value);
-  const hasError = (phoneError || errorMessage) && hasBeenTouched;
+  // Show error only when the field has been touched and the input is still empty
+  const hasError = (phoneError || errorMessage) && hasBeenTouched && !(value && value.trim());
   // Removed: (!isValid && hasBeenTouched && value)
 
   return (
@@ -172,8 +169,8 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
         />
       </View>
 
-      {phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
-      {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+      {hasError && phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
+      {hasError && errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
     </View>
   );
 };

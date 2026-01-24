@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, StatusBar, Alert, Platform, PermissionsAndroid } from 'react-native';
+import { View, ScrollView, StyleSheet, StatusBar, Alert, Platform, PermissionsAndroid, RefreshControl, Modal, ActivityIndicator, Text } from 'react-native';
 import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
@@ -26,6 +26,8 @@ export const HomeScreen = ({ navigation }) => {
   const [isActive, setIsActive] = useState(false);
   const [hasAudioPermission, setHasAudioPermission] = useState(false);
   const [hasVideoPermission, setHasVideoPermission] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -95,7 +97,9 @@ export const HomeScreen = ({ navigation }) => {
   const handleAcceptRequest = async (requestId: string) => {
     try {
       console.log('Accepting consultation request:', requestId);
-      
+      // show connecting UI while we accept and prepare navigation
+      setIsConnecting(true);
+
       // Call acceptConsultation API
       await acceptConsultation({ id: requestId });
       
@@ -146,6 +150,7 @@ export const HomeScreen = ({ navigation }) => {
             patientID: patientID,
             recipientID: patientID,
           });
+          setIsConnecting(false);
           navigation.navigate('AudioConsultation', {
             consultationId: `consultation_${requestId}`,
             userId: userId,
@@ -163,6 +168,7 @@ export const HomeScreen = ({ navigation }) => {
             patientID: patientID,
             recipientID: patientID,
           });
+          setIsConnecting(false);
           navigation.navigate('VideoConsultation', {
             consultationId: `consultation_${requestId}`,
             userId: userId,
@@ -173,6 +179,7 @@ export const HomeScreen = ({ navigation }) => {
           });
         } else {
           // Default to ChatScreen for chat consultations
+          setIsConnecting(false);
           navigation.navigate('ChatScreen', {
             id: requestId,
             consultationId: requestId,
@@ -190,6 +197,7 @@ export const HomeScreen = ({ navigation }) => {
         error?.message || 
         'Failed to accept consultation';
       Toast.error(errorMessage);
+      setIsConnecting(false);
     }
   };
 
@@ -225,6 +233,17 @@ export const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchDashboardData();
+    } catch (error) {
+      console.error('Error refreshing dashboard:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   // Get clinic name from profile data or use default
   const clinicName = profileData?.clinic?.clinicName || 
                      profileData?.clinic?.business_setting?.businessName || 
@@ -240,12 +259,10 @@ export const HomeScreen = ({ navigation }) => {
     if (businessSetting.address) parts.push(businessSetting.address);
     if (businessSetting.city) parts.push(businessSetting.city);
     if (businessSetting.district) parts.push(businessSetting.district);
-    
     return parts.length > 0 ? parts.join(', ') : 'Location';
   };
 
   const location = getLocation();
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -262,11 +279,22 @@ export const HomeScreen = ({ navigation }) => {
         notificationCount={notificationCount}
       />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
         {/* Stats Row */}
         <StatsRow
           totalConsultations={stats?.totalConsultations || 0}
-          thisMonth={stats?.thisMonth || 0}
+          thisMonth={stats?.thisMonthTotalConsultations || 0}
         />
 
         {/* Recent Consultations */}
@@ -282,17 +310,19 @@ export const HomeScreen = ({ navigation }) => {
             console.log('View chat:', id);
             // Find the consultation data to pass patient info
             const consultation = recentConsultations.find(cons => cons.id === id);
-            navigation.navigate('ChatScreen', { 
+            navigation.navigate('ChatScreen', {
               id,
               consultationId: id,
               patientID: consultation?.patientID,
-              patientInfo: consultation ? {
-                id: consultation.patientID,
-                name: consultation.patientName,
-                image: consultation.patientImage,
-              } : null,
+              patientInfo: consultation
+                ? {
+                    id: consultation.patientID,
+                    name: consultation.patientName,
+                    image: consultation.patientImage,
+                  }
+                : null,
               chatType: 'doctor',
-              fromHistory: false,
+              fromHistory: true,
             });
           }}
         />
@@ -306,6 +336,14 @@ export const HomeScreen = ({ navigation }) => {
         onDecline={handleDeclineRequest}
         onClose={() => clearAllRequests()}
       />
+      <Modal transparent visible={isConnecting} animationType="fade">
+        <View style={styles.connectingModal}>
+          <View style={styles.connectingModalContent}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.connectingText}>Connecting with patient, please wait...</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -320,6 +358,26 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: mvs(20),
     paddingHorizontal: mvs(15),
+  },
+  connectingModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  connectingModalContent: {
+    width: '80%',
+    backgroundColor: colors.white,
+    padding: mvs(20),
+    borderRadius: mvs(8),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  connectingText: {
+    marginTop: mvs(12),
+    color: colors.primaryText,
+    fontSize: mvs(14),
+    textAlign: 'center',
   },
 });
 

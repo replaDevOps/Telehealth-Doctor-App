@@ -16,11 +16,12 @@ export interface Consultation {
     gender?: string;
     age?: string;
     status?: string;
+    hasPrescription?: boolean;
 }
 
 export interface DashboardStats {
     totalConsultations: number;
-    thisMonth: number;
+    thisMonthTotalConsultations: number;
 }
 
 
@@ -32,6 +33,12 @@ interface DashboardStore {
     fetchDashboardData: () => Promise<void>;
     fetchAllConsultations: () => Promise<void>;
 }
+
+// Helper function to capitalize first letter
+const capitalizeFirstLetter = (str: string): string => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 
 export const useDashboardStore = create<DashboardStore>((set) => ({
     stats: null,
@@ -69,12 +76,13 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
                     sevviceName: item.service?.name || 'Unknown Service',
                     date: consultationDate,
                     time: consultationTime,
-                    duration: item.duration ? `${item.duration} min` : '0 min',
+                    duration: item.duration ? `${item.duration}` : '0 min',
                     type: (item.type?.toLowerCase() || 'chat') as 'chat' | 'video' | 'audio',
                     amount: item.price ? `SAR ${item.price}` : 'SAR 0.00',
-                    gender: item.patient?.gender || '',
+                    gender: capitalizeFirstLetter(item.patient?.gender || ''),
                     age: item.patient?.age || '',
                     status: item.status || '',
+                    hasPrescription: !!item.prescription || !!item.hasPrescription,
                 };
             });
 
@@ -119,9 +127,10 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
                     duration: item.service?.duration ? `${item.service.duration} min` : '0 min',
                     type: (item.type?.toLowerCase() || 'chat') as 'chat' | 'video' | 'audio',
                     amount: item.price ? `SAR ${item.price}` : 'SAR 0.00',
-                    gender: item.patient?.gender || '',
+                    gender: capitalizeFirstLetter(item.patient?.gender || ''),
                     age: item.patient?.age || '',
                     status: item.status || '',
+                    hasPrescription: !!item.prescription || !!item.hasPrescription,
                 };
             });
             

@@ -7,6 +7,15 @@ import { useAuthStore } from '../../store';
 export const changePassword = async (data: any) => {
     try {
         const response = await apiClient.post(API.SETTINGS.CHANGE_PASSWORD, data);
+        console.log('changePassword response:', response.data);
+        // Some APIs return 200 with success: false. Treat that as an error so callers can handle it.
+        if (response?.data && response.data.success === false) {
+            const message = response.data.message || 'Failed to change password';
+            const err: any = new Error(message);
+            err.response = response;
+            throw err;
+        }
+
         return response.data;
     } catch (error) {
         throw error;

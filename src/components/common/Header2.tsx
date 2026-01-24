@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { mvs } from '../../config/metrices';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -32,6 +32,7 @@ interface Header2Props {
   handleDownload?: () => void;
   handleSave?: () => void;
   saveDisabled?: boolean;
+  saveLoading?: boolean;
   logo?: boolean;
   handleBackPress?: () => void;
 }
@@ -52,8 +53,9 @@ const Header2: React.FC<Header2Props> = ({
   notificationCount = 0,
   handleNotification = () => {},
   handleDownload = () => {},
-  handleSave,
+  handleSave  = () => {},
   saveDisabled = false,
+  saveLoading = false,
   handleBackPress,
   handleSkip,
   logo = false,
@@ -94,13 +96,15 @@ const Header2: React.FC<Header2Props> = ({
 
       {useSave ? (
         <TouchableOpacity
-          style={[styles.icon, saveDisabled && { opacity: 0.5 }]}
-          onPress={() => handleSave}
-          disabled={saveDisabled}
+          style={[styles.icon, (saveDisabled || saveLoading) && { opacity: 0.5 }]}
+          onPress={() => handleSave()}
+          disabled={saveDisabled || saveLoading}
         >
-          <Text style={[styles.saveText, saveDisabled && { color: 'gray' }]}>
-            Save
-          </Text>
+          {saveLoading ? (
+            <ActivityIndicator size="small" color={colors.primary} />
+          ) : (
+            <Text style={[styles.saveText, saveDisabled && { color: 'gray' }]}>Save</Text>
+          )}
         </TouchableOpacity>
       ) : useSkip && handleSkip ? (
         <TouchableOpacity style={styles.icon} onPress={handleSkip}>
