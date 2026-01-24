@@ -6,6 +6,7 @@ import React, {
   RefObject,
 } from 'react';
 import { TextInput, TouchableOpacity, View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useIsFocused, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import styles from './style';
@@ -30,6 +31,7 @@ export const NumberVerification: React.FC<Props> = ({ navigation, route }) => {
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(false);
   const [inputValues, setInputValues] = useState<string[]>(Array(5).fill(''));
+  const { t } = useTranslation();
 
   const inputRefs = useRef<RefObject<TextInput | null>[]>([]);
 
@@ -70,13 +72,12 @@ export const NumberVerification: React.FC<Props> = ({ navigation, route }) => {
           </View>
 
           <View style={styles.title}>
-            <CustomText text="OTP Code" />
+            <CustomText text={t('auth.otpCode')} />
           </View>
 
           <View style={styles.content}>
             <Text style={styles.TextContent}>
-              Enter the 5 digit OTP code sent to your email{' '}
-              {route.params?.email ?? '+91****4@gmail.com'}.
+              {t('auth.enterOtpDescription', { email: route.params?.email ?? '+91****4@gmail.com' })}
             </Text>
           </View>
 
@@ -96,15 +97,15 @@ export const NumberVerification: React.FC<Props> = ({ navigation, route }) => {
           </View>
 
           <CustomButton
-            title={loading ? 'Verifying…' : 'Confirm'}
+            title={loading ? t('auth.verifying') : t('auth.confirm')}
             onPress={handleNext}
             // disabled={!loading}
           />
 
           <View style={styles.signinRow}>
-            <Text style={styles.TextContent}>Didn’t receive code? </Text>
+            <Text style={styles.TextContent}>{t('otp.didntReceiveCode')} </Text>
             <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-              <Text style={styles.signinLink}>Resend Code</Text>
+              <Text style={styles.signinLink}>{t('otp.resendCode')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Header2 } from '../../../components/common/Header2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { colors } from '../../../styles/colors';
@@ -14,6 +15,7 @@ interface FAQ {
 }
 
 export const FAQs = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<number | null>(1);
 
   const faqData: FAQ[] = [
@@ -76,7 +78,7 @@ export const FAQs = ({ navigation }: { navigation: any }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <Header2 title="FAQ's" />
+      <Header2 title={t('settings.faqs')} />
 
       <ScrollView
         style={styles.container}

@@ -97,7 +97,7 @@ export function CartScreen({ navigation }) {
       <StatusBar barStyle="dark-content" />
 
       {/* Header */}
-      <Header2 title="Cart" />
+      <Header2 title={t('screens.cart')} />
 
       <ScrollView
         style={styles.scrollView}

@@ -21,6 +21,7 @@ interface NotificationItem {
 }
 
 export const NotificationScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const { notifications, isLoading, fetchNotifications, removeNotification, clearAll, unreadCount } = useNotificationStore();
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [clearingAll, setClearingAll] = useState(false);
@@ -126,7 +127,7 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
       
-      <Header2 title="Notifications" back />
+      <Header2 title={t('settings.notifications')} back />
 
       {mappedNotifications.length > 0 && (
         <View style={styles.clearAllContainer}>

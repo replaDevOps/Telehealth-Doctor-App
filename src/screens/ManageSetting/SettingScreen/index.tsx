@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, ScrollView, Modal, ActivityIndicator, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import UserProfile from '../../../components/common/UserProfile';
 import { Header2 } from '../../../components/common/Header2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -14,6 +15,7 @@ import style from './style';
 
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const { logout } = useAuthStore();
   const { profileData, clearProfile, fetchProfile, refreshProfile, isLoading } = useProfileStore();
   const [profileImage, setProfileImage] = useState<string>('');
@@ -88,8 +90,8 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
   })) || [];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <Header2 title="Setting" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['top']}>
+        <Header2 title={t('settings.title')} />
 
       <ScrollView 
         showsVerticalScrollIndicator={false} 
@@ -112,34 +114,34 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
 
           {/* Personal Information */}
           <View style={style.sectionHeader}>
-            <Text style={style.sectionTitle}>Personal Information</Text>
+            <Text style={style.sectionTitle}>{t('settingsScreen.personalInformation')}</Text>
           </View>
           <View style={style.card}>
             <View style={style.infoRow}>
-              <Text style={style.infoLabel}>Full Name:</Text>
+              <Text style={style.infoLabel}>{t('profile.fullName')}:</Text>
               <Text style={style.infoValue}>{profileData?.name || 'N/A'}</Text>
             </View>
             <View style={style.infoRow}>
-              <Text style={style.infoLabel}>Phone Number:</Text>
+              <Text style={style.infoLabel}>{t('profile.phone')}:</Text>
               <Text style={style.infoValue}>{profileData?.phoneNo || 'N/A'}</Text>
             </View>
             <View style={style.infoRow}>
-              <Text style={style.infoLabel}>Email Address:</Text>
+              <Text style={style.infoLabel}>{t('profile.email')}:</Text>
               <Text style={style.infoValue}>{profileData?.email || 'N/A'}</Text>
             </View>
             <View style={style.infoRow}>
-              <Text style={style.infoLabel}>Specialization:</Text>
+              <Text style={style.infoLabel}>{t('settingsScreen.specialization')}:</Text>
               <Text style={style.infoValue}>{profileData?.specialization || 'N/A'}</Text>
             </View>
             <View style={style.infoRow}>
-              <Text style={style.infoLabel}>Year of Experience:</Text>
+              <Text style={style.infoLabel}>{t('settingsScreen.yearsExperience')}:</Text>
               <Text style={style.infoValue}>{profileData?.experience ? `${profileData.experience} Years` : 'N/A'}</Text>
             </View>
           </View>
 
           {/* Working Hour */}
           <View style={style.sectionHeader}>
-            <Text style={style.sectionTitle}>Working Hour</Text>
+            <Text style={style.sectionTitle}>{t('settingsScreen.workingHour')}</Text>
           </View>
           <View style={style.card}>
             {displayWorkingHours.length > 0 ? (
@@ -149,7 +151,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
                   {item.isDayOff ? (
                     <View style={style.dayOffContainer}>
                       <Ionicons name="ban-outline" size={16} color="#9CA3AF" style={{ marginRight: 5 }} />
-                      <Text style={style.dayOffText}>Day Off</Text>
+                      <Text style={style.dayOffText}>{t('settingsScreen.dayOff')}</Text>
                     </View>
                   ) : (
                     <Text style={style.workingTimeText}>{item.time}</Text>
@@ -157,7 +159,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
                 </View>
               ))
             ) : (
-              <Text style={[style.infoValue, { textAlign: 'center', padding: 10 }]}>No working hours available</Text>
+              <Text style={[style.infoValue, { textAlign: 'center', padding: 10 }]}>{t('settingsScreen.noWorkingHours')}</Text>
             )}
           </View>
 
@@ -170,7 +172,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
           >
             <View style={style.menuLeft}>
               <Ionicons name="settings-outline" size={24} color={colors.black} />
-              <Text style={style.menuTitle}>Settings</Text>
+              <Text style={style.menuTitle}>{t('settings.profile')}</Text>
             </View>
             <AntDesign name="right" size={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -182,7 +184,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
             activeOpacity={0.8}
           >
             <Ionicons name="person-outline" size={20} color={colors.white} />
-            <Text style={style.logoutText}>Log Out</Text>
+            <Text style={style.logoutText}>{t('settings.logout')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -196,7 +198,7 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
       >
         <View style={style.loadingOverlay}>
           <ActivityIndicator size="large" color={colors.white} />
-          <Text style={style.loadingText}>Logging Out...</Text>
+          <Text style={style.loadingText}>{t('settingsScreen.loggingOut')}</Text>
         </View>
       </Modal>
     </SafeAreaView>

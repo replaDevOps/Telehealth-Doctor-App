@@ -1,5 +1,6 @@
 /* HistoryScreen.tsx */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, TextInput, ScrollView, StatusBar, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -11,6 +12,7 @@ import RecentConsultations from '@components/molecules/Organisms/RecentConsultat
 import { useDashboardStore } from '../../../store';
 
 export function HistoryScreen({ navigation }: { navigation: any }) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const { allConsultations, fetchAllConsultations, isLoading } = useDashboardStore();
@@ -40,14 +42,14 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Header2 title="History" />
+      <Header2 title={t('history.title')} />
 
       {/* Search */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color={colors.secondaryText} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by patient or service name..."
+          placeholder={t('history.searchPlaceholder')}
           placeholderTextColor={colors.secondaryText}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -71,7 +73,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
         <RecentConsultations
           consultations={filteredConsultations}
           isLoading={isLoading}
-          emptyMessage="No consultations found."
+          emptyMessage={t('recent.noRecentConsultations')}
           onViewPrescription={id => {
             console.log('View prescription:', id);
             navigation.navigate('PrescriptionDetail', { id });

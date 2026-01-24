@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -70,6 +71,7 @@ interface Props {
 }
 
 export function PrescriptionDetail({ route, navigation }: Props) {
+  const { t } = useTranslation();
   const [prescription, setPrescription] = useState<Prescription | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -273,7 +275,7 @@ export function PrescriptionDetail({ route, navigation }: Props) {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <Header2 title="Prescription" />
+        <Header2 title={t('screens.prescription')} />
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Loading prescription...</Text>
@@ -287,7 +289,7 @@ export function PrescriptionDetail({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
-        <Header2 title="Prescription" />
+        <Header2 title={t('screens.prescription')} />
 
         <View style={styles.noPrescriptionContainer}>
           <Text style={styles.noPrescriptionTitle}>{infoMessage}</Text>
@@ -303,7 +305,7 @@ export function PrescriptionDetail({ route, navigation }: Props) {
   if (error && !infoMessage) {
     return (
       <SafeAreaView style={styles.container}>
-        <Header2 title="Prescription" />
+        <Header2 title={t('screens.prescription')} />
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity

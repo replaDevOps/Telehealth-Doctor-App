@@ -6,6 +6,8 @@ import { mvs } from '../../config/metrices';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackSvg, ShopingCartSvg, SingleLogo } from '../../assets/icons';
 import { colors } from '../../styles/colors';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 type RootStackParamList = {
   [key: string]: undefined;
@@ -61,6 +63,9 @@ const Header2: React.FC<Header2Props> = ({
   logo = false,
 }) => {
   const navigation = useNavigation<NavigationProp>();
+  const { language } = useLanguage();
+
+  const { t } = useTranslation();
 
   const onBackPress = () => {
     if (handleBackPress) {
@@ -70,16 +75,22 @@ const Header2: React.FC<Header2Props> = ({
     }
   };
 
-  const handleLanguage = () => {
+  const handleLanguagePress = () => {
+    console.log('Opening language selection. Current language:', language);
     navigation.navigate('LanguageSelection');
   };
+
+  // Get language display text - Arabic shows 'ع', English shows 'Eng'
+  const languageText = language === 'ar' ? 'ع' : 'Eng';
+  
+  console.log('Header2 rendering with language:', language, '- Display:', languageText);
 
   return (
     <View style={styles.container}>
       {back && (
         <TouchableOpacity style={styles.headerButton} onPress={onBackPress}>
           {useCancel ? (
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('common.cancel')}</Text>
           ) : (
             <BackSvg />
           )}
@@ -103,12 +114,12 @@ const Header2: React.FC<Header2Props> = ({
           {saveLoading ? (
             <ActivityIndicator size="small" color={colors.primary} />
           ) : (
-            <Text style={[styles.saveText, saveDisabled && { color: 'gray' }]}>Save</Text>
+            <Text style={[styles.saveText, saveDisabled && { color: 'gray' }]}>{t('common.save')}</Text>
           )}
         </TouchableOpacity>
       ) : useSkip && handleSkip ? (
         <TouchableOpacity style={styles.icon} onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('common.skip')}</Text>
         </TouchableOpacity>
       ) : showCart ? (
         <TouchableOpacity
@@ -123,9 +134,9 @@ const Header2: React.FC<Header2Props> = ({
           </View>
         </TouchableOpacity>
       ) : showLanguage ? (
-        <TouchableOpacity style={styles.icon} onPress={() => handleLanguage()}>
+        <TouchableOpacity style={styles.icon} onPress={handleLanguagePress}>
           <Ionicons name="globe" size={18} color={colors.black} />
-          <Text style={styles.languageText}>Eng</Text>
+          <Text style={styles.languageText}>{languageText}</Text>
           <Ionicons name="chevron-down" size={16} color={colors.black} />
         </TouchableOpacity>
       ) : showEdit ? (

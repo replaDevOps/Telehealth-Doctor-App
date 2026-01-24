@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { colors } from '../../styles/colors';
@@ -28,6 +29,7 @@ export type TabParamList = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function CustomTabBar() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -57,18 +59,18 @@ export default function CustomTabBar() {
           switch (route.name) {
             case 'Home':
               SvgComponent = focused ? FHomeSvg : HomeSvg;
-              label = 'Home';
+              label = t('home.title');
               break;
 
             case 'History':
               SvgComponent = focused ? fHistorySvg : HistorySvg;
 
-              label = 'History';
+              label = t('history.title');
               break;
             case 'Setting':
               SvgComponent = focused ? fSettingSvg : SettingSvg;
 
-              label = 'Setting';
+                label = t('settings.title');
               break;
           }
           return (

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Header2 } from '@components/common/Header2';
@@ -39,6 +40,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isConsultationActive = false,
   consultationData,
 }) => {
+  const { t } = useTranslation();
   // Extract patient and service info from consultation data
   const patientName = consultationData?.patient?.name || 'Patient';
   const serviceName = consultationData?.service?.name || '';
@@ -80,7 +82,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   return chatType === 'ai' ? (
-    <Header2 title="Chat" showCart logo />
+    <Header2 title={t('chat.title')} showCart logo />
   ) : (
     <View style={styles.doctorHeaderContainer}>
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
@@ -99,7 +101,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           style={styles.endButton}
           onPress={handleEndConsultation}
         >
-          <Text style={styles.endButtonText}>End</Text>
+          <Text style={styles.endButtonText}>{t('chat.end')}</Text>
         </TouchableOpacity>
       )}
     </View>

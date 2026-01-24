@@ -6,7 +6,11 @@ import { colors } from './src/styles/colors';
 import { setGlobalFont } from './src/utils/overrideText';
 import { usePusherNotifications } from './src/hooks/usePusherNotifications';
 import { NotificationCountProvider } from './src/context/NotificationCountContext';
+import { LanguageProvider } from './src/context/LanguageContext';
 import ToastManager from 'toastify-react-native';
+
+// Initialize i18n
+import './src/locales/i18n';
 
 setGlobalFont();
 
@@ -34,9 +38,11 @@ const App = () => {
         barStyle="dark-content"
       />
       {/* <SafeAreaView style={styles.safeArea}> */}
-      <NotificationCountProvider>
-        <AppContent />
-      </NotificationCountProvider>
+      <LanguageProvider>
+        <NotificationCountProvider>
+          <AppContent />
+        </NotificationCountProvider>
+      </LanguageProvider>
       {/* </SafeAreaView> */}
     </SafeAreaProvider>
   );

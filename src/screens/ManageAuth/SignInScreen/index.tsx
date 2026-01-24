@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
 import { CustomButton } from '../../../components/common/CustomButton';
@@ -25,6 +26,7 @@ import { useAuthStore, User, useProfileStore } from '../../../store';
 import { Toast } from 'toastify-react-native';
 
 export function SignInScreen({ navigation }) {
+  const { t } = useTranslation();
   const { login: setAuth } = useAuthStore();
   const { fetchProfile } = useProfileStore();
   const [phone, setPhone] = useState('');
@@ -50,7 +52,7 @@ export function SignInScreen({ navigation }) {
 
     // Phone validation (user error - show under input)
     if (!phone.trim()) {
-      setPhoneError('Phone number is required');
+      setPhoneError(t('auth.phoneRequired'));
       valid = false;
     } else {
       setPhoneError('');
@@ -58,7 +60,7 @@ export function SignInScreen({ navigation }) {
 
     // Password validation (user error - show under input)
     if (!password.trim()) {
-      setPasswordError('Password is required');
+      setPasswordError(t('auth.passwordRequired'));
       valid = false;
     } else {
       setPasswordError('');
@@ -217,17 +219,17 @@ export function SignInScreen({ navigation }) {
 
           {/* Title */}
           <View style={styles.title}>
-            <CustomText text="Welcome Back" />
+            <CustomText text={t('auth.welcomeBack')} />
           </View>
           <View style={styles.content}>
             <Text style={styles.TextContent}>
-              Login and continue your healthy journey today!
+              {t('auth.loginSubtitle')}
             </Text>
           </View>
 
           {/* Phone Input */}
           <View style={{ marginTop: mvs(25) }}>
-            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.label}>{t('auth.phoneNumber')}</Text>
             <PhoneNumberInput
               phone={phone}
               setPhone={setPhone}
@@ -241,15 +243,15 @@ export function SignInScreen({ navigation }) {
 
           {/* Password Input */}
           <CustomTextInput
-            label="Password"
-            placeholder="Enter your password"
+            label={t('auth.password')}
+            placeholder={t('auth.enterPassword')}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
             errorMessage={passwordError}
           />
 
-          <View style={styles.PasswordRemember}>
+          {/* <View style={styles.PasswordRemember}>
             <View style={styles.CheckBox}>
               <TouchableOpacity
                 onPress={() => setRemember(!remember)}
@@ -268,20 +270,20 @@ export function SignInScreen({ navigation }) {
             <TouchableOpacity onPress={() => {}}>
               <Text style={styles.signinLink}>Forgot password?</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           {/* Sign In Button */}
           <CustomButton
-            title="Sign In"
+            title={t('auth.signIn')}
             onPress={handleSignIn}
             loading={loading}
           />
 
           {/* Sign Up Link */}
           <View style={styles.signinRow}>
-            <Text style={styles.TextContent}>Need Help? </Text>
+            <Text style={styles.TextContent}>{t('common.needHelp')} </Text>
             <TouchableOpacity onPress={() => {}}>
-              <Text style={styles.signinLink}>Contact admin</Text>
+              <Text style={styles.signinLink}>{t('common.contactAdmin')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

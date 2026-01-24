@@ -1,5 +1,6 @@
 /* HistoryScreen.tsx */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -201,7 +202,7 @@ export function RefundRequest2({ navigation }: { navigation: any }) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Header2 title="Refund Request" />
+      <Header2 title={t('screens.refund')} />
 
       {/* Search */}
       <View style={styles.searchContainer}>

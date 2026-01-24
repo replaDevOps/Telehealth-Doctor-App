@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import ConsultationCard from '../../molecules/ConsultationCard';
 import { mvs } from '../../../config/metrices';
 import HomeSectionTitle from '../HomeSectionTitle';
@@ -35,6 +36,7 @@ const RecentConsultations = ({
   onViewChat,
   emptyMessage = 'No recent consultations found.',
 }: RecentConsultationsProps) => {
+  const { t } = useTranslation();
   // Only show View All button when there are consultations
   const hasConsultations = consultations && consultations.length > 0;
   console.log('RecentConsultations consultations:', consultations);
@@ -42,14 +44,14 @@ const RecentConsultations = ({
     <View style={styles.container}>
       {onViewAll && (
         <HomeSectionTitle
-          title="Recent Consultations"
+          title={t('recent.recentConsultations')}
           onActionPress={hasConsultations ? onViewAll : undefined}
         />
       )}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading consultations...</Text>
+          <Text style={styles.loadingText}>{t('recent.loadingConsultations')}</Text>
         </View>
       ) : consultations && consultations.length > 0 ? (
         consultations.map(consultation => (
@@ -92,7 +94,7 @@ const RecentConsultations = ({
         ))
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>{emptyMessage}</Text>
+          <Text style={styles.emptyText}>{t('recent.noRecentConsultations')}</Text>
         </View>
       )}
     </View>

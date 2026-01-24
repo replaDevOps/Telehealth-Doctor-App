@@ -58,7 +58,7 @@ export function CheckoutScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Header2 title="Checkkout" />
+      <Header2 title={t('screens.checkout')} />
 
       <ScrollView
         style={styles.scrollView}

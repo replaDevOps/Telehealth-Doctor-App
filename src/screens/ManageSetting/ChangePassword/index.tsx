@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { Toast } from 'toastify-react-native';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidScrollview } from '../../../components/common/keyboard-avoid-scrollview';
 import { Header2 } from '../../../components/common/Header2';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
@@ -9,6 +10,7 @@ import { styles } from './style';
 import { changePassword } from '../../../services/api';
 
 export const ChangePassword = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -101,7 +103,7 @@ const [loading, setLoading] = useState(false);
   return (
     <KeyboardAvoidScrollview>
       <SafeAreaView style={{ flex: 1 }}>
-        <Header2 title="Password" useSave={true} handleSave={handleSave} saveLoading={loading} saveDisabled={loading} />
+        <Header2 title={t('settings.password')} useSave={true} handleSave={handleSave} saveLoading={loading} saveDisabled={loading} />
 
         <View style={styles.container}>
           <View style={styles.InputContainer}>

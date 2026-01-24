@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAvoidScrollview } from '../../../components/common/keyboard-avoid-scrollview';
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
@@ -62,31 +64,31 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
     setGenderError('');
 
     if (!fullName.trim()) {
-      setNameError('Name is Required');
+      setNameError(t('validation.nameRequired'));
       valid = false;
     }
     if (!email.trim() || !email.includes('@')) {
-      setEmailError('Valid email required');
+      setEmailError(t('validation.validEmail'));
       valid = false;
     }
     if (!phone.trim() || !isPhoneValid) {
-      setPhoneError('Valid phone required');
+      setPhoneError(t('validation.validPhone'));
       valid = false;
     }
     if (!nationality) {
-      setNationalityError('Select nationality');
+      setNationalityError(t('validation.selectNationality'));
       valid = false;
     }
     if (!IdCardNumber.trim()) {
-      setIdError('ID required');
+      setIdError(t('validation.idRequired'));
       valid = false;
     }
     if (!gender) {
-      setGenderError('Select gender');
+      setGenderError(t('validation.selectGender'));
       valid = false;
     }
     if (!age.trim()) {
-      setAgeError('Age is required');
+      setAgeError(t('validation.ageRequired'));
       valid = false;
     }
     if (!profileImage) {
@@ -110,23 +112,21 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <View style={styles.content}>
-            <CustomText text="Setup Your Profile" />
-            <Text style={styles.TextContent}>
-              Setup your profile with a basic details.
-            </Text>
+            <CustomText text={t('profile.setupTitle')} />
+            <Text style={styles.TextContent}>{t('profile.setupDescription')}</Text>
           </View>
 
           <CustomTextInput
-            label="Full Name"
-            placeholder="Enter full name"
+            label={t('profile.fullName')}
+            placeholder={t('profile.fullName')}
             value={fullName}
             onChangeText={setFullName}
             errorMessage={nameError}
           />
 
           <CustomTextInput
-            label="Email Address"
-            placeholder="Enter email address"
+            label={t('profile.email')}
+            placeholder={t('profile.email')}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -134,7 +134,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
             errorMessage={emailError}
           />
 
-          <Text style={styles.label}>Phone Number</Text>
+          <Text style={styles.label}>{t('profile.phone')}</Text>
           <PhoneNumberInput
             phone={phone}
             setPhone={setPhone}
@@ -147,8 +147,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <CustomDropdown
-            label="Nationality"
-            placeholder="Select nationality"
+            label={t('profile.personalInfo')}
+            placeholder={t('profile.selectNationality')}
             value={nationality}
             onValueChange={setNationality}
             errorMessage={nationalityError} // Add
@@ -162,8 +162,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <CustomTextInput
-            label="National ID / Iqama Number"
-            placeholder="XXXXXXXXX"
+            label={t('profile.nationality')}
+            placeholder={t('profile.nationality')}
             value={IdCardNumber}
             onChangeText={setIdCardNumber}
             keyboardType="numeric"
@@ -171,8 +171,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <CustomDropdown
-            label="Gender"
-            placeholder="Select Gender"
+            label={t('profile.gender')}
+            placeholder={t('profile.selectGender')}
             value={gender}
             onValueChange={setGender}
             options={[
@@ -184,15 +184,15 @@ export const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <CustomTextInput
-            label="Age"
-            placeholder="Enter your age"
+            label={t('profile.age')}
+            placeholder={t('profile.age')}
             value={age}
             onChangeText={setAge}
             keyboardType="numeric"
             errorMessage={ageError}
           />
         </View>
-        <CustomButton title="Save & Continue" onPress={handleSaveAndContinue} />
+        <CustomButton title={t('common.continue')} onPress={handleSaveAndContinue} />
       </SafeAreaView>
     </KeyboardAvoidScrollview>
   );

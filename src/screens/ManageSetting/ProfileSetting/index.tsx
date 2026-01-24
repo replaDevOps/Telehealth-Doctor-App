@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -14,9 +15,10 @@ import { mvs } from '@config/metrices';
 
 
 export const ProfileSetting = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <Header2 title="Settings" />
+      <Header2 title={t('settings.title')} />
 
       <View style={[styles.container, { marginTop: mvs(20) }]}>
         {/* My Signature */}
@@ -27,7 +29,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Ionicons name="pencil-outline" size={22} color={colors.black} />
-            <Text style={[styles.menuItemText, { marginLeft: 15 }]}>My Signature</Text>
+            <Text style={[styles.menuItemText, { marginLeft: 15 }]}>{t('settings.signature')}</Text>
           </View>
           <AntDesign name="right" size={20} color="#9CA3AF" />
         </TouchableOpacity>
@@ -40,7 +42,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Ionicons name="key-outline" size={22} color={colors.black} />
-            <Text style={[styles.menuItemText, { marginLeft: 15 }]}>Password Manager</Text>
+            <Text style={[styles.menuItemText, { marginLeft: 15 }]}>{t('settings.passwordManager')}</Text>
           </View>
           <AntDesign name="right" size={20} color="#9CA3AF" />
         </TouchableOpacity>
