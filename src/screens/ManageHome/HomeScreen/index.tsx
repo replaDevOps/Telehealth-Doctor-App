@@ -269,7 +269,7 @@ export const HomeScreen = ({ navigation }) => {
       <HomeHeader
         centerName={clinicName}
         location={location}
-        doctorName={profileData?.name || 'Dr. Sultan Khan'}
+        doctorName={profileData?.name || 'Dr. '}
         doctorSpecialty={profileData?.specialization || 'Dermatologist'}
         doctorImage={profileData?.image ? { uri: profileData.image } : doctor}
         isActive={isActive}

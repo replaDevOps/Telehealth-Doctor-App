@@ -32,14 +32,18 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   onEndConsultation,
   hasPrescription = false,
 }) => {
-  const shouldPromptForPrescription = isDoctor && !hasPrescription;
+  const shouldPromptForPrescription = isDoctor && !hasPrescription && onAddPrescription;
 
   const titleText = shouldPromptForPrescription
     ? 'No Prescription Added'
+    : hasPrescription
+    ? 'Consultation Complete!'
     : 'Consultation Ended!';
 
   const descriptionText = shouldPromptForPrescription
     ? "You haven't created a prescription for this session. Are you sure you want to end the consultation without writing one?"
+    : isDoctor && hasPrescription
+    ? 'The consultation has ended successfully. The prescription has been shared with the patient.'
     : isDoctor
     ? 'The consultation has ended.'
     : 'The consultation has ended. The doctor has shared your prescription. You can download it now or anytime from your history.';

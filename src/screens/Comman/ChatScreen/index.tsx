@@ -30,6 +30,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Toast } from 'toastify-react-native';
 import { pusherService } from '../../../services/pusher/PusherService';
 import { endConsultation } from '../../../services/api/webrtcService';
+import { useBackgroundTimer } from '../../../hooks/useBackgroundTimer';
 
 // ---------- Main Component ----------
 export function ChatScreen({ navigation, route }) {
@@ -46,9 +47,6 @@ export function ChatScreen({ navigation, route }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [serviceDetailVisible, setServiceDetailVisible] = useState(false);
-  const [remainingSeconds, setRemainingSeconds] = useState(
-    CONSULTATION_DURATION,
-  );
   const [isConsultationActive, setIsConsultationActive] = useState(
     chatType === 'doctor' && !fromHistory,
   );
@@ -63,7 +61,7 @@ export function ChatScreen({ navigation, route }) {
   const scrollRef = useRef<ScrollView>(null);
   const consultationStartTimeRef = useRef<number | null>(null); // Track when consultation started
   const consultationEndedRef = useRef(false); // Prevent duplicate API calls
-  const chatTimerInitializedRef = useRef(false); // Track if timer was initialized
+  const handleEndConsultationConfirmRef = useRef<(() => void) | undefined>(undefined); // Ref for background timer callback
   const { user } = useAuthStore();
   const { profileData } = useProfileStore();
   const doctorID = user?.id;
@@ -78,11 +76,6 @@ export function ChatScreen({ navigation, route }) {
   
   // State to store patientID from consultation data
   const [consultationPatientID, setConsultationPatientID] = useState<string | number | undefined>(patientID);
-
-  const consultationTime = useMemo(
-    () => formatTime(remainingSeconds),
-    [remainingSeconds],
-  );
 
   const showAvatar = chatType === 'doctor';
   const canSendMessages = !fromHistory;
@@ -202,39 +195,6 @@ export function ChatScreen({ navigation, route }) {
       console.log('📞 [ChatScreen] Consultation started, tracking duration');
     }
   }, [isConsultationActive, chatType, consultationId]);
-
-  // Timer for consultation - Countdown from 30 minutes (1800 seconds)
-  useEffect(() => {
-    if (chatType !== 'doctor' || !isConsultationActive) {
-      // Reset timer when consultation is not active
-      chatTimerInitializedRef.current = false;
-      setRemainingSeconds(CONSULTATION_DURATION);
-      return;
-    }
-
-    // Initialize timer once when consultation becomes active
-    if (!chatTimerInitializedRef.current) {
-      chatTimerInitializedRef.current = true;
-      setRemainingSeconds(CONSULTATION_DURATION);
-      console.log('⏰ [ChatScreen] Starting 30-minute countdown timer');
-    }
-
-    const timer = setInterval(() => {
-      setRemainingSeconds(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setIsConsultationActive(false);
-          // Auto-end consultation at 30 minutes
-          console.log('⏰ [ChatScreen] 30 minutes elapsed, auto-ending consultation');
-          handleEndConsultationConfirm();
-          return 0;
-        }
-        return prev - 1; // Count down from 30:00 to 00:00
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isConsultationActive, chatType]);
 
   // Auto-scroll when new message arrives
   useEffect(() => {
@@ -708,9 +668,15 @@ export function ChatScreen({ navigation, route }) {
   }, [chatType, fromHistory]);
 
   const handleAddPrescription = useCallback(() => {
+    // Don't allow adding prescription if already added
+    if (hasPrescription) {
+      Toast.info('Prescription has already been added for this consultation');
+      return;
+    }
     setEndConsultationModalVisible(false);
+    setModalVisible(false);
     setPrescriptionBottomSheetVisible(true);
-  }, []);
+  }, [hasPrescription]);
 
   const handleSavePrescription = useCallback(async (prescriptions: Array<{ name: string; description: string }>) => {
     if (!consultationId) {
@@ -787,6 +753,24 @@ export function ChatScreen({ navigation, route }) {
     setIsConsultationActive(false);
   }, [endConsultationAndNotify]);
 
+  // Keep ref updated for background timer callback
+  useEffect(() => {
+    handleEndConsultationConfirmRef.current = handleEndConsultationConfirm;
+  }, [handleEndConsultationConfirm]);
+
+  // Use background-aware timer for 30-minute countdown (works in background)
+  const { remainingSeconds, formattedTime } = useBackgroundTimer({
+    totalDuration: CONSULTATION_DURATION,
+    isActive: chatType === 'doctor' && isConsultationActive,
+    onTimeUpRef: handleEndConsultationConfirmRef,
+  });
+
+  // Memoized consultation time display
+  const consultationTime = useMemo(
+    () => formattedTime,
+    [formattedTime],
+  );
+
   const handleGetPrescription = useCallback(() => {
     setModalVisible(false);
     navigation.navigate('PrescriptionScreen');
@@ -821,17 +805,13 @@ export function ChatScreen({ navigation, route }) {
 
   // ---------- Main Render ----------
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-      style={
-        flexToggle
-          ? [{ flexGrow: 1 }, styles.container]
-          : [{ flex: 1 }, styles.container]
-      }
-      enabled={!flexToggle}
-    >
-      <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.container}>
       <ChatHeader
         chatType={chatType}
         doctorInfo={doctorInfo}
@@ -918,7 +898,8 @@ export function ChatScreen({ navigation, route }) {
         consultationID={consultationId || ''}
         consultationData={consultationData}
       />
-    </SafeAreaView>
+    </View>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

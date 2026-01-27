@@ -246,7 +246,11 @@ export function SignInScreen({ navigation }) {
             label={t('auth.password')}
             placeholder={t('auth.enterPassword')}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text: string) => {
+              // Clear previous password error when user starts typing
+              if (passwordError) setPasswordError('');
+              setPassword(text);
+            }}
             secureTextEntry={true}
             errorMessage={passwordError}
           />
