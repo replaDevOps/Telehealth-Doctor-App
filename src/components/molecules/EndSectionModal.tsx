@@ -32,18 +32,26 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   onEndConsultation,
   hasPrescription = false,
 }) => {
-  const shouldPromptForPrescription = isDoctor && !hasPrescription && onAddPrescription;
+  const shouldPromptForPrescription = isDoctor && !hasPrescription && onAddPrescription && onEndConsultation;
+  const isPrescriptionAddedButNotEnded = isDoctor && hasPrescription && onEndConsultation;
+  const isConsultationEnded = isDoctor && !onEndConsultation; // Consultation has ended
 
   const titleText = shouldPromptForPrescription
     ? 'No Prescription Added'
+    : isPrescriptionAddedButNotEnded
+    ? 'End Consultation?'
     : hasPrescription
     ? 'Consultation Complete!'
     : 'Consultation Ended!';
 
   const descriptionText = shouldPromptForPrescription
     ? "You haven't created a prescription for this session. Are you sure you want to end the consultation without writing one?"
+    : isPrescriptionAddedButNotEnded
+    ? 'The prescription has been added. Are you ready to end this consultation?'
     : isDoctor && hasPrescription
     ? 'The consultation has ended successfully. The prescription has been shared with the patient.'
+    : isDoctor && isConsultationEnded
+    ? 'The consultation has ended. You can add a prescription now or close this window.'
     : isDoctor
     ? 'The consultation has ended.'
     : 'The consultation has ended. The doctor has shared your prescription. You can download it now or anytime from your history.';
@@ -95,9 +103,33 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                 <Text style={styles.primaryActionText}>Write Prescription</Text>
               </TouchableOpacity>
             </View>
-          ) : (
+          ) : onEndConsultation ? (
             <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.closeButton, styles.endConsultationButton]} 
+                onPress={onEndConsultation}
+              >
+                <Text style={styles.endConsultationButtonText}>End Consultation</Text>
+              </TouchableOpacity>
+            </View>
+          ) : isConsultationEnded && !hasPrescription && onAddPrescription ? (
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.closeButton, styles.endConsultationButton]} 
+                onPress={onAddPrescription}
+              >
+                <Text style={styles.endConsultationButtonText}>Add Prescription</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={[styles.closeButton,{flex:1}]} onPress={onClose}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -151,29 +183,39 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: colors.secondaryText,
-    textAlign: 'left',
+    textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
     paddingHorizontal: 0,
     width: '100%',
+
   },
   buttonRow: {
     flexDirection: 'row',
     gap: 12,
-    width: '100%',
     justifyContent: 'center',
   },
   closeButton: {
-    width: '100%',
+    // flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: colors.gray,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
+    width: "50%",
   },
   closeButtonText: {
     color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  endConsultationButton: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  endConsultationButtonText: {
+    color: colors.white,
     fontSize: 15,
     fontWeight: '600',
   },

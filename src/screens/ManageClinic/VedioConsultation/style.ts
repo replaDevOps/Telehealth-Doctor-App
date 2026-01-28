@@ -45,13 +45,15 @@ export const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     quickActionWrapper: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
       position: 'relative',
-      alignItems: 'center',
-      justifyContent: 'center',
-      overflow: 'visible',
+      alignItems: 'flex-end',
+      justifyContent: 'flex-end',
+    },
+    floatingActionMenu: {
+      position: 'absolute',
+      bottom: 100,
+      left: 16,
+      zIndex: 100,
     },
     moreButton: {
       width: 52,
@@ -70,11 +72,12 @@ export const styles = StyleSheet.create({
       bottom: 70,
       right: 0,
       alignItems: 'flex-end',
+      zIndex: 999,
+      elevation: 999,
     },
     actionRow: {
-      flexDirection: 'row-reverse',
+      flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'flex-end',
       marginBottom: 12,
     },
     actionRowDisabled: {

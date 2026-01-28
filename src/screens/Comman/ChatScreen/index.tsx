@@ -688,6 +688,13 @@ export function ChatScreen({ navigation, route }) {
       prescriptions,
     });
 
+    // Update consultationData to reflect that prescription has been added
+    setConsultationData((prevData: any) => ({
+      ...prevData,
+      hasPrescription: true,
+      prescription: prescriptions,
+    }));
+
     Toast.success('Prescription added successfully');
   }, [consultationId]);
 
@@ -807,11 +814,15 @@ export function ChatScreen({ navigation, route }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        style={
+          flexToggle
+            ? [{ flexGrow: 1 }, styles.container]
+            : [{ flex: 1 }, styles.container]
+        }
+        enabled={!flexToggle}
       >
-        <View style={styles.container}>
       <ChatHeader
         chatType={chatType}
         doctorInfo={doctorInfo}
@@ -898,7 +909,6 @@ export function ChatScreen({ navigation, route }) {
         consultationID={consultationId || ''}
         consultationData={consultationData}
       />
-    </View>
     </KeyboardAvoidingView>
     </SafeAreaView>
   );

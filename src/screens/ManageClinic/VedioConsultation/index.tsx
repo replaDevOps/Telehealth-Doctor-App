@@ -144,7 +144,7 @@ export function VideoConsultation({ navigation, route }) {
     navigation.navigate('PrescriptionScreen');
   };
 
-  const handleAddPrescription = () => {
+  const handleAddPrescription = useCallback(() => {
     // Don't allow adding prescription if already added
     if (hasPrescription) {
       Toast.info('Prescription has already been added for this consultation');
@@ -152,8 +152,10 @@ export function VideoConsultation({ navigation, route }) {
     }
     setIsActionMenuOpen(false);
     setModalVisible(false);
-    setPrescriptionBottomSheetVisible(true);
-  };
+    setTimeout(() => {
+      setPrescriptionBottomSheetVisible(true);
+    }, 100);
+  }, [hasPrescription]);
 
   const toggleActionMenu = useCallback(() => {
     setIsActionMenuOpen(prev => !prev);
@@ -469,77 +471,77 @@ export function VideoConsultation({ navigation, route }) {
             </View>
           )}
 
+          {/* Floating Action Menu - Rendered outside controls for proper touch handling */}
+          {shouldShowActionMenu && isActionMenuOpen && (
+            <View style={styles.floatingActionMenu}>
+              <TouchableOpacity
+                style={styles.actionRow}
+                onPress={handleViewAiChatHistory}
+                activeOpacity={0.75}
+              >
+                <View style={styles.actionLabelBubble}>
+                  <Text style={styles.actionLabelText}>View AI Chat History</Text>
+                </View>
+                <View style={styles.actionCircle}>
+                  <Ionicons
+                    name="chatbubble-ellipses"
+                    size={18}
+                    color={colors.white}
+                  />
+                </View>
+              </TouchableOpacity>
+              {!hasPrescription ? (
+                <TouchableOpacity
+                  style={styles.actionRow}
+                  onPress={handleAddPrescription}
+                  activeOpacity={0.75}
+                >
+                  <View style={styles.actionLabelBubble}>
+                    <Text style={styles.actionLabelText}>Write Prescription</Text>
+                  </View>
+                  <View style={styles.actionCircle}>
+                    <Ionicons
+                      name="add"
+                      size={20}
+                      color={colors.white}
+                    />
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <View style={[styles.actionRow, styles.actionRowDisabled]}>
+                  <View style={styles.actionLabelBubble}>
+                    <Text style={[styles.actionLabelText, styles.actionLabelTextDisabled]}>
+                      Prescription Sent
+                    </Text>
+                  </View>
+                  <View
+                    style={[styles.actionCircle, styles.actionCircleSecondary]}
+                  >
+                    <Ionicons
+                      name="checkmark-done"
+                      size={18}
+                      color={colors.white}
+                    />
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
           {/* Call Controls at Bottom */}
           <View style={styles.controlsContainer}>
             {shouldShowActionMenu && (
-              <View style={styles.quickActionWrapper}>
-                {isActionMenuOpen && (
-                  <View style={styles.actionMenu}>
-                    <TouchableOpacity
-                      style={styles.actionRow}
-                      onPress={handleViewAiChatHistory}
-                      activeOpacity={0.75}
-                    >
-                      <View style={styles.actionCircle}>
-                        <Ionicons
-                          name="chatbubble-ellipses"
-                          size={18}
-                          color={colors.white}
-                        />
-                      </View>
-                      <View style={styles.actionLabelBubble}>
-                        <Text style={styles.actionLabelText}>View AI Chat History</Text>
-                      </View>
-                    </TouchableOpacity>
-                    {!hasPrescription ? (
-                      <TouchableOpacity
-                        style={styles.actionRow}
-                        onPress={handleAddPrescription}
-                        activeOpacity={0.75}
-                      >
-                        <View style={styles.actionCircle}>
-                          <Ionicons
-                            name="add"
-                            size={20}
-                            color={colors.white}
-                          />
-                        </View>
-                        <View style={styles.actionLabelBubble}>
-                          <Text style={styles.actionLabelText}>Write Prescription</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ) : (
-                      <View style={[styles.actionRow, styles.actionRowDisabled]}>
-                        <View
-                          style={[styles.actionCircle, styles.actionCircleSecondary]}
-                        >
-                          <Ionicons
-                            name="checkmark-done"
-                            size={18}
-                            color={colors.white}
-                          />
-                        </View>
-                        <View style={styles.actionLabelBubble}>
-                          <Text style={[styles.actionLabelText, styles.actionLabelTextDisabled]}>
-                            Prescription Sent
-                          </Text>
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                )}
-                <TouchableOpacity
-                  style={[styles.moreButton, isActionMenuOpen && styles.moreButtonActive]}
-                  onPress={toggleActionMenu}
-                  activeOpacity={0.85}
-                >
-                  <Ionicons
-                    name={isActionMenuOpen ? 'close' : 'ellipsis-vertical'}
-                    size={24}
-                    color={colors.white}
-                  />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={[styles.moreButton, isActionMenuOpen && styles.moreButtonActive]}
+                onPress={toggleActionMenu}
+                activeOpacity={0.85}
+              >
+                <Ionicons
+                  name={isActionMenuOpen ? 'close' : 'ellipsis-vertical'}
+                  size={24}
+                  color={colors.white}
+                />
+              </TouchableOpacity>
             )}
             {/* Speaker Button */}
             <TouchableOpacity
