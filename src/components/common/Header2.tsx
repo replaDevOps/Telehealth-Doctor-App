@@ -53,9 +53,9 @@ const Header2: React.FC<Header2Props> = ({
   showCart = false,
   cartCount = 0,
   notificationCount = 0,
-  handleNotification = () => {},
-  handleDownload = () => {},
-  handleSave  = () => {},
+  handleNotification = () => { },
+  handleDownload = () => { },
+  handleSave = () => { },
   saveDisabled = false,
   saveLoading = false,
   handleBackPress,
@@ -80,9 +80,9 @@ const Header2: React.FC<Header2Props> = ({
     navigation.navigate('LanguageSelection');
   };
 
-  // Get language display text - Arabic shows 'ع', English shows 'Eng'
-  const languageText = language === 'ar' ? 'ع' : 'Eng';
-  
+  // Get language display text - Arabic shows 'العربية', English shows 'English'
+  const languageText = language === 'ar' ? 'العربية' : 'English';
+
   console.log('Header2 rendering with language:', language, '- Display:', languageText);
 
   return (

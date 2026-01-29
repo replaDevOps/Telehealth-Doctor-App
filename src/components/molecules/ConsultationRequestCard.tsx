@@ -24,7 +24,7 @@ interface ConsultationRequestCardProps {
   onDecline: () => void;
 }
 
-const TIMER_DURATION = 60; // seconds
+const TIMER_DURATION = 120; // seconds
 
 const ConsultationRequestCard = ({
   patientName,
@@ -126,7 +126,7 @@ const ConsultationRequestCard = ({
               {patientGender}, {patientAge} Year old
             </Text>
           </View>
-          <Text style={styles.timerText}>{timeLeft}s</Text>
+          {/* <Text style={styles.timerText}>{timeLeft}s</Text> */}
         </View>
 
         {/* Action Buttons */}

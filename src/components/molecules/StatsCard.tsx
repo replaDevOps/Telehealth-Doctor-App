@@ -18,7 +18,7 @@ const StatsCard = ({ title, value }: StatsCardProps) => {
       <View style={[styles.iconContainer]}>
         <TotalConsultationSvg />
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
       <Text style={styles.value}>{value}</Text>
     </View>
   );
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     paddingVertical: mvs(12),
-    paddingHorizontal: mvs(16),
+    paddingHorizontal: mvs(12),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

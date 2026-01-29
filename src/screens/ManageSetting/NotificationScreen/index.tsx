@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Header2 } from '@components/common/Header2';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { styles } from './style';
@@ -9,6 +9,7 @@ import { colors } from '../../../styles/colors';
 import { useNotificationStore } from '../../../store';
 import { useFocusEffect } from '@react-navigation/native';
 import { Toast } from 'toastify-react-native';
+import { useTranslation } from 'react-i18next';
 
 interface NotificationItem {
   id: number | string;
@@ -20,9 +21,9 @@ interface NotificationItem {
   is_read?: boolean;
 }
 
-export const NotificationScreen = ({ navigation }: { navigation: any }) => {
+export const NotificationScreen = () => {
   const { t } = useTranslation();
-  const { notifications, isLoading, fetchNotifications, removeNotification, clearAll, unreadCount } = useNotificationStore();
+  const { notifications, isLoading, fetchNotifications, removeNotification, clearAll } = useNotificationStore();
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [clearingAll, setClearingAll] = useState(false);
 
@@ -41,9 +42,9 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
       Toast.success('Notification deleted');
     } catch (error: any) {
       console.error('Error deleting notification:', error);
-      const errorMessage = 
-        error?.response?.data?.message || 
-        error?.message || 
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
         'Failed to delete notification';
       Toast.error(errorMessage);
     } finally {
@@ -71,9 +72,9 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
               Toast.success('All notifications cleared');
             } catch (error: any) {
               console.error('Error clearing notifications:', error);
-              const errorMessage = 
-                error?.response?.data?.message || 
-                error?.message || 
+              const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
                 'Failed to clear notifications';
               Toast.error(errorMessage);
             } finally {
@@ -88,7 +89,7 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
   // Format time
   const formatTime = (timeStr?: string): string => {
     if (!timeStr) return '';
-    
+
     try {
       const date = new Date(timeStr);
       const now = new Date();
@@ -101,7 +102,7 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
       if (diffMins < 60) return `${diffMins}m ago`;
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays < 7) return `${diffDays}d ago`;
-      
+
       // Format as date if older than a week
       return date.toLocaleDateString('en-US', {
         month: 'short',
@@ -126,7 +127,7 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
-      
+
       <Header2 title={t('settings.notifications')} back />
 
       {mappedNotifications.length > 0 && (
@@ -168,10 +169,10 @@ export const NotificationScreen = ({ navigation }: { navigation: any }) => {
               activeOpacity={0.7}
             >
               <View style={styles.iconContainer}>
-                <Icon 
-                  name="bell-outline" 
-                  size={20} 
-                  color={!notification.read ? colors.primary : colors.secondaryText} 
+                <Icon
+                  name="bell-outline"
+                  size={20}
+                  color={!notification.read ? colors.primary : colors.secondaryText}
                 />
               </View>
 

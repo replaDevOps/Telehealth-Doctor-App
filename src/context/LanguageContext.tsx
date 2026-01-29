@@ -21,6 +21,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Load saved language on mount
   useEffect(() => {
+    // Ensure LTR layout is enforced on mount
+    if (I18nManager.isRTL) {
+      I18nManager.allowRTL(false);
+      I18nManager.forceRTL(false);
+      console.log('🔄 Forced LTR on mount');
+    }
     loadLanguage();
   }, []);
 
@@ -29,7 +35,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       console.log('📚 Loading saved language from AsyncStorage...');
       const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
       console.log('📚 Saved language value:', savedLanguage);
-      
+
       if (savedLanguage === 'en' || savedLanguage === 'ar') {
         console.log('📚 Setting language state to:', savedLanguage);
         setLanguageState(savedLanguage);
@@ -53,22 +59,21 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       // Update i18n language
       await i18n.changeLanguage(lang);
       console.log('🌐 i18n language changed to:', lang);
-      
-      // Handle RTL for Arabic
-      const isRTL = lang === 'ar';
-      if (I18nManager.isRTL !== isRTL) {
-        I18nManager.allowRTL(isRTL);
-        I18nManager.forceRTL(isRTL);
-        console.log('🌐 RTL set to:', isRTL);
+
+      // Force LTR layout always (Disable RTL)
+      if (I18nManager.isRTL) {
+        I18nManager.allowRTL(false);
+        I18nManager.forceRTL(false);
+        console.log('🌐 RTL disabled, forcing LTR');
       }
-      
+
       console.log('🌐 setLanguage called - Changing from', language, 'to', lang);
       await AsyncStorage.setItem('selectedLanguage', lang);
       console.log('🌐 AsyncStorage updated successfully');
-      
+
       setLanguageState(lang);
       console.log('🌐 Language state updated to:', lang);
-      
+
       // Verify it was saved
       const saved = await AsyncStorage.getItem('selectedLanguage');
       console.log('🌐 Verified saved language in AsyncStorage:', saved);

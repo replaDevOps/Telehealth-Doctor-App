@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { styles } from './styles';
 import { Header2 } from '../../../components/common/Header2';
@@ -33,10 +32,10 @@ export function LanguageScreen() {
       // Update language in context (which also saves to AsyncStorage)
       await setLanguage(selectedLang);
       console.log('Language updated successfully to:', selectedLang);
-      
+
       // Add a small delay to ensure state is updated
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {

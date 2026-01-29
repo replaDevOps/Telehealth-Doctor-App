@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { pusherService } from '../services/pusher/PusherService';
-import { useAuthStore, useDashboardStore } from '../store';
+import { useAuthStore, useDashboardStore, useProfileStore } from '../store';
 import { useNotificationStore } from '../store/useNotificationStore';
 import { useConsultationRequestStore } from '../store/useConsultationRequestStore';
 import { ConsultationRequest } from '../components/molecules/Organisms/ConsultationRequestModal';
@@ -55,7 +55,7 @@ export const usePusherNotifications = () => {
     // Handler for notification-send-doctor event
     const handleNotification = async (data: any) => {
       console.log('Doctor notification received:', data);
-      
+
       // Refresh notifications from API
       try {
         const { refreshNotifications } = useNotificationStore.getState();
@@ -64,19 +64,19 @@ export const usePusherNotifications = () => {
       } catch (error) {
         console.error('❌ Error refreshing notifications:', error);
       }
-      
+
       // Show toast notification - ensure we extract a string value
       let notificationMessage = 'New notification received';
-      
+
       if (typeof data === 'string') {
         notificationMessage = data;
       } else if (data && typeof data === 'object') {
         // Extract string from various possible fields
-        notificationMessage = 
-          data?.description || 
-          data?.message || 
-          data?.title || 
-          data?.body || 
+        notificationMessage =
+          data?.description ||
+          data?.message ||
+          data?.title ||
+          data?.body ||
           data?.type ||
           (data?.notification ? (typeof data.notification === 'string' ? data.notification : data.notification?.description || data.notification?.message || data.notification?.title) : null) ||
           'New notification received';
@@ -86,22 +86,22 @@ export const usePusherNotifications = () => {
       if (typeof notificationMessage !== 'string') {
         notificationMessage = JSON.stringify(notificationMessage);
       }
-      
+
       Toast.info(notificationMessage);
     };
 
     // Handler for consultation-doctor event
     const handleConsultationUpdate = (data: any) => {
       console.log('Consultation update received:', data);
-      
+
       // Extract consultation data from Pusher event
       const consultation = data?.consultation || data;
-      
+
       if (!consultation || !consultation.id) {
         console.warn('Invalid consultation data received:', data);
         return;
       }
-      
+
       // Map consultation type (Chat/Video/Audio) to ConsultationType
       const consultationTypeMap: Record<string, ConsultationRequest['consultationType']> = {
         'Chat': 'chat',
@@ -111,34 +111,34 @@ export const usePusherNotifications = () => {
         'video': 'video',
         'audio': 'audio',
       };
-      
+
       const consultationType = consultationTypeMap[consultation.type] || 'chat';
-      
+
       // Try to get patient info from dashboard store (if consultation was already fetched)
       const { recentConsultations, allConsultations } = useDashboardStore.getState();
       const existingConsultation = [...recentConsultations, ...allConsultations].find(
         (cons: any) => String(cons.id) === String(consultation.id)
       );
-      
+
       // Extract patient info from existing consultation or use placeholders
-      const patientName = existingConsultation?.patientName || 
-        (consultation.patient?.name) || 
-        `Patient ${consultation.patientID}` || 
+      const patientName = existingConsultation?.patientName ||
+        (consultation.patient?.name) ||
+        `Patient ${consultation.patientID}` ||
         'Patient';
-      
-      const patientAge = existingConsultation?.age ? 
+
+      const patientAge = existingConsultation?.age ?
         parseInt(existingConsultation.age.replace(/\D/g, '')) || 25 : 25;
-      
+
       const patientGender = (existingConsultation?.gender || consultation.patient?.gender || 'Male') as 'Male' | 'Female';
-      
-      const treatmentType = existingConsultation?.sevviceName || 
-        (consultation.service?.name) || 
-        `Service ${consultation.serviceID}` || 
+
+      const treatmentType = existingConsultation?.sevviceName ||
+        (consultation.service?.name) ||
+        `Service ${consultation.serviceID}` ||
         'Consultation';
-      
-      const patientImage = existingConsultation?.patientImage || 
+
+      const patientImage = existingConsultation?.patientImage ||
         (consultation.patient?.image ? { uri: consultation.patient.image } : undefined);
-      
+
       // Create consultation request object
       const consultationRequest: ConsultationRequest = {
         id: String(consultation.id),
@@ -150,20 +150,29 @@ export const usePusherNotifications = () => {
         patientImage: patientImage,
         patientID: consultation.patientID || existingConsultation?.patientID, // Store patientID
       };
-      
+
       // Add consultation request to store (this will trigger modal to show)
       const { addRequest } = useConsultationRequestStore.getState();
       addRequest(consultationRequest);
-      
+
       // Refresh dashboard to get updated consultation data with patient info
       const { fetchDashboardData } = useDashboardStore.getState();
       fetchDashboardData().catch(err => console.error('Error refreshing dashboard:', err));
-      
+
       // Show toast notification
-      const consultationMessage = data?.message || 
-        (consultation.status ? `A new consultation is available.` : null) || 
+      const consultationMessage = data?.message ||
+        (consultation.status ? `A new consultation is available.` : null) ||
         'A new consultation is available.';
-      Toast.info(consultationMessage);
+
+      // Only show toast if doctor is active/online
+      const { profileData } = useProfileStore.getState();
+      const isActive = profileData?.status === 'Active';
+
+      if (isActive) {
+        Toast.info(consultationMessage);
+      } else {
+        console.log('🔇 [usePusherNotifications] Doctor is offline, suppressing notification toast');
+      }
     };
 
     // Handler for message-sent event

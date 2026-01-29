@@ -102,30 +102,30 @@ export const HomeScreen = ({ navigation }) => {
 
       // Call acceptConsultation API
       await acceptConsultation({ id: requestId });
-      
+
       // Find the consultation request to get patient info and type
       const consultationRequest = consultationRequests.find(req => req.id === requestId);
-      
+
       // Remove request from store
       removeRequest(requestId);
-      
+
       // Refresh dashboard to show updated consultations
       fetchDashboardData();
-      
+
       Toast.success('Consultation accepted successfully');
-      
+
       // Wait a bit for toast to show, then navigate
       setTimeout(() => {
         // Get patientID from consultation request or from recent consultations after refresh
         const consultation = recentConsultations.find(cons => cons.id === requestId);
         const patientID = consultationRequest?.patientID || consultation?.patientID;
         const consultationType = consultationRequest?.consultationType || consultation?.type || 'chat';
-        
+
         // Get user ID for WebRTC
         const { user } = useAuthStore.getState();
         const doctorID = user?.id;
         const userId = doctorID ? `doctor_${doctorID}` : `doctor_${Date.now()}`;
-        
+
         const patientInfo = consultationRequest ? {
           id: patientID,
           name: consultationRequest.patientName,
@@ -139,7 +139,7 @@ export const HomeScreen = ({ navigation }) => {
           age: consultation.age || '',
           gender: consultation.gender || '',
         } : null);
-        
+
         // Navigate based on consultation type
         if (consultationType === 'audio') {
           console.log('🎤 [Doctor] Navigating to AudioConsultation with params:', {
@@ -192,9 +192,9 @@ export const HomeScreen = ({ navigation }) => {
       }, 1000);
     } catch (error: any) {
       console.error('Error accepting consultation:', error);
-      const errorMessage = 
-        error?.response?.data?.message || 
-        error?.message || 
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
         'Failed to accept consultation';
       Toast.error(errorMessage);
       setIsConnecting(false);
@@ -211,10 +211,10 @@ export const HomeScreen = ({ navigation }) => {
     try {
       // Optimistically update UI
       setIsActive(value);
-      
+
       // Call API to update online status
       await updateOnlineStatus(value);
-      
+
       if (!value) {
         // Clear requests when going offline
         clearAllRequests();
@@ -222,13 +222,13 @@ export const HomeScreen = ({ navigation }) => {
     } catch (error: any) {
       // Revert the toggle if API call fails
       setIsActive(!value);
-      
+
       // Show error message
-      const errorMessage = 
+      const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
         'Failed to update online status. Please try again.';
-      
+
       Alert.alert('Error', errorMessage);
     }
   };
@@ -245,16 +245,16 @@ export const HomeScreen = ({ navigation }) => {
   };
 
   // Get clinic name from profile data or use default
-  const clinicName = profileData?.clinic?.clinicName || 
-                     profileData?.clinic?.business_setting?.businessName || 
-                     'Medical Center';
+  const clinicName = profileData?.clinic?.clinicName ||
+    profileData?.clinic?.business_setting?.businessName ||
+    'Medical Center';
 
   // Get location/address from clinic business_setting or use default
   // Combine address, city, and district if available
   const getLocation = (): string => {
     const businessSetting = profileData?.clinic?.business_setting;
     if (!businessSetting) return 'Location';
-    
+
     const parts: string[] = [];
     if (businessSetting.address) parts.push(businessSetting.address);
     if (businessSetting.city) parts.push(businessSetting.city);
@@ -279,8 +279,8 @@ export const HomeScreen = ({ navigation }) => {
         notificationCount={notificationCount}
       />
 
-      <ScrollView 
-        style={styles.content} 
+      <ScrollView
+        style={styles.content}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -316,10 +316,10 @@ export const HomeScreen = ({ navigation }) => {
               patientID: consultation?.patientID,
               patientInfo: consultation
                 ? {
-                    id: consultation.patientID,
-                    name: consultation.patientName,
-                    image: consultation.patientImage,
-                  }
+                  id: consultation.patientID,
+                  name: consultation.patientName,
+                  image: consultation.patientImage,
+                }
                 : null,
               chatType: 'doctor',
               fromHistory: true,

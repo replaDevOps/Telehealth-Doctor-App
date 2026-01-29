@@ -21,7 +21,7 @@
   "language": {
     "title": "Select Language",
     "subtitle": "Choose your preferred language.",
-    "english": "Eng",
+    "english": "English",
     "arabic": "Arabic"
   },
   "auth": {
@@ -37,8 +37,8 @@
     "phoneRequired": "Phone number is required",
     "passwordRequired": "Password is required",
     "loginSuccess": "Login successful",
-    "loginFailed": "Login failed. Please check your credentials and try again."
-    ,"otpCode": "OTP Code",
+    "loginFailed": "Login failed. Please check your credentials and try again.",
+    "otpCode": "OTP Code",
     "enterOtpDescription": "Enter the 5 digit OTP code sent to your email {{email}}.",
     "confirm": "Confirm",
     "verifying": "Verifying…",
@@ -46,7 +46,6 @@
     "setNewPassword": "Set a New Password",
     "forgetPasswordTitle": "Forget Password"
   },
-
   "forget": {
     "description": "Enter the email address or phone number to send you the OTP code.",
     "emailTab": "Email Address",
@@ -134,9 +133,8 @@
     "male": "Male",
     "female": "Female",
     "other": "Other"
-  }
-
-  ,"validation": {
+  },
+  "validation": {
     "nameRequired": "Name is required",
     "validEmail": "Valid email required",
     "validPhone": "Valid phone required",
