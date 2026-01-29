@@ -154,6 +154,7 @@
     "nearbyClinic": "العيادات القريبة",
     "selectLocation": "اختر الموقع",
     "noSignature": "لم يتم إضافة توقيع بعد",
-    "currentSignature": "التوقيع الحالي"
+    "currentSignature": "التوقيع الحالي",
+    "prescription_saved_successfully": "تم حفظ الوصفة كملف PDF بنجاح"
   }
 }

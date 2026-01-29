@@ -152,6 +152,7 @@
     "nearbyClinic": "Nearby Clinic",
     "selectLocation": "Select Location",
     "noSignature": "No signature added yet",
-    "currentSignature": "Current Signature"
+    "currentSignature": "Current Signature",
+    "prescription_saved_successfully": "Prescription saved as PDF successfully"
   }
 }
