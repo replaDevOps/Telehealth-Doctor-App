@@ -26,11 +26,11 @@ const languageDetector = {
   },
   init: () => {},
   cacheUserLanguage: async (lng: string) => {
-    try {
-      await AsyncStorage.setItem('selectedLanguage', lng);
-    } catch (error) {
-      console.error('Error caching language:', error);
-    }
+    // try {
+    //   await AsyncStorage.setItem('selectedLanguage', lng);
+    // } catch (error) {
+    //   console.error('Error caching language:', error);
+    // }
   },
 };
 

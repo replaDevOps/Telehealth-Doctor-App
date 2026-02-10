@@ -40,7 +40,7 @@ const ConsultationRequestModal = ({
 }: ConsultationRequestModalProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-
+  console.log('requests', requests);
   useEffect(() => {
     console.log('Modal visible:', visible);
     console.log('Requests:', requests);

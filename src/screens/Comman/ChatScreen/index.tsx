@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, BackHandler, KeyboardAvoidingView, Keyboard, Platform } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, BackHandler, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ServiceDetailBottomSheet, PrescriptionBottomSheet } from '@components/molecules';
 import { styles } from './style';
@@ -56,12 +56,12 @@ export function ChatScreen({ navigation, route }) {
   const [prescriptionBottomSheetVisible, setPrescriptionBottomSheetVisible] = useState(false);
   const [endConsultationModalVisible, setEndConsultationModalVisible] = useState(false);
   const [consultationWasEnded, setConsultationWasEnded] = useState(false); // Track if consultation was ended (use state for re-renders)
-  const [flexToggle, setFlexToggle] = useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
   const consultationStartTimeRef = useRef<number | null>(null); // Track when consultation started
   const consultationEndedRef = useRef(false); // Prevent duplicate API calls
   const handleEndConsultationConfirmRef = useRef<(() => void) | undefined>(undefined); // Ref for background timer callback
+  const prescriptionOpenedFromEndModalRef = useRef(false); // true only when opened from End modal; don't end chat when opened from plus button
   const { user } = useAuthStore();
   const { profileData } = useProfileStore();
   const doctorID = user?.id;
@@ -136,12 +136,17 @@ export function ChatScreen({ navigation, route }) {
     try {
       const response = await getConsultationMessages(consultationId);
       
-      // Store consultation data for header display
-      if (response.consultation) {
-        setConsultationData(response.consultation);
-      } else if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
-        // If data is the consultation object itself
-        setConsultationData(response.data);
+      // Store consultation data for header display; preserve hasPrescription/prescription
+      // so the plus button doesn't flicker when refetching after sending messages
+      const incomingConsultation = response.consultation || (response.data && typeof response.data === 'object' && !Array.isArray(response.data) ? response.data : null);
+      if (incomingConsultation) {
+        setConsultationData((prev: any) => {
+          const next = { ...incomingConsultation };
+          // Never clear prescription once set (stops plus button from reappearing on refetch after sending messages)
+          next.hasPrescription = !!(prev?.hasPrescription || incomingConsultation?.hasPrescription);
+          next.prescription = prev?.prescription ?? incomingConsultation?.prescription;
+          return next;
+        });
       }
       
       // Extract patientID from consultation data if available
@@ -203,21 +208,6 @@ export function ChatScreen({ navigation, route }) {
     }
   }, [messages.length]);
 
-  // Keyboard listeners for Android flex toggle fix
-  useEffect(() => {
-    const keyboardShowListener = Keyboard.addListener("keyboardDidShow", () => {
-      setFlexToggle(false);
-    });
-
-    const keyboardHideListener = Keyboard.addListener("keyboardDidHide", () => {
-      setFlexToggle(true);
-    });
-
-    return () => {
-      keyboardShowListener.remove();
-      keyboardHideListener.remove();
-    };
-  }, []);
 
   // Setup Pusher listeners for real-time messages
   useEffect(() => {
@@ -667,36 +657,29 @@ export function ChatScreen({ navigation, route }) {
     }
   }, [chatType, fromHistory]);
 
+  // Plus button: open prescription sheet only; do not end chat on save
   const handleAddPrescription = useCallback(() => {
-    // Don't allow adding prescription if already added
     if (hasPrescription) {
       Toast.info('Prescription has already been added for this consultation');
       return;
     }
+    prescriptionOpenedFromEndModalRef.current = false;
     setEndConsultationModalVisible(false);
     setModalVisible(false);
     setPrescriptionBottomSheetVisible(true);
   }, [hasPrescription]);
 
-  const handleSavePrescription = useCallback(async (prescriptions: Array<{ name: string; description: string }>) => {
-    if (!consultationId) {
-      throw new Error('Consultation ID not found');
+  // End modal: open prescription sheet; on save we will end the consultation
+  const handleAddPrescriptionFromEndModal = useCallback(() => {
+    if (hasPrescription) {
+      Toast.info('Prescription has already been added for this consultation');
+      return;
     }
-
-    await addPrescription({
-      consultationID: consultationId,
-      prescriptions,
-    });
-
-    // Update consultationData to reflect that prescription has been added
-    setConsultationData((prevData: any) => ({
-      ...prevData,
-      hasPrescription: true,
-      prescription: prescriptions,
-    }));
-
-    Toast.success('Prescription added successfully');
-  }, [consultationId]);
+    prescriptionOpenedFromEndModalRef.current = true;
+    setEndConsultationModalVisible(false);
+    setModalVisible(false);
+    setPrescriptionBottomSheetVisible(true);
+  }, [hasPrescription]);
 
   // Helper function to calculate duration
   const calculateDuration = useCallback(() => {
@@ -749,6 +732,35 @@ export function ChatScreen({ navigation, route }) {
       Toast.error(error?.response?.data?.message || 'Failed to end consultation');
     }
   }, [consultationId, isConsultationActive, doctorID, consultationPatientID, patientID, calculateDuration]);
+
+  const handleSavePrescription = useCallback(async (prescriptions: Array<{ name: string; description: string }>) => {
+    if (!consultationId) {
+      throw new Error('Consultation ID not found');
+    }
+
+    await addPrescription({
+      consultationID: consultationId,
+      prescriptions,
+    });
+
+    // Update consultationData to reflect that prescription has been added
+    setConsultationData((prevData: any) => ({
+      ...prevData,
+      hasPrescription: true,
+      prescription: prescriptions,
+    }));
+
+    Toast.success('Prescription added successfully');
+
+    setPrescriptionBottomSheetVisible(false);
+
+    // Only end the consultation when prescription was opened from the End modal (not from plus button)
+    if (prescriptionOpenedFromEndModalRef.current) {
+      prescriptionOpenedFromEndModalRef.current = false;
+      await endConsultationAndNotify();
+      setEndConsultationModalVisible(true);
+    }
+  }, [consultationId, endConsultationAndNotify]);
 
   const handleEndConsultationConfirm = useCallback(async () => {
     // Call API to notify other side (this sets consultationEndedRef.current = true and consultationWasEnded = true)
@@ -812,26 +824,24 @@ export function ChatScreen({ navigation, route }) {
 
   // ---------- Main Render ----------
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-        style={
-          flexToggle
-            ? [{ flexGrow: 1 }, styles.container]
-            : [{ flex: 1 }, styles.container]
-        }
-        enabled={!flexToggle}
+        style={styles.container}
       >
       <ChatHeader
         chatType={chatType}
         doctorInfo={doctorInfo}
+        doctorDisplayName={profileData?.name || user?.name || doctorInfo.name}
         consultationTime={consultationTime}
         fromHistory={fromHistory}
         handleGoBack={handleGoBack}
         handleEndConsultation={handleEndConsultation}
         isConsultationActive={isConsultationActive}
         consultationData={consultationData}
+        patientInfo={patientInfo}
+        onChatHistoryPress={consultationId ? () => navigation.navigate('PrescriptionScreen', { consultationId }) : undefined}
       />
 
       {/* Messages */}
@@ -883,7 +893,7 @@ export function ChatScreen({ navigation, route }) {
         onGetPrescription={handleGetPrescription}
         isDoctor={true}
         hasPrescription={hasPrescription}
-        onAddPrescription={!hasPrescription ? handleAddPrescription : undefined}
+        onAddPrescription={!hasPrescription ? handleAddPrescriptionFromEndModal : undefined}
       />
       <ConsultationEndedModal
         visible={endConsultationModalVisible}
@@ -897,7 +907,7 @@ export function ChatScreen({ navigation, route }) {
         onGetPrescription={handleGetPrescription}
         isDoctor={true}
         hasPrescription={hasPrescription}
-        onAddPrescription={!hasPrescription ? handleAddPrescription : undefined}
+        onAddPrescription={!hasPrescription ? handleAddPrescriptionFromEndModal : undefined}
         // Only show "End Consultation" button if consultation hasn't been ended yet
         // If consultationWasEnded is true, it means consultation was already ended, so hide the End button
         onEndConsultation={!consultationWasEnded ? handleEndConsultationConfirm : undefined}

@@ -1,25 +1,37 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Header2 } from '@components/common/Header2';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { DoctorInfo } from '../../../types/chat.types';
+import { patient as defaultPatientImage } from '../../../assets/images';
+
+export type PatientInfoHeader = {
+  id?: string | number;
+  name?: string;
+  image?: string | { uri: string };
+  age?: string | number;
+  gender?: string;
+};
 
 interface ChatHeaderProps {
   chatType: 'ai' | 'doctor';
   doctorInfo: DoctorInfo;
+  /** Display name shown in header center (e.g. "Dr. Sultan Khan") */
+  doctorDisplayName?: string;
   consultationTime: string;
   fromHistory: boolean;
   handleGoBack: () => void;
   handleEndConsultation: () => void;
-  isConsultationActive?: boolean; // Add flag to show timer when active
+  isConsultationActive?: boolean;
   consultationData?: {
     patient?: {
       name?: string;
       image?: string;
+      age?: string | number;
+      gender?: string;
     };
     service?: {
       name?: string;
@@ -28,82 +40,110 @@ interface ChatHeaderProps {
     type?: string;
     code?: string;
   } | null;
+  patientInfo?: PatientInfoHeader | null;
+  onChatHistoryPress?: () => void;
+  onZIconPress?: () => void;
+}
+
+function capitalizeFirst(s: string): string {
+  if (!s || !s.length) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+function formatGenderAge(gender?: string, age?: string | number): string {
+  const g = gender ? capitalizeFirst(String(gender).trim()) : '';
+  const a = age != null && age !== '' ? Number(age) : NaN;
+  if (g && !Number.isNaN(a)) return `${g}, ${a} Year${a !== 1 ? 's' : ''} old`;
+  if (g) return g;
+  if (!Number.isNaN(a)) return `${a} Year${a !== 1 ? 's' : ''} old`;
+  return '';
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatType,
   doctorInfo,
+  doctorDisplayName,
   consultationTime,
   fromHistory,
   handleGoBack,
   handleEndConsultation,
   isConsultationActive = false,
   consultationData,
+  patientInfo,
+  onChatHistoryPress,
+  onZIconPress,
 }) => {
   const { t } = useTranslation();
-  // Extract patient and service info from consultation data
-  const patientName = consultationData?.patient?.name || 'Patient';
+  const headerDoctorName = doctorDisplayName || doctorInfo.name;
+
+  const patient = consultationData?.patient;
+  const patientName = patient?.name || patientInfo?.name || 'Patient';
+  const patientImage =
+    (patient?.image && (patient.image.startsWith('http') ? { uri: patient.image } : { uri: `https://telehealth.repla-projects.com/${patient.image}` })) ||
+    (patientInfo?.image && (typeof patientInfo.image === 'string' ? (patientInfo.image.startsWith('http') ? { uri: patientInfo.image } : { uri: `https://telehealth.repla-projects.com/${patientInfo.image}` }) : patientInfo.image)) ||
+    defaultPatientImage;
+  const gender = patient?.gender ?? patientInfo?.gender ?? '';
+  const age = patient?.age ?? patientInfo?.age ?? '';
+  const genderAgeLine = formatGenderAge(gender, age);
+
   const serviceName = consultationData?.service?.name || '';
   const consultationType = consultationData?.type || '';
   const consultationCode = consultationData?.code || '';
   const serviceDuration = consultationData?.service?.duration;
-  
-  // Build subtitle: Show countdown timer when consultation is active, otherwise show service info
+
   const buildSubtitle = () => {
-    // When consultation is active, always show the countdown timer
-    if (isConsultationActive && !fromHistory) {
-      return consultationTime; // This is the formatted countdown timer (MM:SS)
-    }
-    
-    // When viewing history, show service info
-    if (!consultationData) {
-      return consultationTime;
-    }
-    
+    if (isConsultationActive && !fromHistory) return consultationTime;
+    if (!consultationData) return consultationTime;
     const parts: string[] = [];
-    // Add code if available
-    if (consultationCode) {
-      parts.push(consultationCode);
-    }
-    // Add service name if available
-    if (serviceName) {
-      parts.push(serviceName);
-    }
-    // Add type if available
-    if (consultationType) {
-      parts.push(consultationType);
-    }
-    // Add duration if available
-    if (serviceDuration) {
-      parts.push(`${serviceDuration}`);
-    }
-    
+    if (consultationCode) parts.push(consultationCode);
+    if (serviceName) parts.push(serviceName);
+    if (consultationType) parts.push(consultationType);
+    if (serviceDuration) parts.push(`${serviceDuration}`);
     return parts.length > 0 ? parts.join(' | ') : consultationTime;
   };
 
   return chatType === 'ai' ? (
     <Header2 title={t('chat.title')} showCart logo />
   ) : (
-    <View style={styles.doctorHeaderContainer}>
-      <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-        <Ionicons name="chevron-back" size={24} color={colors.text} />
-      </TouchableOpacity>
-
-      <View style={styles.doctorHeaderCenter}>
-        <Text style={styles.doctorName}>{patientName}</Text>
-        <Text style={styles.consultationTime}>
-          {buildSubtitle()}
-        </Text>
+    <View style={styles.headerWrapper}>
+      {/* Top bar: Back | Doctor name + Timer | End */}
+      <View style={styles.doctorHeaderContainer}>
+        <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <View style={styles.doctorHeaderCenter}>
+          <Text style={styles.doctorName} numberOfLines={1}>{headerDoctorName}</Text>
+          <Text style={styles.consultationTime}>{buildSubtitle()}</Text>
+        </View>
+        {!fromHistory ? (
+          <TouchableOpacity style={styles.endButton} onPress={handleEndConsultation}>
+            <Text style={styles.endButtonText}>{t('chat.end')}</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.endButtonSpacer} />
+        )}
       </View>
 
-      {!fromHistory && (
-        <TouchableOpacity
-          style={styles.endButton}
-          onPress={handleEndConsultation}
-        >
-          <Text style={styles.endButtonText}>{t('chat.end')}</Text>
-        </TouchableOpacity>
-      )}
+      {/* Patient info card */}
+      <View style={styles.patientCard}>
+        <View style={styles.patientInfoRow}>
+          <View style={styles.patientAvatarWrapper}>
+            <Image source={patientImage} style={styles.patientAvatar} resizeMode="cover" />
+          </View>
+          <View style={styles.patientTextBlock}>
+            <Text style={styles.patientName} numberOfLines={1}>{patientName}</Text>
+            {genderAgeLine ? (
+              <Text style={styles.patientDemographics} numberOfLines={1}>{genderAgeLine}</Text>
+            ) : null}
+          </View>
+        </View>
+        {onChatHistoryPress != null && (
+          <TouchableOpacity style={styles.chatHistoryButton} onPress={onChatHistoryPress}>
+            <Text style={styles.chatHistoryButtonText}>{t('chat.aiChatHistory', 'AI Chat History')}</Text>
+          </TouchableOpacity>
+        )}
+     
+      </View>
     </View>
   );
 };

@@ -23,7 +23,7 @@ export const getRecentConsultations = async () => {
 export const getAllConsultations = async () => {
     try {
         const response = await apiClient.get(API.DASHBOARD.ALL_CONSULTATIONS);
-        console.log('All Consultations:', response.data);
+        // console.log('All Consultations:', response.data);
         return response.data;
     } catch (error) {
         throw error;

@@ -22,7 +22,7 @@ export const HomeScreen = ({ navigation }) => {
   const { fetchNotifications } = useNotificationStore();
   const { notificationCount } = useNotificationCount();
   const { requests: consultationRequests, removeRequest, clearAll: clearAllRequests } = useConsultationRequestStore();
-
+  
   const [isActive, setIsActive] = useState(false);
   const [hasAudioPermission, setHasAudioPermission] = useState(false);
   const [hasVideoPermission, setHasVideoPermission] = useState(false);

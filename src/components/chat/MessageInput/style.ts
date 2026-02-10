@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 12,
         borderTopWidth: 1,
         borderTopColor: '#f0f0f0',
+        backgroundColor: colors.white,
         gap: 5,
       },
       preButton: {

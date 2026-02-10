@@ -24,7 +24,7 @@ interface ConsultationRequestCardProps {
   onDecline: () => void;
 }
 
-const TIMER_DURATION = 120; // seconds
+const TIMER_DURATION = 122; // seconds
 
 const ConsultationRequestCard = ({
   patientName,
@@ -47,12 +47,12 @@ const ConsultationRequestCard = ({
       useNativeDriver: false,
     }).start();
 
-    // Countdown timer
+    // Countdown timer (defer onDecline to avoid updating parent during setState)
     const interval = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          onDecline();
+          setTimeout(() => onDecline(), 0);
           return 0;
         }
         return prev - 1;
@@ -74,6 +74,9 @@ const ConsultationRequestCard = ({
         return 'chatbubble-ellipses';
     }
   };
+
+  const capitalizeFirst = (s: string) =>
+    s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
 
   const getConsultationLabel = () => {
     switch (consultationType) {
@@ -123,7 +126,7 @@ const ConsultationRequestCard = ({
           <View style={styles.patientDetails}>
             <Text style={styles.patientName}>{patientName}</Text>
             <Text style={styles.patientInfo}>
-              {patientGender}, {patientAge} Year old
+              {capitalizeFirst(String(patientGender))}, {patientAge} Year old
             </Text>
           </View>
           {/* <Text style={styles.timerText}>{timeLeft}s</Text> */}

@@ -124,7 +124,7 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
                     sevviceName: item.service?.name || 'Unknown Service',
                     date: consultationDate,
                     time: consultationTime,
-                    duration: item.service?.duration ? `${item.service.duration} min` : '0 min',
+                    duration: item.duration ? `${item.duration}` : '0 min',
                     type: (item.type?.toLowerCase() || 'chat') as 'chat' | 'video' | 'audio',
                     amount: item.price ? `SAR ${item.price}` : 'SAR 0.00',
                     gender: capitalizeFirstLetter(item.patient?.gender || ''),

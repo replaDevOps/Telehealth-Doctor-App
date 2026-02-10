@@ -129,7 +129,10 @@ export const usePusherNotifications = () => {
       const patientAge = existingConsultation?.age ?
         parseInt(existingConsultation.age.replace(/\D/g, '')) || 25 : 25;
 
-      const patientGender = (existingConsultation?.gender || consultation.patient?.gender || 'Male') as 'Male' | 'Female';
+      const rawGender = existingConsultation?.gender || consultation.patient?.gender || 'Male';
+      const patientGender = (typeof rawGender === 'string'
+        ? rawGender.charAt(0).toUpperCase() + rawGender.slice(1).toLowerCase()
+        : 'Male') as 'Male' | 'Female';
 
       const treatmentType = existingConsultation?.sevviceName ||
         (consultation.service?.name) ||

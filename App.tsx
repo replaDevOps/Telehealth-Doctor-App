@@ -31,20 +31,18 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <SafeAreaProvider>
-      <StatusBar
-        backgroundColor="transparent"
-        translucent={false}
-        barStyle="dark-content"
-      />
-      {/* <SafeAreaView style={styles.safeArea}> */}
-      <LanguageProvider>
+    <LanguageProvider>
+      <SafeAreaProvider>
+        <StatusBar
+          backgroundColor="transparent"
+          translucent={false}
+          barStyle="dark-content"
+        />
         <NotificationCountProvider>
           <AppContent />
         </NotificationCountProvider>
-      </LanguageProvider>
-      {/* </SafeAreaView> */}
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </LanguageProvider>
   );
 };
 

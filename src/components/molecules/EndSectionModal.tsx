@@ -85,7 +85,7 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
           <Text style={styles.description}>{descriptionText}</Text>
 
           {/* Buttons */}
-          {shouldPromptForPrescription ? (
+          {shouldPromptForPrescription && !hasPrescription ? (
             <View style={styles.primaryActionRow}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.secondaryActionButton]}
@@ -95,13 +95,15 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                   End Consultation
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.primaryActionButton]}
-                onPress={onAddPrescription || onClose}
-                disabled={!onAddPrescription}
-              >
-                <Text style={styles.primaryActionText}>Write Prescription</Text>
-              </TouchableOpacity>
+              {!hasPrescription && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.primaryActionButton]}
+                  onPress={onAddPrescription || onClose}
+                  disabled={!onAddPrescription}
+                >
+                  <Text style={styles.primaryActionText}>Write Prescription</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : onEndConsultation ? (
             <View style={styles.buttonRow}>

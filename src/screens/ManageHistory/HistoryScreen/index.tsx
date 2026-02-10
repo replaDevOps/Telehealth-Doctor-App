@@ -37,7 +37,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
     (item.patientName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
     (item.sevviceName?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   );
-
+  console.log('filteredConsultations', filteredConsultations);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />

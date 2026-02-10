@@ -20,7 +20,6 @@ import PhoneNumberInput from '../../../components/common/PhoneTextInput';
 import { styles } from './style';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import parsePhoneNumberFromString from 'libphonenumber-js';
 import { login } from '../../../services/api/authService';
 import { useAuthStore, User, useProfileStore } from '../../../store';
 import { Toast } from 'toastify-react-native';
@@ -32,16 +31,11 @@ export function SignInScreen({ navigation }) {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [phoneError, setPhoneError] = useState('');
-  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [countryCode, setCountryCode] = useState('SA');
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [remember, setRemember] = useState(false);
-
-  const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
-  const formattedPhone = phoneNumber
-    ? `+${phoneNumber.countryCallingCode}${phoneNumber.nationalNumber}`
-    : `+${phone}`;
 
   const handleSignIn = async () => {
     // Clear previous validation errors (user errors only)
@@ -50,13 +44,17 @@ export function SignInScreen({ navigation }) {
     
     let valid = true;
 
-    // Phone validation (user error - show under input)
+    // Phone validation: only require non-empty for API call (format validation commented out)
     if (!phone.trim()) {
       setPhoneError(t('auth.phoneRequired'));
       valid = false;
     } else {
       setPhoneError('');
     }
+    // else if (!isPhoneValid) {
+    //   setPhoneError(t('auth.invalidPhone'));
+    //   valid = false;
+    // }
 
     // Password validation (user error - show under input)
     if (!password.trim()) {
@@ -232,9 +230,15 @@ export function SignInScreen({ navigation }) {
             <Text style={styles.label}>{t('auth.phoneNumber')}</Text>
             <PhoneNumberInput
               phone={phone}
-              setPhone={setPhone}
+              setPhone={(v) => {
+                setPhone(v);
+                if (phoneError) setPhoneError('');
+              }}
               countryCode={countryCode}
-              setCountryCode={setCountryCode}
+              setCountryCode={(code) => {
+                setCountryCode(code);
+                if (phoneError) setPhoneError('');
+              }}
               phoneError={phoneError}
               onValidationChange={setIsPhoneValid}
               CustomStyle={{ backgroundColor: colors.white }}

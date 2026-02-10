@@ -35,6 +35,7 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password?",
     "phoneRequired": "Phone number is required",
+    "invalidPhone": "Please enter a valid phone number",
     "passwordRequired": "Password is required",
     "loginSuccess": "Login successful",
     "loginFailed": "Login failed. Please check your credentials and try again.",
@@ -113,7 +114,8 @@
   },
   "chat": {
     "title": "Chat",
-    "end": "End"
+    "end": "End",
+    "aiChatHistory": "AI Chat History"
   },
   "history": {
     "title": "History",

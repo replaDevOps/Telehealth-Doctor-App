@@ -1,10 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 import { mvs } from '../../config/metrices';
 import { colors } from '../../styles/colors';
+
+// Saudi Arabia: 9 digits only, must start with 5
+const SAUDI_NATIONAL_LENGTH = 10;
+
+const getMaxLengthForCountry = (countryCode: string): number => {
+  if (countryCode === 'SA') return SAUDI_NATIONAL_LENGTH;
+  return 10;
+};
 
 // ✅ Props Interface
 interface PhoneNumberInputProps {
@@ -41,7 +49,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   const [value, setValue] = useState<string>(initialValue || '');
   const [isValid, setIsValid] = useState<boolean>(false);
   const [hasBeenTouched, setHasBeenTouched] = useState<boolean>(false);
-  const [selectedCountryCode, setSelectedCountryCode] = useState<string>('PK');
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>(countryCode || 'SA');
   const [componentKey, setComponentKey] = useState<number>(0);
 
   const phoneInput = useRef<PhoneInput | null>(null);
@@ -65,73 +73,89 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   }, [phone, countryCode]);
 
   useEffect(() => {
-    // Commented out number validation for now
-    // if (value && phoneInput.current) {
-    //   const valid = phoneInput.current.isValidNumber(value);
-    //   setIsValid(valid === true);
-    //   onValidationChange?.(valid && value.trim() !== '');
-    // }
-    // Always set as valid when there's a value
-    if (value) {
-      setIsValid(true);
-      onValidationChange?.(value.trim() !== '');
+    if (!value) {
+      setIsValid(false);
+      onValidationChange?.(false);
+      return;
     }
+    const isSaudi = selectedCountryCode === 'SA';
+    const validByLength = isSaudi
+      ? value.length === SAUDI_NATIONAL_LENGTH
+      : value.length >= 8 && value.length <= getMaxLengthForCountry(selectedCountryCode);
+    const validStartsWith5 = !isSaudi || value[0] === '5';
+    const valid = validByLength && validStartsWith5;
+    setIsValid(valid);
+    onValidationChange?.(valid);
   }, [value, selectedCountryCode]);
 
   const handleTextChange = (text: string) => {
-    setValue(text);
+    const digitsOnly = text.replace(/\D/g, '');
+    const maxLen = getMaxLengthForCountry(selectedCountryCode);
+    const limited = digitsOnly.slice(0, maxLen);
+    setValue(limited);
     setHasBeenTouched(true);
     hasUserTypedRef.current = true;
-
-    // Commented out number validation for now
-    // if (phoneInput.current) {
-    //   const valid = phoneInput.current.isValidNumber(text);
-    //   setIsValid(valid === true);
-    // }
-    // Always set as valid when there's text
-    setIsValid(text.trim() !== '');
+    safeSetPhone(limited);
+    const isSaudi = selectedCountryCode === 'SA';
+    const validByLength = isSaudi
+      ? limited.length === SAUDI_NATIONAL_LENGTH
+      : limited.length >= 8 && limited.length <= maxLen;
+    const validStartsWith5 = !isSaudi || limited[0] === '5';
+    const valid = validByLength && validStartsWith5;
+    setIsValid(valid);
+    onValidationChange?.(true);
   };
 
   const handleFormattedTextChange = (formattedText: string) => {
     if (!hasUserTypedRef.current) return;
 
     const parsed = parsePhoneNumberFromString(formattedText);
-    const digitsOnly = parsed
+    let digitsOnly = parsed
       ? parsed.nationalNumber
       : formattedText.replace(/\D/g, '');
 
-    safeSetPhone(digitsOnly);
+    const maxLen = getMaxLengthForCountry(selectedCountryCode);
+    digitsOnly = digitsOnly.slice(0, maxLen);
 
-    // Commented out number validation for now
-    // if (formattedText && phoneInput.current) {
-    //   const valid = phoneInput.current.isValidNumber(formattedText);
-    //   setIsValid(valid === true);
-    // }
-    // Always set as valid when there's formatted text
-    if (formattedText) {
-      setIsValid(true);
-    }
+    safeSetPhone(digitsOnly);
+    setValue(digitsOnly);
+    const isSaudi = selectedCountryCode === 'SA';
+    const validByLength = isSaudi
+      ? digitsOnly.length === SAUDI_NATIONAL_LENGTH
+      : digitsOnly.length >= 8 && digitsOnly.length <= maxLen;
+    const validStartsWith5 = !isSaudi || digitsOnly[0] === '5';
+    const valid = validByLength && validStartsWith5;
+    setIsValid(valid);
+    onValidationChange?.(true);
   };
 
   const handleCountryChange = (country: any) => {
-    setSelectedCountryCode(country.cca2);
-    safeSetCountryCode(country.cca2);
+    const newCountry = country.cca2;
+    setSelectedCountryCode(newCountry);
+    safeSetCountryCode(newCountry);
     setHasBeenTouched(true);
 
-    // Commented out number validation for now
-    // if (value.trim() && phoneInput.current) {
-    //   const valid = phoneInput.current.isValidNumber(value);
-    //   setIsValid(valid === true);
-    // }
-    // Always set as valid when there's a value
-    if (value.trim()) {
-      setIsValid(true);
+    const maxLen = getMaxLengthForCountry(newCountry);
+    const digitsOnly = value.replace(/\D/g, '').slice(0, maxLen);
+    if (digitsOnly !== value) {
+      setValue(digitsOnly);
+      safeSetPhone(digitsOnly);
     }
+    const current = digitsOnly || value;
+    const isSaudi = newCountry === 'SA';
+    const validByLength = isSaudi
+      ? current.length === SAUDI_NATIONAL_LENGTH
+      : current.length >= 8 && current.length <= maxLen;
+    const validStartsWith5 = !isSaudi || current[0] === '5';
+    const valid = validByLength && validStartsWith5;
+    setIsValid(valid);
+    onValidationChange?.(valid);
   };
 
-  // Show error only when the field has been touched and the input is still empty
-  const hasError = (phoneError || errorMessage) && hasBeenTouched && !(value && value.trim());
-  // Removed: (!isValid && hasBeenTouched && value)
+  // Red input when: parent set error, OR (touched and has value but invalid: not 9 digits or doesn't start with 5 for SA)
+  const hasError =
+    !!(phoneError || errorMessage) ||
+    (hasBeenTouched && value.length > 0 && !isValid);
 
   return (
     <View>
@@ -157,6 +181,8 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
           textInputProps={{
             placeholderTextColor: colors.gray,
             editable: editable,
+            maxLength: maxLength ?? getMaxLengthForCountry(selectedCountryCode),
+            keyboardType: 'phone-pad',
           }}
           onChangeText={handleTextChange}
           onChangeCountry={handleCountryChange}
@@ -169,8 +195,8 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
         />
       </View>
 
-      {hasError && phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
-      {hasError && errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+      {phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
+      {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
     </View>
   );
 };
