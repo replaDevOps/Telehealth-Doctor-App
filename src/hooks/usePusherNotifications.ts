@@ -73,12 +73,6 @@ export const usePusherNotifications = () => {
       } else if (data && typeof data === 'object') {
         // Extract string from various possible fields
         notificationMessage =
-          data?.description ||
-          data?.message ||
-          data?.title ||
-          data?.body ||
-          data?.type ||
-          (data?.notification ? (typeof data.notification === 'string' ? data.notification : data.notification?.description || data.notification?.message || data.notification?.title) : null) ||
           'New notification received';
       }
       console.log('Notification message to display:', notificationMessage);
@@ -133,11 +127,13 @@ export const usePusherNotifications = () => {
       const patientGender = (typeof rawGender === 'string'
         ? rawGender.charAt(0).toUpperCase() + rawGender.slice(1).toLowerCase()
         : 'Male') as 'Male' | 'Female';
-
-      const treatmentType = existingConsultation?.sevviceName ||
-        (consultation.service?.name) ||
+        console.log('consultation', consultation);
+      const rawTreatment =
+        consultation.service?.name ||
         `Service ${consultation.serviceID}` ||
         'Consultation';
+      const treatmentType =
+        rawTreatment.charAt(0).toUpperCase() + rawTreatment.slice(1).toLowerCase();
 
       const patientImage = existingConsultation?.patientImage ||
         (consultation.patient?.image ? { uri: consultation.patient.image } : undefined);
