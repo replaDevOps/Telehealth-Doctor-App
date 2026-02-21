@@ -35,10 +35,10 @@ export const HomeScreen = ({ navigation }) => {
     requestPermissions(); // Request media permissions
   }, [fetchDashboardData, fetchNotifications]);
 
-  // Initialize isActive state based on profile status
+  // Initialize isActive state based on profile online_status
   useEffect(() => {
-    if (profileData?.status) {
-      setIsActive(profileData.status === 'Active');
+    if (profileData) {
+      setIsActive(!!profileData.online_status);
     }
   }, [profileData]);
 
@@ -257,8 +257,8 @@ export const HomeScreen = ({ navigation }) => {
 
     const parts: string[] = [];
     if (businessSetting.address) parts.push(businessSetting.address);
-    if (businessSetting.city) parts.push(businessSetting.city);
-    if (businessSetting.district) parts.push(businessSetting.district);
+    // if (businessSetting.city) parts.push(businessSetting.city);
+    // if (businessSetting.district) parts.push(businessSetting.district);
     return parts.length > 0 ? parts.join(', ') : 'Location';
   };
 
@@ -281,6 +281,7 @@ export const HomeScreen = ({ navigation }) => {
 
       <ScrollView
         style={styles.content}
+        contentContainerStyle={isLoading && !refreshing ? styles.loadingContentContainer : undefined}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -301,6 +302,7 @@ export const HomeScreen = ({ navigation }) => {
         <RecentConsultations
           consultations={recentConsultations}
           isLoading={isLoading}
+          hideLoader={refreshing}
           onViewAll={() => navigation.navigate('History')}
           onViewPrescription={id => {
             console.log('View prescription:', id);
@@ -358,6 +360,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: mvs(20),
     paddingHorizontal: mvs(15),
+  },
+  loadingContentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   connectingModal: {
     flex: 1,

@@ -11,6 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import { mvs } from '@config/metrices';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface HomeHeaderProps {
   centerName?: string;
@@ -37,6 +38,7 @@ const HomeHeader = ({
   onLocationPress,
   notificationCount = 0,
 }: HomeHeaderProps) => {
+  const inset = useSafeAreaInsets()
   return (
     <LinearGradient
       colors={['#7625D7', '#591CA2', '#3E1371']}
@@ -44,7 +46,7 @@ const HomeHeader = ({
       end={{ x: 0.5, y: 1 }}
       style={styles.linearGradientContainer}
     >
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer, { paddingTop: inset.top }]}>
         {/* Top Section - Medical Center Name & Notification */}
         <View style={styles.topRow}>
           <View style={styles.centerInfoContainer}>
@@ -139,7 +141,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
   },
   headerContainer: {
-    paddingTop: 70,
     paddingBottom: 10,
     paddingHorizontal: 20,
   },

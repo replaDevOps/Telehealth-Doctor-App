@@ -22,6 +22,7 @@ import {
   CONSULTATION_DURATION,
   getCurrentTimestamp,
   formatTime,
+  formatTimestampToLocal,
 } from '../../../constants/appData';
 import { Message, Service } from '../../../types/chat.types';
 import { getConsultationMessages, sendMessage as sendMessageAPI, ChatMessage, addPrescription } from '../../../services/api/chatConsultationService';
@@ -834,6 +835,7 @@ export function ChatScreen({ navigation, route }) {
         chatType={chatType}
         doctorInfo={doctorInfo}
         doctorDisplayName={profileData?.name || user?.name || doctorInfo.name}
+        consultationId={consultationId}
         consultationTime={consultationTime}
         fromHistory={fromHistory}
         handleGoBack={handleGoBack}

@@ -21,6 +21,7 @@ interface ChatHeaderProps {
   doctorInfo: DoctorInfo;
   /** Display name shown in header center (e.g. "Dr. Sultan Khan") */
   doctorDisplayName?: string;
+  consultationId?: string | number;
   consultationTime: string;
   fromHistory: boolean;
   handleGoBack: () => void;
@@ -63,6 +64,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatType,
   doctorInfo,
   doctorDisplayName,
+  consultationId,
   consultationTime,
   fromHistory,
   handleGoBack,
@@ -74,7 +76,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onZIconPress,
 }) => {
   const { t } = useTranslation();
-  const headerDoctorName = doctorDisplayName || doctorInfo.name;
+  const headerDisplayText = consultationId ? `#${consultationId}` : (doctorDisplayName || doctorInfo.name);
 
   const patient = consultationData?.patient;
   const patientName = patient?.name || patientInfo?.name || 'Patient';
@@ -89,8 +91,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const serviceName = consultationData?.service?.name || '';
   const consultationType = consultationData?.type || '';
   const consultationCode = consultationData?.code || '';
-  const serviceDuration = consultationData?.service?.duration;
-
+  const serviceDuration = consultationData?.duration;
   const buildSubtitle = () => {
     if (isConsultationActive && !fromHistory) return consultationTime;
     if (!consultationData) return consultationTime;
@@ -99,6 +100,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     if (serviceName) parts.push(serviceName);
     if (consultationType) parts.push(consultationType);
     if (serviceDuration) parts.push(`${serviceDuration}`);
+    // if()
     return parts.length > 0 ? parts.join(' | ') : consultationTime;
   };
 
@@ -112,7 +114,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.doctorHeaderCenter}>
-          <Text style={styles.doctorName} numberOfLines={1}>{headerDoctorName}</Text>
+          <Text style={styles.doctorName} numberOfLines={1}>{headerDisplayText}</Text>
           <Text style={styles.consultationTime}>{buildSubtitle()}</Text>
         </View>
         {!fromHistory ? (

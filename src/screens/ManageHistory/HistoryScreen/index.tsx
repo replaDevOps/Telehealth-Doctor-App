@@ -59,6 +59,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
       {/* Content */}
       <ScrollView
         style={styles.content}
+        contentContainerStyle={isLoading && !refreshing ? styles.loadingContentContainer : undefined}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -73,6 +74,7 @@ export function HistoryScreen({ navigation }: { navigation: any }) {
         <RecentConsultations
           consultations={filteredConsultations}
           isLoading={isLoading}
+          hideLoader={refreshing}
           emptyMessage={t('recent.noRecentConsultations')}
           onViewPrescription={id => {
             console.log('View prescription:', id);

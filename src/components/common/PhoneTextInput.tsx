@@ -7,11 +7,11 @@ import { mvs } from '../../config/metrices';
 import { colors } from '../../styles/colors';
 
 // Saudi Arabia: 9 digits only, must start with 5
-const SAUDI_NATIONAL_LENGTH = 10;
+const SAUDI_NATIONAL_LENGTH = 9;
 
 const getMaxLengthForCountry = (countryCode: string): number => {
   if (countryCode === 'SA') return SAUDI_NATIONAL_LENGTH;
-  return 10;
+  return 9;
 };
 
 // ✅ Props Interface

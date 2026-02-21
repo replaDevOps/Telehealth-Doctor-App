@@ -40,9 +40,9 @@ export function PrescriptionScreen({ navigation }) {
         />
       </ScrollView>
 
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <CustomButton title="Download Prescription" onPress={handleDownload} />
-      </View>
+      </View> */}
 
       {/* Loading Modal */}
       <Modal

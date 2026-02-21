@@ -4,6 +4,7 @@ import FastImage from '@d11/react-native-fast-image';
 import { Suggestion } from '../Suggestion';
 import { Message as MessageType, Service } from '../../../types/chat.types';
 import { styles } from './style';
+import { formatTimestampToLocal } from '../../../constants/appData';
 
 interface MessageProps {
   msg: MessageType;
@@ -21,6 +22,7 @@ export const Message: React.FC<MessageProps> = ({
   const isUser = msg.type === 'user';
   const hasText = msg.text && msg.text.trim().length > 0;
   const hasImages = msg.images && msg.images.length > 0;
+  const formattedTime = formatTimestampToLocal(msg.timestamp);
   return (
     <View style={styles.messageContainer}>
       {/* Bot Message */}
@@ -31,7 +33,10 @@ export const Message: React.FC<MessageProps> = ({
           )}
           <View style={styles.botMessageContent}>
             {showAvatar && msg.user && (
-              <Text style={styles.senderName}>{msg.user.name}</Text>
+              <View style={styles.messageHeader}>
+                <Text style={styles.senderName}>{msg.user.name}</Text>
+                <Text style={styles.timestamp}>{formattedTime}</Text>
+              </View>
             )}
             {(hasText || hasImages) && (
               <View style={styles.botMessage}>
@@ -99,7 +104,7 @@ export const Message: React.FC<MessageProps> = ({
         <View style={styles.userMessageWrapper}>
           {showAvatar && msg.user && (
             <View style={styles.userMessageHeader}>
-              <Text style={styles.timestamp}>{msg.timestamp}</Text>
+              <Text style={styles.timestamp}>{formattedTime}</Text>
               <Text style={styles.senderName}>{msg.user.name}</Text>
               <Image source={msg.user.avatar} style={styles.avatar} />
             </View>

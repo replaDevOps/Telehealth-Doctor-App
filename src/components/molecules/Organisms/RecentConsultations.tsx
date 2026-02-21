@@ -26,6 +26,7 @@ interface RecentConsultationsProps {
   onViewPrescription?: (id: string) => void;
   onViewChat?: (id: string) => void;
   emptyMessage?: string;
+  hideLoader?: boolean;
 }
 
 const RecentConsultations = ({
@@ -35,6 +36,7 @@ const RecentConsultations = ({
   onViewPrescription,
   onViewChat,
   emptyMessage = 'No recent consultations found.',
+  hideLoader = false,
 }: RecentConsultationsProps) => {
   const { t } = useTranslation();
   // Only show View All button when there are consultations
@@ -48,7 +50,7 @@ const RecentConsultations = ({
           onActionPress={hasConsultations ? onViewAll : undefined}
         />
       )}
-      {isLoading ? (
+      {isLoading && !hideLoader ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>{t('recent.loadingConsultations')}</Text>
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   loadingContainer: {
-    padding: mvs(40),
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

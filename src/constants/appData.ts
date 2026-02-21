@@ -491,6 +491,36 @@ export function formatTime(seconds: number): string {
   return `${minutes}:${secs}`;
 }
 
+// Format timestamp (UTC or ISO string) to local time in 12-hour format
+export function formatTimestampToLocal(timestamp: string): string {
+  try {
+    // If timestamp is already in HH:MM format (from getCurrentTimestamp), return as is
+    if (/^\d{1,2}:\d{2}\s?(AM|PM)?$/i.test(timestamp)) {
+      return timestamp;
+    }
+    
+    // Parse the timestamp as a Date object
+    const date = new Date(timestamp);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return timestamp; // Return original if invalid
+    }
+    
+    // Convert to local time in 12-hour format
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const hoursStr = hours.toString();
+    return `${hoursStr}:${minutes} ${ampm}`;
+  } catch (error) {
+    console.error('Error formatting timestamp:', error);
+    return timestamp; // Return original on error
+  }
+}
+
 export function getInitialMessages(
   chatType: 'ai' | 'doctor',
   doctorInfo: DoctorInfo,

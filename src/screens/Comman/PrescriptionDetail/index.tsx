@@ -454,11 +454,11 @@ export function PrescriptionDetail({ route, navigation }: Props) {
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <View style={styles.buttonWrapper}>
           <CustomButton title="Download" onPress={handleDownload} />
         </View>
-      </View>
+      </View> */}
 
       <Modal
         visible={isDownloading}

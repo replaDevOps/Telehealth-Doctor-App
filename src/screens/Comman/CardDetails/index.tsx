@@ -225,7 +225,7 @@ export function CardDetails({ navigation }: { navigation: any }) {
         </View>
       </ScrollView>
 
-      {!reason && (
+      {/* {!reason && (
         <View style={styles.bottomButtonContainer}>
           {isAppointment ? (
             <CustomButton title="Request for Refund" onPress={handleRefund} />
@@ -236,7 +236,7 @@ export function CardDetails({ navigation }: { navigation: any }) {
             />
           )}
         </View>
-      )}
+      )} */}
 
       <RatingBottomSheet
         visible={showRating}
