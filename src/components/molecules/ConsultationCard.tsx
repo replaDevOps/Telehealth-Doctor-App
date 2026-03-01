@@ -134,13 +134,13 @@ const ConsultationCard = ({
               <Text style={styles.chatButtonText}>View Chat</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.prescriptionButton, type === 'chat' && onViewChat ? {} : styles.prescriptionButtonFullWidth]}
             onPress={onViewPrescription}
             activeOpacity={0.7}
           >
             <Text style={styles.prescriptionButtonText}>View Prescription</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>

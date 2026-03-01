@@ -29,7 +29,7 @@ interface HomeHeaderProps {
 const HomeHeader = ({
   centerName = 'Eden Medical Center',
   location = 'Makkah',
-  doctorName = 'Dr. Sultan Khan',
+  doctorName = 'Sultan Khan',
   doctorSpecialty = 'Dermatologist',
   doctorImage,
   isActive = true,

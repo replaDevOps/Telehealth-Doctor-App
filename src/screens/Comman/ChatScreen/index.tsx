@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from 'react';
 import { View, Text, ActivityIndicator, ScrollView, BackHandler, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ServiceDetailBottomSheet, PrescriptionBottomSheet } from '@components/molecules';
 import { styles } from './style';
 import { patient } from '@assets/images';
@@ -63,6 +63,7 @@ export function ChatScreen({ navigation, route }) {
   const consultationEndedRef = useRef(false); // Prevent duplicate API calls
   const handleEndConsultationConfirmRef = useRef<(() => void) | undefined>(undefined); // Ref for background timer callback
   const prescriptionOpenedFromEndModalRef = useRef(false); // true only when opened from End modal; don't end chat when opened from plus button
+  const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const { profileData } = useProfileStore();
   const doctorID = user?.id;
@@ -91,12 +92,9 @@ export function ChatScreen({ navigation, route }) {
     if (!Array.isArray(apiMessages)) return [];
 
     return apiMessages.map((apiMsg: ChatMessage) => {
-      // Determine if message is from doctor using sender.type or senderID
-      // API response has sender.type: 'doctor' or 'patient'
-      const isDoctorMessage = apiMsg.sender?.type === 'doctor' || 
-                             apiMsg.senderID === user?.id || 
-                             apiMsg.senderID === user?.doctorID ||
-                             apiMsg.senderID === doctorID;
+      // Determine if message is from doctor by comparing senderID (use String to avoid number/string mismatch)
+      const isDoctorMessage = String(apiMsg.senderID) === String(user?.id) ||
+                             String(apiMsg.senderID) === String(doctorID);
       
       // Use sender/recipient info from API response if available
       const senderInfo = apiMsg.sender;
@@ -658,18 +656,6 @@ export function ChatScreen({ navigation, route }) {
     }
   }, [chatType, fromHistory]);
 
-  // Plus button: open prescription sheet only; do not end chat on save
-  const handleAddPrescription = useCallback(() => {
-    if (hasPrescription) {
-      Toast.info('Prescription has already been added for this consultation');
-      return;
-    }
-    prescriptionOpenedFromEndModalRef.current = false;
-    setEndConsultationModalVisible(false);
-    setModalVisible(false);
-    setPrescriptionBottomSheetVisible(true);
-  }, [hasPrescription]);
-
   // End modal: open prescription sheet; on save we will end the consultation
   const handleAddPrescriptionFromEndModal = useCallback(() => {
     if (hasPrescription) {
@@ -828,7 +814,7 @@ export function ChatScreen({ navigation, route }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
         style={styles.container}
       >
       <ChatHeader
@@ -876,9 +862,7 @@ export function ChatScreen({ navigation, route }) {
         message={message}
         setMessage={setMessage}
         handleSend={handleSend}
-        handleImagePick={handleAddPrescription}
         canSendMessages={canSendMessages}
-        showAddButton={!hasPrescription}
       />
 
       {/* Modals */}

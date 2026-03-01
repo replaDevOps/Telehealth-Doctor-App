@@ -463,7 +463,7 @@ export const SERVICES = [
 // ---------- Chat Constants and Helper Functions ----------
 export const DEFAULT_DOCTOR_INFO: DoctorInfo = {
   id: 'doctor_1',
-  name: 'Dr. Sultan Khan',
+  name: 'Sultan Khan',
   avatar: doctor,
   serviceName: '',
 };
@@ -499,8 +499,26 @@ export function formatTimestampToLocal(timestamp: string): string {
       return timestamp;
     }
     
-    // Parse the timestamp as a Date object
-    const date = new Date(timestamp);
+    // Accept numeric timestamps as well
+    let date: Date;
+    if (typeof timestamp === 'number') {
+      date = new Date(timestamp);
+    } else if (typeof timestamp === 'string') {
+      // Clean microsecond fractions like .000000Z which some JS engines may not parse
+      let ts = timestamp.trim();
+      // "YYYY-MM-DD HH:MM:SS" has no timezone → treat as UTC by converting to ISO format
+      if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(ts)) {
+        ts = ts.replace(' ', 'T') + 'Z';
+      }
+      // Replace fractional seconds with up-to-3-digit milliseconds, e.g. .123456Z -> .123Z
+      ts = ts.replace(/\.(\d{3})\d*(Z?)$/, '.$1$2');
+      // If still has longer fractional (or unexpected format), remove fractional part entirely
+      ts = ts.replace(/\.(\d+)(Z?)$/, '$2');
+      date = new Date(ts);
+    } else {
+      // Unknown type, fallback
+      date = new Date(String(timestamp));
+    }
     
     // Check if date is valid
     if (isNaN(date.getTime())) {

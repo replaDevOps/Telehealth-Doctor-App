@@ -490,7 +490,7 @@ export function VideoConsultation({ navigation, route }) {
                   />
                 </View>
               </TouchableOpacity>
-              {!hasPrescription ? (
+              {/* {!hasPrescription ? (
                 <TouchableOpacity
                   style={styles.actionRow}
                   onPress={handleAddPrescription}
@@ -524,7 +524,7 @@ export function VideoConsultation({ navigation, route }) {
                     />
                   </View>
                 </View>
-              )}
+              )} */}
             </View>
           )}
 

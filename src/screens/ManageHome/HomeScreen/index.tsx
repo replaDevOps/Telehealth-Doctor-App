@@ -29,6 +29,10 @@ export const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
+
+useEffect(() => {
+console.log('HomeScreen render', consultationRequests)
+})
   useEffect(() => {
     fetchDashboardData();
     fetchNotifications(); // Fetch notifications on mount
@@ -269,7 +273,7 @@ export const HomeScreen = ({ navigation }) => {
       <HomeHeader
         centerName={clinicName}
         location={location}
-        doctorName={profileData?.name || 'Dr. '}
+        doctorName={profileData?.name || ''}
         doctorSpecialty={profileData?.specialization || 'Dermatologist'}
         doctorImage={profileData?.image ? { uri: profileData.image } : doctor}
         isActive={isActive}

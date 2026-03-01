@@ -95,7 +95,7 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                   End Consultation
                 </Text>
               </TouchableOpacity>
-              {!hasPrescription && (
+              {/* {!hasPrescription && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.primaryActionButton]}
                   onPress={onAddPrescription || onClose}
@@ -103,7 +103,7 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                 >
                   <Text style={styles.primaryActionText}>Write Prescription</Text>
                 </TouchableOpacity>
-              )}
+              )} */}
             </View>
           ) : onEndConsultation ? (
             <View style={styles.buttonRow}>
@@ -122,12 +122,12 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              {/* <TouchableOpacity 
                 style={[styles.closeButton, styles.endConsultationButton]} 
                 onPress={onAddPrescription}
               >
                 <Text style={styles.endConsultationButtonText}>Add Prescription</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           ) : (
             <View style={styles.buttonRow}>
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
-    width: "50%",
+    width: "100%",
   },
   closeButtonText: {
     color: colors.text,

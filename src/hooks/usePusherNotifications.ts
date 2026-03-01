@@ -119,11 +119,10 @@ export const usePusherNotifications = () => {
         (consultation.patient?.name) ||
         `Patient ${consultation.patientID}` ||
         'Patient';
+      
+        const patientAge = consultation.patient?.age ;
 
-      const patientAge = existingConsultation?.age ?
-        parseInt(existingConsultation.age.replace(/\D/g, '')) || 25 : 25;
-
-      const rawGender = existingConsultation?.gender || consultation.patient?.gender || 'Male';
+      const rawGender = existingConsultation?.gender || consultation.patient?.gender ;
       const patientGender = (typeof rawGender === 'string'
         ? rawGender.charAt(0).toUpperCase() + rawGender.slice(1).toLowerCase()
         : 'Male') as 'Male' | 'Female';

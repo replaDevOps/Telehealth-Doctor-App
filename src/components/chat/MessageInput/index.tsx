@@ -12,18 +12,14 @@ interface MessageInputProps {
   message: string;
   setMessage: (message: string) => void;
   handleSend: () => void;
-  handleImagePick: () => void; // For doctor: opens prescription modal
   canSendMessages: boolean;
-  showAddButton?: boolean; // Show/hide the plus button
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
   message,
   setMessage,
   handleSend,
-  handleImagePick,
   canSendMessages,
-  showAddButton = true,
 }) => {
   if (!canSendMessages) {
     return null;
@@ -31,11 +27,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   return (
     <View style={styles.inputContainer}>
-      {showAddButton && (
-        <TouchableOpacity style={styles.preButton} onPress={handleImagePick}>
-          <Ionicons name="add-sharp" size={24} color={colors.white} />
-        </TouchableOpacity>
-      )}
       <TextInput
         style={styles.input}
         placeholder="Message"

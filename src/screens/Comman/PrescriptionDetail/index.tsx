@@ -277,7 +277,7 @@ export function PrescriptionDetail({ route, navigation }: Props) {
     return {
       id: `#${consultationData.code || consultationId || 'N/A'}`,
       doctor: {
-        name: doctorData.name || 'Dr. Unknown',
+        name: doctorData.name || 'Unknown',
         credentials: credentials,
         signatureImage: signatureImage,
         image: doctorImage,

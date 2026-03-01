@@ -468,7 +468,7 @@ export function AudioConsultation({ navigation, route }) {
                 />
               </View>
             </TouchableOpacity>
-            {!hasPrescription ? (
+            {/* {!hasPrescription ? (
               <TouchableOpacity
                 style={styles.actionRow}
                 onPress={handleAddPrescription}
@@ -502,7 +502,7 @@ export function AudioConsultation({ navigation, route }) {
                   />
                 </View>
               </View>
-            )}
+            )} */}
           </View>
         )}
 
