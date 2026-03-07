@@ -34,18 +34,7 @@ export const ProfileSetting = ({ navigation }: { navigation: any }) => {
           <AntDesign name="right" size={20} color="#9CA3AF" />
         </TouchableOpacity>
 
-        {/* Password Manager */}
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('ChangePassword')}
-          activeOpacity={0.7}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="key-outline" size={22} color={colors.black} />
-            <Text style={[styles.menuItemText, { marginLeft: 15 }]}>{t('settings.passwordManager')}</Text>
-          </View>
-          <AntDesign name="right" size={20} color="#9CA3AF" />
-        </TouchableOpacity>
+
       </View>
     </SafeAreaView>
   );

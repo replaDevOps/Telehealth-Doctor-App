@@ -60,12 +60,12 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
               // Even if API call fails, proceed with logout
               console.log('Logout API error:', error);
             }
-            
+
             // Clear stores and navigate
             logout();
             clearProfile();
             navigation.getParent()?.getParent()?.replace('Auth', { screen: 'SignIn' });
-            
+
             // Note: setIsLoggingOut(false) is not needed as component unmounts on navigation
             // Show success message after navigation
             setTimeout(() => {
@@ -90,11 +90,11 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
   })) || [];
 
   return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['top']}>
-        <Header2 title={t('settings.title')} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['top']}>
+      <Header2 title={t('settings.title')} />
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
         refreshControl={
           <RefreshControl
@@ -164,18 +164,20 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
           </View>
 
 
-          {/* Settings Button */}
+          {/* Password Manager */}
           <TouchableOpacity
             style={[style.menuItem, { marginTop: 25 }]}
-            onPress={() => navigation.navigate('ProfileSetting')}
+            onPress={() => navigation.navigate('ChangePassword')}
             activeOpacity={0.7}
           >
             <View style={style.menuLeft}>
-              <Ionicons name="settings-outline" size={24} color={colors.black} />
-              <Text style={style.menuTitle}>{t('settings.profile')}</Text>
+              <Ionicons name="key-outline" size={24} color={colors.black} />
+              <Text style={style.menuTitle}>{t('settings.passwordManager')}</Text>
             </View>
             <AntDesign name="right" size={20} color="#9CA3AF" />
           </TouchableOpacity>
+
+
 
           {/* Logout Button */}
           <TouchableOpacity

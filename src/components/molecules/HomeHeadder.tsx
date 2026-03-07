@@ -116,7 +116,7 @@ const HomeHeader = ({
             {/* Doctor Details */}
             <View style={styles.doctorDetails}>
               <Text style={styles.doctorName}>{doctorName}</Text>
-              <Text style={styles.doctorSpecialty}>{doctorSpecialty}</Text>
+              {/* <Text style={styles.doctorSpecialty}>{doctorSpecialty}</Text> */}
             </View>
           </View>
 

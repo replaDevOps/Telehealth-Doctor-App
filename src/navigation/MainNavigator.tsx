@@ -16,10 +16,8 @@ import { HistoryScreen } from '@screens/ManageHistory';
 import {
   ChangePassword,
   FAQs,
-  ProfileSetting,
   RefundRequest2,
   SettingScreen,
-  SignatureScreen,
   NotificationScreen,
 } from '@screens/ManageSetting';
 import {
@@ -135,11 +133,10 @@ export const SettingNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SettingScreen" component={SettingScreen} />
-      <Stack.Screen name="ProfileSetting" component={ProfileSetting} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
       <Stack.Screen name="FAQs" component={FAQs} />
       <Stack.Screen name="RefundRequest2" component={RefundRequest2} />
-      <Stack.Screen name="SignatureScreen" component={SignatureScreen} />
+
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
     </Stack.Navigator>
   );
