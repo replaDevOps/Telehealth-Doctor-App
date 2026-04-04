@@ -29,7 +29,6 @@ const ConsultationCard = ({
   time,
   duration,
   type,
-  amount = '',
   gender = 'Male',
   age = '',
   code = '',
@@ -100,7 +99,6 @@ const ConsultationCard = ({
               <Text style={styles.patientGender}>{patientInfo || ''}</Text>
             </View>
           </View>
-          <Text style={styles.amount}>{amount}</Text>
         </View>
 
         {/* Service and Status Row */}

@@ -811,12 +811,12 @@ export function ChatScreen({ navigation, route }) {
 
   // ---------- Main Render ----------
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
-        style={styles.container}
-      >
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
+      style={{ flex: 1, backgroundColor: '#fff' }}
+    >
+      <SafeAreaView style={styles.container}>
       <ChatHeader
         chatType={chatType}
         doctorInfo={doctorInfo}
@@ -829,7 +829,6 @@ export function ChatScreen({ navigation, route }) {
         isConsultationActive={isConsultationActive}
         consultationData={consultationData}
         patientInfo={patientInfo}
-        onChatHistoryPress={consultationId ? () => navigation.navigate('PrescriptionScreen', { consultationId }) : undefined}
       />
 
       {/* Messages */}
@@ -905,7 +904,7 @@ export function ChatScreen({ navigation, route }) {
         consultationID={consultationId || ''}
         consultationData={consultationData}
       />
-    </KeyboardAvoidingView>
     </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }

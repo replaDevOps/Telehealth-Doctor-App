@@ -72,6 +72,16 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 12,
   },
+  initialsAvatar: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#EDE9FE',
+  },
+  initialsText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#7625D7',
+  },
   clinicName: {
     fontSize: 15,
     fontWeight: '600',

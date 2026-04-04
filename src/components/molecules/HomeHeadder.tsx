@@ -46,7 +46,7 @@ const HomeHeader = ({
       end={{ x: 0.5, y: 1 }}
       style={styles.linearGradientContainer}
     >
-      <View style={[styles.headerContainer, { paddingTop: inset.top }]}>
+      <View style={[styles.headerContainer, { paddingTop: inset.top+20 }]}>
         {/* Top Section - Medical Center Name & Notification */}
         <View style={styles.topRow}>
           <View style={styles.centerInfoContainer}>
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   centerInfoContainer: {
     flex: 1,

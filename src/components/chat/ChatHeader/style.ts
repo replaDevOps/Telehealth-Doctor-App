@@ -38,11 +38,13 @@ export const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '600',
         color: colors.text,
+        textAlign: 'center',
       },
       consultationTime: {
         fontSize: 13,
         color: colors.secondaryText,
         marginTop: 2,
+        textAlign: 'center',
       },
       endButton: {
         backgroundColor: '#ef4444',

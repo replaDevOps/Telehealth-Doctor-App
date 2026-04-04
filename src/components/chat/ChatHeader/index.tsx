@@ -42,7 +42,6 @@ interface ChatHeaderProps {
     code?: string;
   } | null;
   patientInfo?: PatientInfoHeader | null;
-  onChatHistoryPress?: () => void;
   onZIconPress?: () => void;
 }
 
@@ -72,7 +71,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isConsultationActive = false,
   consultationData,
   patientInfo,
-  onChatHistoryPress,
   onZIconPress,
 }) => {
   const { t } = useTranslation();
@@ -139,11 +137,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             ) : null}
           </View>
         </View>
-        {onChatHistoryPress != null && (
-          <TouchableOpacity style={styles.chatHistoryButton} onPress={onChatHistoryPress}>
-            <Text style={styles.chatHistoryButtonText}>{t('chat.aiChatHistory', 'AI Chat History')}</Text>
-          </TouchableOpacity>
-        )}
      
       </View>
     </View>
