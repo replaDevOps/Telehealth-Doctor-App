@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,6 +7,7 @@ import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { DoctorInfo } from '../../../types/chat.types';
 import { patient as defaultPatientImage } from '../../../assets/images';
+import { AiChatHistoryBottomSheet } from '../AiChatHistoryBottomSheet';
 
 export type PatientInfoHeader = {
   id?: string | number;
@@ -74,6 +75,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onZIconPress,
 }) => {
   const { t } = useTranslation();
+  const [aiHistoryVisible, setAiHistoryVisible] = useState(false);
   const headerDisplayText = consultationId ? `#${consultationId}` : (doctorDisplayName || doctorInfo.name);
 
   const patient = consultationData?.patient;
@@ -137,8 +139,18 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             ) : null}
           </View>
         </View>
-     
+
+        <TouchableOpacity style={styles.chatHistoryButton} onPress={() => setAiHistoryVisible(true)}>
+          <Text style={styles.chatHistoryButtonText}>AI Chat History</Text>
+          <Image source={patientImage} style={styles.chatHistoryAvatar} resizeMode="cover" />
+        </TouchableOpacity>
       </View>
+
+      <AiChatHistoryBottomSheet
+        visible={aiHistoryVisible}
+        patientId={patientInfo?.id}
+        onClose={() => setAiHistoryVisible(false)}
+      />
     </View>
   );
 };
