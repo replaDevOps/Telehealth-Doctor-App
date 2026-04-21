@@ -140,9 +140,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           </View>
         </View>
 
-        <TouchableOpacity style={styles.chatHistoryButton} onPress={() => setAiHistoryVisible(true)}>
-          <Text style={styles.chatHistoryButtonText}>AI Chat History</Text>
-          <Image source={patientImage} style={styles.chatHistoryAvatar} resizeMode="cover" />
+        <TouchableOpacity
+          style={styles.chatHistoryButton}
+          onPress={() => setAiHistoryVisible(true)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.chatHistoryButtonText} numberOfLines={1}>AI Chat History</Text>
         </TouchableOpacity>
       </View>
 

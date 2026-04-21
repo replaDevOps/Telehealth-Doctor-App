@@ -12,6 +12,22 @@ interface MessageProps {
   handleServicePress: (service: Service) => void;
 }
 
+const renderBoldText = (text: string, baseStyle: any) => {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  if (parts.length === 1) return <Text style={baseStyle}>{text}</Text>;
+  return (
+    <Text style={baseStyle}>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <Text key={i} style={{ fontWeight: 'bold' }}>{part}</Text>
+        ) : (
+          part
+        ),
+      )}
+    </Text>
+  );
+};
+
 export const Message: React.FC<MessageProps> = ({
   msg,
   showAvatar,
@@ -40,9 +56,7 @@ export const Message: React.FC<MessageProps> = ({
             )}
             {(hasText || hasImages) && (
               <View style={styles.botMessage}>
-                {hasText && (
-                  <Text style={styles.botMessageText}>{msg.text}</Text>
-                )}
+                {hasText && renderBoldText(msg.text, styles.botMessageText)}
                 {hasImages && (
                   <View style={styles.botImagesRow}>
                     {msg.images?.map((img, i) => {

@@ -18,6 +18,7 @@ import {
   VenaAISession,
   VenaAIMessage,
 } from '../../../services/venaAI/venaAIService';
+import { Suggestion } from '../Suggestion';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
@@ -43,6 +44,22 @@ function formatTime(iso: string | null | undefined): string {
   return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
+const renderBoldText = (text: string, baseStyle: any) => {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  if (parts.length === 1) return <Text style={baseStyle}>{text}</Text>;
+  return (
+    <Text style={baseStyle}>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <Text key={i} style={{ fontWeight: 'bold' }}>{part}</Text>
+        ) : (
+          part
+        ),
+      )}
+    </Text>
+  );
+};
+
 export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> = ({
   visible,
   patientId,
@@ -53,7 +70,6 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
   const insets = useSafeAreaInsets();
 
   const [sessions, setSessions] = useState<VenaAISession[]>([]);
-  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,7 +86,6 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
     try {
       const data = await venaAIService.getPatientSessions(patientId);
       setSessions(data.sessions);
-      setTotal(data.total);
     } catch (e: any) {
       setError(e?.message ?? 'Failed to load sessions');
     } finally {
@@ -84,6 +99,8 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
     setMessages([]);
     try {
       const data = await venaAIService.getSessionChat(chatId);
+      console.log('[AiChatHistoryBottomSheet] getSessionChat response', JSON.stringify(data, null, 2));
+      console.log('[AiChatHistoryBottomSheet] messages array', data.messages);
       setMessages(data.messages);
     } catch (e: any) {
       setChatError(e?.message ?? 'Failed to load chat');
@@ -170,28 +187,57 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
   const renderMessage = ({ item }: { item: VenaAIMessage }) => {
     const isUser = item.role === 'user';
     const ts = item.timestamp ?? item.createdAt;
+    const hasContent = !!(item.content && item.content.trim().length > 0);
+    const hasSuggestions = !!(item.suggestions && item.suggestions.length > 0);
+    const hasImageMeta = !!item.imageMeta;
+
     return (
-      <View style={[styles.messageRow, isUser ? styles.messageRowUser : styles.messageRowAssistant]}>
-        <View
-          style={[
-            styles.messageBubble,
-            isUser ? styles.messageBubbleUser : styles.messageBubbleAssistant,
-          ]}
-        >
-          <Text style={isUser ? styles.messageTextUser : styles.messageTextAssistant}>
-            {item.content}
-          </Text>
-          {ts ? (
-            <Text
-              style={[
-                styles.messageTimestamp,
-                isUser ? styles.messageTimestampUser : styles.messageTimestampAssistant,
-              ]}
-            >
-              {formatTime(ts)}
-            </Text>
-          ) : null}
+      <View style={styles.messageBlock}>
+        <View style={[styles.messageRow, isUser ? styles.messageRowUser : styles.messageRowAssistant]}>
+          <View
+            style={[
+              styles.messageBubble,
+              isUser ? styles.messageBubbleUser : styles.messageBubbleAssistant,
+              !hasContent && hasImageMeta ? styles.messageBubbleImage : null,
+            ]}
+          >
+            {hasContent ? (
+              renderBoldText(
+                item.content,
+                isUser ? styles.messageTextUser : styles.messageTextAssistant,
+              )
+            ) : hasImageMeta ? (
+              <View style={styles.imageMetaRow}>
+                <Ionicons
+                  name="image-outline"
+                  size={14}
+                  color={isUser ? 'rgba(255,255,255,0.9)' : colors.secondaryText}
+                />
+                <Text
+                  style={isUser ? styles.messageTextUser : styles.messageTextAssistant}
+                  numberOfLines={1}
+                >
+                  {item.imageMeta?.originalName ?? 'Image'}
+                </Text>
+              </View>
+            ) : null}
+            {ts ? (
+              <Text
+                style={[
+                  styles.messageTimestamp,
+                  isUser ? styles.messageTimestampUser : styles.messageTimestampAssistant,
+                ]}
+              >
+                {formatTime(ts)}
+              </Text>
+            ) : null}
+          </View>
         </View>
+        {hasSuggestions && !isUser ? (
+          <View style={styles.suggestionsWrapper}>
+            <Suggestion suggestions={item.suggestions!} />
+          </View>
+        ) : null}
       </View>
     );
   };
@@ -210,23 +256,21 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
         {/* Handle */}
         <View style={styles.handleBar} />
 
-        {/* Floating Close / Back button */}
-        <TouchableOpacity onPress={handleHeaderBack} style={styles.closeButton}>
-          <Ionicons
-            name={mode === 'chat' ? 'chevron-back' : 'close'}
-            size={24}
-            color={colors.text}
-          />
+        {/* Floating Back button (only in chat mode) */}
+        {mode === 'chat' && (
+          <TouchableOpacity onPress={handleHeaderBack} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+        )}
+
+        {/* Floating Close button (always) */}
+        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
 
         {/* Header */}
         <View style={styles.sheetHeader}>
           <Text style={styles.sheetTitle}>{headerTitle}</Text>
-          {mode === 'list' && total > 0 && !loading && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{total}</Text>
-            </View>
-          )}
         </View>
         <View style={styles.headerDivider} />
 
@@ -323,31 +367,34 @@ const styles = StyleSheet.create({
   sheetHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'center',
     paddingVertical: 12,
+    paddingHorizontal: 56,
   },
   sheetTitle: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '700',
     color: colors.text,
-  },
-  badge: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    minWidth: 26,
-    alignItems: 'center',
-  },
-  badgeText: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: '700',
+    textAlign: 'center',
   },
   closeButton: {
     position: 'absolute',
     top: 16,
     right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -471,6 +518,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     gap: 10,
   },
+  messageBlock: {
+    width: '100%',
+    gap: 6,
+  },
+  suggestionsWrapper: {
+    width: '100%',
+  },
   messageRow: {
     flexDirection: 'row',
     width: '100%',
@@ -494,6 +548,15 @@ const styles = StyleSheet.create({
   messageBubbleAssistant: {
     backgroundColor: colors.lightGray,
     borderBottomLeftRadius: 4,
+  },
+  messageBubbleImage: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  imageMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   messageTextUser: {
     color: colors.white,
