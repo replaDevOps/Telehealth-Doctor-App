@@ -67,6 +67,7 @@ export interface VenaAIMessage {
     mimeType?: string;
     size?: number;
   } | null;
+  imageDataUrl?: string | null;
 }
 
 interface VenaAIRawMessage {
@@ -79,6 +80,7 @@ interface VenaAIRawMessage {
   details?: string;
   suggestions?: VenaAISuggestions | null;
   imageMeta?: any;
+  imageDataUrl?: string | null;
 }
 
 export function mapVenaItemsToSuggestions(
@@ -122,6 +124,7 @@ function normalizeMessage(raw: VenaAIRawMessage): VenaAIMessage {
     timestamp: raw.timestamp ?? raw.createdAt,
     suggestions: extractSuggestions(raw),
     imageMeta: raw.imageMeta ?? null,
+    imageDataUrl: raw.imageDataUrl ?? null,
   };
 }
 
@@ -174,6 +177,7 @@ class VenaAIService {
       : Array.isArray(data)
       ? data
       : [];
+    console.log("message Raw",data)
     const messages: VenaAIMessage[] = rawMessages.map(normalizeMessage);
     return {
       chatId: data?.chatId ?? chatId,

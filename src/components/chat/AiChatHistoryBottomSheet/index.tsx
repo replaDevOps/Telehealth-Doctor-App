@@ -9,6 +9,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -190,6 +191,7 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
     const hasContent = !!(item.content && item.content.trim().length > 0);
     const hasSuggestions = !!(item.suggestions && item.suggestions.length > 0);
     const hasImageMeta = !!item.imageMeta;
+    const hasImageData = !!item.imageDataUrl;
 
     return (
       <View style={styles.messageBlock}>
@@ -198,15 +200,24 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
             style={[
               styles.messageBubble,
               isUser ? styles.messageBubbleUser : styles.messageBubbleAssistant,
-              !hasContent && hasImageMeta ? styles.messageBubbleImage : null,
+              !hasContent && (hasImageData || hasImageMeta)
+                ? styles.messageBubbleImage
+                : null,
             ]}
           >
+            {hasImageData ? (
+              <Image
+                source={{ uri: item.imageDataUrl! }}
+                style={styles.messageImage}
+                resizeMode="cover"
+              />
+            ) : null}
             {hasContent ? (
               renderBoldText(
                 item.content,
                 isUser ? styles.messageTextUser : styles.messageTextAssistant,
               )
-            ) : hasImageMeta ? (
+            ) : !hasImageData && hasImageMeta ? (
               <View style={styles.imageMetaRow}>
                 <Ionicons
                   name="image-outline"
@@ -557,6 +568,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  messageImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 6,
+    backgroundColor: colors.lightGray,
   },
   messageTextUser: {
     color: colors.white,
