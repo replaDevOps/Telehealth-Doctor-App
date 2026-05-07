@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, StatusBar, Alert, Platform, PermissionsAndroid, RefreshControl, Modal, ActivityIndicator, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, StatusBar, Platform, PermissionsAndroid, RefreshControl, Modal, ActivityIndicator, Text } from 'react-native';
 import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
@@ -24,6 +24,7 @@ export const HomeScreen = ({ navigation }) => {
   const { requests: consultationRequests, removeRequest, clearAll: clearAllRequests } = useConsultationRequestStore();
   
   const [isActive, setIsActive] = useState(false);
+  const [isStatusLoading, setIsStatusLoading] = useState(false);
   const [hasAudioPermission, setHasAudioPermission] = useState(false);
   const [hasVideoPermission, setHasVideoPermission] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -37,14 +38,11 @@ console.log('HomeScreen render', consultationRequests)
     fetchDashboardData();
     fetchNotifications(); // Fetch notifications on mount
     requestPermissions(); // Request media permissions
+    // Force doctor status to inactive on app open / login
+    updateOnlineStatus(false).catch(err => {
+      console.warn('Failed to set status to inactive on launch:', err);
+    });
   }, [fetchDashboardData, fetchNotifications]);
-
-  // Initialize isActive state based on profile online_status
-  useEffect(() => {
-    if (profileData) {
-      setIsActive(!!profileData.online_status);
-    }
-  }, [profileData]);
 
   // Clear requests when doctor goes offline
   useEffect(() => {
@@ -212,28 +210,26 @@ console.log('HomeScreen render', consultationRequests)
   };
 
   const handleToggleActive = async (value: boolean) => {
+    setIsStatusLoading(true);
     try {
-      // Optimistically update UI
-      setIsActive(value);
-
-      // Call API to update online status
+      // Call API first; only flip the toggle on success
       await updateOnlineStatus(value);
+
+      setIsActive(value);
 
       if (!value) {
         // Clear requests when going offline
         clearAllRequests();
       }
     } catch (error: any) {
-      // Revert the toggle if API call fails
-      setIsActive(!value);
-
-      // Show error message
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
         'Failed to update online status. Please try again.';
 
-      Alert.alert('Error', errorMessage);
+      Toast.error(errorMessage);
+    } finally {
+      setIsStatusLoading(false);
     }
   };
 
@@ -277,6 +273,7 @@ console.log('HomeScreen render', consultationRequests)
         doctorSpecialty={profileData?.specialization || 'Dermatologist'}
         doctorImage={profileData?.image ? { uri: profileData.image } : doctor}
         isActive={isActive}
+        isStatusLoading={isStatusLoading}
         onToggleActive={handleToggleActive}
         onNotificationPress={() => navigation.navigate('NotificationScreen')}
         onLocationPress={() => console.log('Location pressed')}

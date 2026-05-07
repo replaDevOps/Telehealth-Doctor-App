@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
@@ -20,6 +21,7 @@ interface HomeHeaderProps {
   doctorSpecialty?: string;
   doctorImage?: any;
   isActive?: boolean;
+  isStatusLoading?: boolean;
   onToggleActive?: (value: boolean) => void;
   onNotificationPress?: () => void;
   onLocationPress?: () => void;
@@ -33,6 +35,7 @@ const HomeHeader = ({
   doctorSpecialty = 'Dermatologist',
   doctorImage,
   isActive = true,
+  isStatusLoading = false,
   onToggleActive,
   onNotificationPress,
   onLocationPress,
@@ -121,14 +124,20 @@ const HomeHeader = ({
           </View>
 
           {/* Active Toggle */}
-          <Switch
-            value={isActive}
-            onValueChange={onToggleActive}
-            trackColor={{ false: '#D1D1D6', true: '#34C759' }}
-            thumbColor={colors.white}
-            ios_backgroundColor="#D1D1D6"
-            style={styles.switch}
-          />
+          {isStatusLoading ? (
+            <View style={styles.switchLoaderContainer}>
+              <ActivityIndicator size="small" color={colors.white} />
+            </View>
+          ) : (
+            <Switch
+              value={isActive}
+              onValueChange={onToggleActive}
+              trackColor={{ false: '#D1D1D6', true: '#34C759' }}
+              thumbColor={colors.white}
+              ios_backgroundColor="#D1D1D6"
+              style={styles.switch}
+            />
+          )}
         </View>
       </View>
     </LinearGradient>
@@ -257,6 +266,12 @@ const styles = StyleSheet.create({
   },
   switch: {
     transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+  },
+  switchLoaderContainer: {
+    width: 51,
+    height: 31,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

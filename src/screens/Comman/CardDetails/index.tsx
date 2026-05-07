@@ -96,15 +96,14 @@ export function CardDetails({ navigation }: { navigation: any }) {
             ) : (
               <View style={[styles.clinicImage, styles.initialsAvatar]}>
                 <Text style={styles.initialsText}>
-                  {params.clinicName
-                    ? params.clinicName
-                        .trim()
-                        .split(/\s+/)
-                        .filter(Boolean)
-                        .slice(0, 2)
-                        .map(w => w[0].toUpperCase())
-                        .join('')
-                    : '?'}
+                  {(() => {
+                    const parts = params.clinicName
+                      ? params.clinicName.trim().split(/\s+/).filter(Boolean)
+                      : [];
+                    if (parts.length === 0) return '?';
+                    if (parts.length === 1) return parts[0][0].toUpperCase();
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                  })()}
                 </Text>
               </View>
             )}

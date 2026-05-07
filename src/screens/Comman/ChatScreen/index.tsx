@@ -406,7 +406,6 @@ export function ChatScreen({ navigation, route }) {
         setConsultationWasEnded(true); // Use state to trigger re-render
         setModalVisible(false); // Close the simple ended modal
         setEndConsultationModalVisible(true); // Show modal where doctor can add prescription (without End button)
-        Toast.info('Consultation ended by the patient. You can still add prescription.');
       } else {
         console.log('❌ [ChatScreen] Consultation ID mismatch - eventIDStr:', eventIDStr, 'consultationIDStr:', consultationIDStr);
       }

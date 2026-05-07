@@ -10,8 +10,23 @@ import { colors } from '../../../styles/colors';
 import { useAuthStore, useProfileStore } from '../../../store';
 import { logout as logoutApi } from '../../../services/api/authService';
 import { Toast } from 'toastify-react-native';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 import style from './style';
+
+const formatPhoneWithCountryCode = (phoneNo?: string): string => {
+  if (!phoneNo) return 'N/A';
+  const trimmed = phoneNo.trim();
+  let phoneWithPlus: string;
+  if (trimmed.startsWith('+')) {
+    phoneWithPlus = trimmed;
+  } else {
+    const digitsOnly = trimmed.replace(/\D/g, '');
+    phoneWithPlus = digitsOnly.startsWith('966') ? `+${digitsOnly}` : `+966${digitsOnly}`;
+  }
+  const parsed = parsePhoneNumberFromString(phoneWithPlus);
+  return parsed ? parsed.formatInternational() : phoneWithPlus;
+};
 
 
 export const SettingScreen = ({ navigation }: { navigation: any }) => {
@@ -123,19 +138,11 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
             </View>
             <View style={style.infoRow}>
               <Text style={style.infoLabel}>{t('profile.phone')}:</Text>
-              <Text style={style.infoValue}>{profileData?.phoneNo || 'N/A'}</Text>
+              <Text style={style.infoValue}>{formatPhoneWithCountryCode(profileData?.phoneNo)}</Text>
             </View>
             <View style={style.infoRow}>
               <Text style={style.infoLabel}>{t('profile.email')}:</Text>
               <Text style={style.infoValue}>{profileData?.email || 'N/A'}</Text>
-            </View>
-            <View style={style.infoRow}>
-              <Text style={style.infoLabel}>{t('settingsScreen.specialization')}:</Text>
-              <Text style={style.infoValue}>{profileData?.specialization || 'N/A'}</Text>
-            </View>
-            <View style={style.infoRow}>
-              <Text style={style.infoLabel}>{t('settingsScreen.yearsExperience')}:</Text>
-              <Text style={style.infoValue}>{profileData?.experience ? `${profileData.experience} Years` : 'N/A'}</Text>
             </View>
           </View>
 
