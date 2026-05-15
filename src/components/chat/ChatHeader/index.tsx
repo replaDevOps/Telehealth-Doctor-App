@@ -76,7 +76,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => {
   const { t } = useTranslation();
   const [aiHistoryVisible, setAiHistoryVisible] = useState(false);
-  const headerDisplayText = consultationId ? `#${consultationId}` : (doctorDisplayName || doctorInfo.name);
+  const headerDisplayText = consultationId ? 'Customer Support' : (doctorDisplayName || doctorInfo.name);
 
   const patient = consultationData?.patient;
   const patientName = patient?.name || patientInfo?.name || 'Patient';
