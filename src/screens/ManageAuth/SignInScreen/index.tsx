@@ -147,8 +147,6 @@ export function SignInScreen({ navigation }) {
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      console.error('Login error response:', error?.response);
-      console.error('Login error data:', error?.response?.data);
       
       // Extract error message from various possible API error structures
       // Structure 1: { status: 401, message: "...", data: { success: false, message: "...", error: "..." } }

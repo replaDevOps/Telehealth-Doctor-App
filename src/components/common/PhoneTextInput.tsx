@@ -47,7 +47,6 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   CustomStyle,
 }) => {
   const [value, setValue] = useState<string>(initialValue || '');
-  const [isValid, setIsValid] = useState<boolean>(false);
   const [hasBeenTouched, setHasBeenTouched] = useState<boolean>(false);
   const [selectedCountryCode, setSelectedCountryCode] = useState<string>(countryCode || 'SA');
   const [componentKey, setComponentKey] = useState<number>(0);
@@ -74,7 +73,6 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
 
   useEffect(() => {
     if (!value) {
-      setIsValid(false);
       onValidationChange?.(false);
       return;
     }
@@ -84,7 +82,6 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
       : value.length >= 8 && value.length <= getMaxLengthForCountry(selectedCountryCode);
     const validStartsWith5 = !isSaudi || value[0] === '5';
     const valid = validByLength && validStartsWith5;
-    setIsValid(valid);
     onValidationChange?.(valid);
   }, [value, selectedCountryCode]);
 
@@ -96,13 +93,6 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
     setHasBeenTouched(true);
     hasUserTypedRef.current = true;
     safeSetPhone(limited);
-    const isSaudi = selectedCountryCode === 'SA';
-    const validByLength = isSaudi
-      ? limited.length === SAUDI_NATIONAL_LENGTH
-      : limited.length >= 8 && limited.length <= maxLen;
-    const validStartsWith5 = !isSaudi || limited[0] === '5';
-    const valid = validByLength && validStartsWith5;
-    setIsValid(valid);
     onValidationChange?.(true);
   };
 
@@ -119,13 +109,6 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
 
     safeSetPhone(digitsOnly);
     setValue(digitsOnly);
-    const isSaudi = selectedCountryCode === 'SA';
-    const validByLength = isSaudi
-      ? digitsOnly.length === SAUDI_NATIONAL_LENGTH
-      : digitsOnly.length >= 8 && digitsOnly.length <= maxLen;
-    const validStartsWith5 = !isSaudi || digitsOnly[0] === '5';
-    const valid = validByLength && validStartsWith5;
-    setIsValid(valid);
     onValidationChange?.(true);
   };
 
@@ -148,14 +131,15 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
       : current.length >= 8 && current.length <= maxLen;
     const validStartsWith5 = !isSaudi || current[0] === '5';
     const valid = validByLength && validStartsWith5;
-    setIsValid(valid);
+
     onValidationChange?.(valid);
   };
 
-  // Red input when: parent set error, OR (touched and has value but invalid: not 9 digits or doesn't start with 5 for SA)
+  // Red input when: parent set error, OR (touched and has value but less than 9 digits)
+  const maxLen = getMaxLengthForCountry(selectedCountryCode);
   const hasError =
     !!(phoneError || errorMessage) ||
-    (hasBeenTouched && value.length > 0 && !isValid);
+    (hasBeenTouched && value.length > 0 && value.length < maxLen);
 
   return (
     <View>
