@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, Modal, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, Modal, ActivityIndicator, RefreshControl, Linking } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import UserProfile from '../../../components/common/UserProfile';
 import { Header2 } from '../../../components/common/Header2';
@@ -185,6 +185,19 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
 
 
+
+          {/* Contact Admin */}
+          <TouchableOpacity
+            style={style.menuItem}
+            onPress={() => Linking.openURL('mailto:Info@vena-app.com')}
+            activeOpacity={0.7}
+          >
+            <View style={style.menuLeft}>
+              <Ionicons name="mail-outline" size={24} color={colors.black} />
+              <Text style={style.menuTitle}>{t('settings.contactAdmin')}</Text>
+            </View>
+            <AntDesign name="right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
 
           {/* Logout Button */}
           <TouchableOpacity

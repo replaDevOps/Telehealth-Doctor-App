@@ -99,7 +99,8 @@
     "notifications": "Notifications",
     "logout": "Log Out",
     "deleteAccount": "Delete Account",
-    "faqs": "FAQ's"
+    "faqs": "FAQ's",
+    "contactAdmin": "Contact Admin"
   },
   "settingsScreen": {
     "personalInformation": "Personal Information",

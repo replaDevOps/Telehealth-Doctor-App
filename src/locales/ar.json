@@ -100,7 +100,8 @@
     "notifications": "الإشعارات",
     "logout": "تسجيل الخروج",
     "deleteAccount": "حذف الحساب",
-    "faqs": "الأسئلة الشائعة"
+    "faqs": "الأسئلة الشائعة",
+    "contactAdmin": "تواصل مع المسؤول"
   },
   "settingsScreen": {
     "personalInformation": "المعلومات الشخصية",
