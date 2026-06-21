@@ -7,14 +7,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
+import { LogoPng } from '../../../assets/images';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
 import { CustomButton } from '../../../components/common/CustomButton';
 import { Header2 } from '../../../components/common/Header2';
-import { LogoSvg } from '../../../assets/icons';
 import { CustomText } from '../../../components/common/CustomText';
 import PhoneNumberInput from '../../../components/common/PhoneTextInput';
 import { styles } from './style';
@@ -210,7 +211,7 @@ export function SignInScreen({ navigation }) {
 
           {/* Logo */}
           <View style={styles.logoContainer}>
-            <LogoSvg />
+            <Image source={LogoPng} style={styles.logo} resizeMode="contain" />
           </View>
 
           {/* Title */}

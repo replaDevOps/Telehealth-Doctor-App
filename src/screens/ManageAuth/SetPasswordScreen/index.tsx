@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAvoidScrollview } from '../../../components/common/keyboard-avoid-scrollview';
-import { LogoSvg } from '../../../assets/icons';
+import { LogoPng } from '../../../assets/images';
 import { Header2 } from '../../../components/common/Header2';
 import CustomText from '../../../components/common/CustomText';
 import { CustomButton } from '../../../components/common/CustomButton';
@@ -65,7 +65,7 @@ export const SetPassword: React.FC<Props> = ({ navigation }) => {
 
         <View style={styles.container}>
           <View style={styles.logoContainer}>
-            <LogoSvg />
+            <Image source={LogoPng} style={styles.logo} resizeMode="contain" />
           </View>
 
           <View style={styles.content}>

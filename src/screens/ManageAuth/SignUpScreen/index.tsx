@@ -6,6 +6,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
@@ -13,7 +14,8 @@ import { CustomButton } from '../../../components/common/CustomButton';
 import { Header2 } from '../../../components/common/Header2';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { GoogleSvg, LogoSvg } from '../../../assets/icons';
+import { GoogleSvg } from '../../../assets/icons';
+import { LogoPng } from '../../../assets/images';
 import { CustomText } from '../../../components/common/CustomText';
 import PhoneNumberInput from '../../../components/common/PhoneTextInput';
 import { styles } from './style';
@@ -84,7 +86,7 @@ export function SignUpScreen({ navigation }) {
           <Header2 title="" showLanguage={true} />
 
           <View style={styles.logoContainer}>
-            <LogoSvg />
+            <Image source={LogoPng} style={styles.logo} resizeMode="contain" />
           </View>
 
           <View style={{ ...styles.title }}>
