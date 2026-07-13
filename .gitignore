@@ -73,3 +73,7 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Signing config secrets
+keystore.properties
+android/app/keystore.properties
