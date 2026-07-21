@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.telehealthdoctorapp"
+    namespace "com.vena.consultant"
     defaultConfig {
-        applicationId "com.telehealthdoctorapp"
+        applicationId "com.vena.consultant"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

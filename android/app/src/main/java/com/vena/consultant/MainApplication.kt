@@ -1,4 +1,4 @@
-package com.telehealthdoctorapp
+package com.vena.consultant
 
 import android.app.Application
 import com.facebook.react.PackageList
