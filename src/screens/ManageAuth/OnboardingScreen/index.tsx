@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header2 } from '../../../components/common/Header2';
 import { CustomButton } from '../../../components/common/CustomButton';
 import { styles } from './styles';
@@ -11,10 +12,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export function OnboardingScreen({ navigation }: any) {
   const [currentStep, setCurrentStep] = useState<number>(0);
 
+  const markOnboardingComplete = async () => {
+    try {
+      await AsyncStorage.setItem('onboardingCompleted', 'true');
+    } catch (error) {
+      console.error('Error saving onboarding completion:', error);
+    }
+  };
+
   const handleNext = () => {
     console.log('Next button pressed');
     setCurrentStep(prev => {
       if (prev === ONBOARDING_STEPS.length - 1) {
+        // Mark onboarding as completed
+        markOnboardingComplete();
         navigation.replace('SignIn');
         return prev;
       }
@@ -30,8 +41,10 @@ export function OnboardingScreen({ navigation }: any) {
         title=""
         back={false}
         useSkip={true}
-        handleSkip={() => {
+        handleSkip={async () => {
           console.log('Skip pressed');
+          // Mark onboarding as completed when skipped
+          await markOnboardingComplete();
           navigation.replace('Auth', { screen: 'SignIn' });
         }}
       />

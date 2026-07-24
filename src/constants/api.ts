@@ -1,0 +1,2 @@
+export const BASE_URL = "https://telehealth.repla-projects.com/api";
+

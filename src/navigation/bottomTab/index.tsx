@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { colors } from '../../styles/colors';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -28,6 +30,8 @@ export type TabParamList = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function CustomTabBar() {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -48,7 +52,11 @@ export default function CustomTabBar() {
             return { display: 'none' };
           }
 
-          return styles.tabBar;
+          return {
+            ...styles.tabBar,
+            height: 65 + insets.bottom,
+            paddingBottom: 5 + insets.bottom,
+          };
         })(),
 
         tabBarIcon: ({ focused }) => {
@@ -57,18 +65,18 @@ export default function CustomTabBar() {
           switch (route.name) {
             case 'Home':
               SvgComponent = focused ? FHomeSvg : HomeSvg;
-              label = 'Home';
+              label = t('home.title');
               break;
 
             case 'History':
               SvgComponent = focused ? fHistorySvg : HistorySvg;
 
-              label = 'History';
+              label = t('history.title');
               break;
             case 'Setting':
               SvgComponent = focused ? fSettingSvg : SettingSvg;
 
-              label = 'Setting';
+                label = t('settings.title');
               break;
           }
           return (

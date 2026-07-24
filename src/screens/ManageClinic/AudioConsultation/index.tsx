@@ -1,56 +1,267 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   ImageBackground,
   StatusBar,
+  ImageSourcePropType,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
-import { doctor } from '@assets/images';
+import { patient } from '@assets/images';
 import { mvs } from '@config/metrices';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
-
-
+import { PrescriptionBottomSheet } from '@components/molecules';
+import { useWebRTC } from '../../../hooks/useWebRTC';
+import { Toast } from 'toastify-react-native';
+import { styles } from './style';
+import { endConsultation } from '@services/api/webrtcService';
+import { pusherService } from '@services/pusher/PusherService';
+import { useAuthStore } from '@store';
+import { addPrescription } from '@services/api/chatConsultationService';
+import { useBackgroundTimer } from '../../../hooks/useBackgroundTimer';
 
 export function AudioConsultation({ navigation, route }) {
-  const doctorInfo = route?.params?.doctorInfo || {
-    name: 'Dr. Yasmin Chowdhury',
-    avatar: doctor,
-    specialization: 'Dermatologist',
+  const patientInfo = route?.params?.patientInfo || route?.params?.doctorInfo || {
+    name: 'Patient',
+    avatar: patient,
+    specialization: 'Patient',
   };
 
-  const [callStatus, setCallStatus] = useState('Connecting....');
+  const patientImageSource = useMemo<ImageSourcePropType | null>(() => {
+    const fallbackImage = patientInfo?.avatar || patient;
+
+    const mergeRemoteSource = (source: any) => {
+      if (!source) return null;
+      if (typeof source === 'number') return source;
+      if (typeof source === 'string') {
+        return { uri: source };
+      }
+      if (typeof source === 'object' && source?.uri) {
+        return { uri: source.uri };
+      }
+      return null;
+    };
+
+    const prioritizedSources = [
+      patientInfo?.avatar,
+      patientInfo?.image,
+      patientInfo?.profileImage,
+      patientInfo?.profile_image,
+      patientInfo?.imageUrl,
+      patientInfo?.imageURL,
+    ];
+
+    for (const source of prioritizedSources) {
+      const parsed = mergeRemoteSource(source);
+      if (parsed) {
+        return parsed;
+      }
+    }
+
+    return mergeRemoteSource(fallbackImage);
+  }, [patientInfo]);
+
+  // Get consultation parameters from route
+  const consultationId = route?.params?.consultationId || `consultation_${Date.now()}`;
+  const userId = route?.params?.userId || `doctor_${Date.now()}`;
+  const isInitiator = route?.params?.isInitiator ?? false; // Doctor typically joins, not initiates
+
   const [callDuration, setCallDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [prescriptionBottomSheetVisible, setPrescriptionBottomSheetVisible] = useState(false);
+  const [hasPrescription, setHasPrescription] = useState(false);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const CONSULTATION_MAX_DURATION = 30 * 60; // 30 minutes in seconds (1800 seconds)
+  const consultationStartTimeRef = useRef<number | null>(null);
+  const consultationEndedRef = useRef(false);
+  const handleEndCallRef = useRef<(() => void) | undefined>(undefined);
+  const { user } = useAuthStore();
+  const doctorID = user?.id;
+  const recipientID = route?.params?.recipientID; // Patient ID for doctor
+  
+  // Extract patientID from route params - this should be passed when navigating to consultation
+  const patientID = route?.params?.patientID || route?.params?.patientInfo?.id;
+
+  // Extract consultation ID from consultationId (format: "consultation_2" -> 2)
+  const consultationID = useMemo(() => {
+    if (!consultationId) return null;
+    const match = consultationId.toString().match(/consultation_(\d+)/);
+    return match ? Number(match[1]) : Number(consultationId);
+  }, [consultationId]);
+
+  const aiChatConsultationId =
+    route?.params?.aiChatConsultationId ||
+    route?.params?.aiConsultationId ||
+    route?.params?.aiHistoryId ||
+    route?.params?.aiChatId;
+
+  // Construct consultationData from patientInfo for PrescriptionBottomSheet
+  const consultationData = useMemo(() => {
+    if (!patientInfo) return null;
+    return {
+      patient: {
+        name: patientInfo.name || 'Patient',
+        age: patientInfo.age || patientInfo.patientAge || '',
+        gender: patientInfo.gender || patientInfo.patientGender || '',
+        id: patientInfo.id || patientID,
+      },
+    };
+  }, [patientInfo, patientID]);
+
+  // Initialize WebRTC for audio-only call
+  const {
+    isConnected,
+    isConnecting,
+    isMuted,
+    isReady,
+    isSpeakerOn,
+    error,
+    toggleMute,
+    toggleSpeaker,
+    startCall,
+    endCall,
+    joinCall,
+  } = useWebRTC({
+    userId,
+    roomId: consultationId,
+    isVideoEnabled: false,
+    isAudioEnabled: true,
+  });
+
   const handleGetPrescription = () => {
     setModalVisible(false);
     console.log('User wants to get the prescription');
     navigation.navigate('PrescriptionScreen');
-    // Navigate to prescription screen or trigger download
   };
 
-  const handleClose = () => {
+  const handleAddPrescription = useCallback(() => {
+    console.log('User wants to add a prescription');
+    // Don't allow adding prescription if already added
+    if (hasPrescription) {
+      Toast.info('Prescription has already been added for this consultation');
+      return;
+    }
+    setIsActionMenuOpen(false);
     setModalVisible(false);
-  };
+    setTimeout(() => {
+      setPrescriptionBottomSheetVisible(true);
+    }, 100);
+  }, [hasPrescription]);
 
-  useEffect(() => {
-    // Simulate connecting to call
-    const connectTimer = setTimeout(() => {
-      setCallStatus('Connected');
-    }, 3000);
-
-    return () => clearTimeout(connectTimer);
+  const toggleActionMenu = useCallback(() => {
+    setIsActionMenuOpen(prev => !prev);
   }, []);
 
+  const handleViewAiChatHistory = useCallback(() => {
+    setIsActionMenuOpen(false);
+    const historyId = aiChatConsultationId || consultationID;
+
+    if (historyId) {
+      const normalizedId = historyId.toString();
+      navigation.navigate('ChatScreen', {
+        chatType: 'ai',
+        fromHistory: true,
+        consultationId: normalizedId,
+        id: normalizedId,
+        patientInfo,
+        patientID,
+      });
+      return;
+    }
+
+    navigation.navigate('ChatScreen', {
+      chatType: 'ai',
+      fromHistory: true,
+      patientInfo,
+      patientID,
+    });
+  }, [aiChatConsultationId, consultationID, navigation, patientInfo, patientID]);
+
+  const handleSavePrescription = useCallback(async (prescriptions: Array<{ name: string; description: string }>) => {
+    if (!consultationID) {
+      Toast.error('Consultation ID not found');
+      return;
+    }
+
+    try {
+      await addPrescription({
+        consultationID: consultationID,
+        prescriptions,
+      });
+      Toast.success('Prescription added successfully');
+      setHasPrescription(true);
+      setPrescriptionBottomSheetVisible(false);
+    } catch (error: any) {
+      console.error('Error adding prescription:', error);
+      Toast.error(error?.response?.data?.message || 'Failed to add prescription');
+    }
+  }, [consultationID]);
+
+  const handleClose = useCallback(() => {
+    setModalVisible(false);
+    // End call if not already ended
+    endCall();
+    navigation.goBack();
+  }, [endCall, navigation]);
+
+  // Start/join call when WebRTC is ready
   useEffect(() => {
-    // Start call duration timer when connected
+    console.log('🎬 [AudioConsultation] Effect triggered:', { isReady, isInitiator });
+    if (isReady) {
+      const initCall = async () => {
+        try {
+          console.log('🎬 [AudioConsultation] Initializing call, isInitiator:', isInitiator);
+          if (isInitiator) {
+            console.log('📞 [AudioConsultation] Patient starting call... (isInitiator IS TRUE)');
+            await startCall();
+          } else {
+            console.log('📞 [AudioConsultation] Doctor joining call...');
+            await joinCall();
+          }
+        } catch (err) {
+          console.error('❌ [AudioConsultation] Error initializing call:', err);
+          Toast.error('Failed to connect to call');
+        }
+      };
+
+      initCall();
+    }
+  }, [isReady, isInitiator]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      endCall();
+    };
+  }, []);
+
+  // Show error toast
+  useEffect(() => {
+    if (error) {
+      Toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!isConnected && isActionMenuOpen) {
+      setIsActionMenuOpen(false);
+    }
+  }, [isConnected, isActionMenuOpen]);
+
+  // Start call duration timer when connected
+  useEffect(() => {
     let interval;
-    if (callStatus === 'Connected') {
+    if (isConnected) {
+      // Track start time
+      if (!consultationStartTimeRef.current) {
+        consultationStartTimeRef.current = Date.now();
+        console.log('📞 [AudioConsultation] Call connected, tracking duration');
+      }
+      
       interval = setInterval(() => {
         setCallDuration(prev => prev + 1);
       }, 1000);
@@ -59,25 +270,145 @@ export function AudioConsultation({ navigation, route }) {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [callStatus]);
+  }, [isConnected]);
 
-  const formatDuration = seconds => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
+  // Listen for consultation-end event from other side
+  useEffect(() => {
+    if (!consultationID || consultationEndedRef.current) return;
 
-  const handleEndCall = () => {
+    pusherService.initialize();
+    const pusher = pusherService.getInstance();
+    if (!pusher) return;
+
+    const channelName = `webrtc-consultation${consultationID}`;
+    console.log('📞 [AudioConsultation] Listening for consultation-end on channel:', channelName);
+
+    const handleConsultationEnd = (eventPayload: any) => {
+      console.log('📞 [AudioConsultation] Consultation end event received (raw):', JSON.stringify(eventPayload, null, 2));
+      if (consultationEndedRef.current) return;
+
+      // Handle nested data structure: { data: { consultationID: ... } } or direct { consultationID: ... }
+      let data = eventPayload;
+      if (eventPayload?.data && typeof eventPayload.data === 'object') {
+        data = eventPayload.data;
+        console.log('📞 [AudioConsultation] Using nested data structure');
+      }
+
+      const eventConsultationID = data?.consultationID || data?.id || eventPayload?.consultationID || eventPayload?.id;
+      const fromUser = (data?.from || eventPayload?.from || '').toString();
+      
+      // Check if this event is from the other side (patient), not from ourselves (doctor)
+      const isFromDoctor = fromUser && fromUser.startsWith('doctor_');
+      if (isFromDoctor) {
+        console.log('📞 [AudioConsultation] Ignoring own event from:', fromUser);
+        return;
+      }
+      
+      const eventIDStr = eventConsultationID?.toString() || '';
+      const consultationIDStr = consultationID?.toString() || '';
+      
+      if (eventIDStr && consultationIDStr && eventIDStr === consultationIDStr) {
+        console.log('✅ [AudioConsultation] Consultation ended by patient, showing modal');
+        consultationEndedRef.current = true;
+        // Show modal first, then end call
+        setModalVisible(true);
+        // End the call locally after showing modal
+        setTimeout(() => {
+          endCall();
+        }, 100);
+      }
+    };
+
+    pusherService.bind(channelName, 'consultation-end', handleConsultationEnd);
+
+    return () => {
+      pusherService.unbind(channelName, 'consultation-end');
+      pusherService.unsubscribe(channelName);
+    };
+  }, [consultationID]);
+
+  const handleEndCall = useCallback(async () => {
+    if (consultationEndedRef.current) return;
+    consultationEndedRef.current = true;
+
+    console.log('📞 [AudioConsultation] handleEndCall called, showing modal first');
+    // Show modal first before ending call to ensure it displays
     setModalVisible(true);
+
+    // Calculate duration and notify the other side
+    // Get recipient ID from multiple sources: recipientID, patientID, or patientInfo
+    const actualRecipientID = recipientID || patientID;
+    
+    if (consultationID && consultationStartTimeRef.current && doctorID && actualRecipientID) {
+      try {
+        const durationMs = Date.now() - consultationStartTimeRef.current;
+        const durationMinutes = Math.floor(durationMs / 60000);
+        const duration = `${durationMinutes} min`;
+
+        // For doctor: from = doctor_XX, to = patient_YY
+        const fromUserId = `doctor_${doctorID}`;
+        const toUserId = `patient_${actualRecipientID}`;
+
+        if (fromUserId && toUserId && !toUserId.includes('undefined')) {
+          console.log('📞 [AudioConsultation] Ending consultation and notifying other side:', {
+            consultationID,
+            duration,
+            from: fromUserId,
+            to: toUserId,
+          });
+
+          await endConsultation({
+            consultationID,
+            duration,
+            from: fromUserId,
+            to: toUserId,
+            offer: { type: 'offer', sdp: '...' },
+          });
+
+          console.log('✅ [AudioConsultation] Consultation ended successfully, other side notified');
+        } else {
+          console.warn('⚠️ [AudioConsultation] Missing user IDs, skipping API call:', { fromUserId, toUserId });
+        }
+      } catch (error: any) {
+        console.error('❌ [AudioConsultation] Error ending consultation:', error);
+        Toast.error(error?.response?.data?.message || 'Failed to end consultation');
+      }
+    } else {
+      console.warn('⚠️ [AudioConsultation] Missing consultation data:', { consultationID, doctorID, recipientID, patientID, actualRecipientID, hasStartTime: !!consultationStartTimeRef.current });
+    }
+
+    // End call locally after showing modal and making API call
+    // Use setTimeout to ensure modal renders first before ending call
+    setTimeout(() => {
+      console.log('📞 [AudioConsultation] Calling endCall() after modal is shown');
+      endCall();
+    }, 300);
+  }, [consultationID, doctorID, recipientID, patientID, endCall]);
+
+  // Keep handleEndCallRef updated with latest handleEndCall
+  useEffect(() => {
+    handleEndCallRef.current = handleEndCall;
+  }, [handleEndCall]);
+
+  // Use background-aware timer for 30-minute countdown
+  const { remainingSeconds, formattedTime } = useBackgroundTimer({
+    totalDuration: CONSULTATION_MAX_DURATION,
+    isActive: isConnected,
+    onTimeUpRef: handleEndCallRef,
+  });
+
+  // Determine call status - show countdown timer when connected
+  const getCallStatus = () => {
+    if (error && !isConnected) return 'Failed';
+    if (isConnecting) return 'Connecting...';
+    if (isConnected) {
+      // Show countdown timer (remainingSeconds counts down from 30:00 to 00:00)
+      return formattedTime;
+    }
+    return 'Connecting...';
   };
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
-
-  const toggleSpeaker = () => {
-    setIsSpeakerOn(!isSpeakerOn);
-  };
+  const shouldShowActionMenu = !isInitiator && isConnected;
 
   return (
     <View style={styles.container}>
@@ -87,75 +418,166 @@ export function AudioConsultation({ navigation, route }) {
         translucent
       />
 
-      {/* Full Screen Background Image */}
-      <ImageBackground
-        source={doctorInfo.avatar}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        {/* Dark Overlay */}
-        <View style={styles.overlay} />
-        {/* Content */}
+      {/* Full Screen Background Image or Dark Background */}
+      {patientImageSource ? (
+        <ImageBackground
+          source={patientImageSource}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          {/* Dark Overlay */}
+          <View style={styles.overlay} />
+        </ImageBackground>
+      ) : (
+        <View style={styles.darkBackground}>
+          {/* Dark Overlay */}
+          <View style={styles.overlay} />
+        </View>
+      )}
+      
+      {/* Content - Positioned absolutely over background */}
+      <View style={styles.contentContainer}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Doctor Info at Top */}
-          <View style={styles.topSection}>
-            <Text style={styles.doctorName}>{doctorInfo.name}</Text>
+        {/* Patient Info at Top with Prescription Button */}
+        <View style={styles.topSection}>
+          {/* Centered Patient Info */}
+          <View style={styles.patientInfoCenter}>
+            <Text style={styles.doctorName}>{patientInfo.name}</Text>
             <Text style={styles.callStatus}>
-              {callStatus === 'Connected'
-                ? formatDuration(callDuration)
-                : callStatus}
+              {getCallStatus()}
             </Text>
           </View>
+        </View>
 
-          {/* Call Controls at Bottom */}
-          <View style={styles.controlsContainer}>
-            {/* Speaker Button */}
+        {/* Floating Action Menu - Rendered outside controls for proper touch handling */}
+        {shouldShowActionMenu && isActionMenuOpen && (
+          <View style={styles.floatingActionMenu}>
             <TouchableOpacity
-              style={[
-                styles.controlButton,
-                isSpeakerOn && styles.controlButtonActive,
-              ]}
-              onPress={toggleSpeaker}
+              style={styles.actionRow}
+              onPress={handleViewAiChatHistory}
+              activeOpacity={0.75}
             >
-              <Ionicons
-                name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
-                size={28}
-                color={colors.white}
-              />
+              <View style={styles.actionLabelBubble}>
+                <Text style={styles.actionLabelText}>View AI Chat History</Text>
+              </View>
+              <View style={styles.actionCircle}>
+                <Ionicons
+                  name="chatbubble-ellipses"
+                  size={18}
+                  color={colors.white}
+                />
+              </View>
             </TouchableOpacity>
-
-            {/* Mute Button */}
-            <TouchableOpacity
-              style={[
-                styles.controlButton,
-                isMuted && styles.controlButtonActive,
-              ]}
-              onPress={toggleMute}
-            >
-              <Ionicons
-                name={isMuted ? 'mic-off' : 'mic'}
-                size={28}
-                color={colors.white}
-              />
-            </TouchableOpacity>
-
-            {/* End Call Button */}
-            <TouchableOpacity
-              style={styles.endCallButton}
-              onPress={handleEndCall}
-            >
-              <Ionicons name="close" size={32} color={colors.white} />
-            </TouchableOpacity>
+            {/* {!hasPrescription ? (
+              <TouchableOpacity
+                style={styles.actionRow}
+                onPress={handleAddPrescription}
+                activeOpacity={0.75}
+              >
+                <View style={styles.actionLabelBubble}>
+                  <Text style={styles.actionLabelText}>Write Prescription</Text>
+                </View>
+                <View style={styles.actionCircle}>
+                  <Ionicons
+                    name="add"
+                    size={20}
+                    color={colors.white}
+                  />
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <View style={[styles.actionRow, styles.actionRowDisabled]}>
+                <View style={styles.actionLabelBubble}>
+                  <Text style={[styles.actionLabelText, styles.actionLabelTextDisabled]}>
+                    Prescription Sent
+                  </Text>
+                </View>
+                <View
+                  style={[styles.actionCircle, styles.actionCircleSecondary]}
+                >
+                  <Ionicons
+                    name="checkmark-done"
+                    size={18}
+                    color={colors.white}
+                  />
+                </View>
+              </View>
+            )} */}
           </View>
+        )}
+
+        {/* Call Controls at Bottom */}
+        <View style={styles.controlsContainer}>
+          {shouldShowActionMenu && (
+            <TouchableOpacity
+              style={[styles.moreButton, isActionMenuOpen && styles.moreButtonActive]}
+              onPress={toggleActionMenu}
+              activeOpacity={0.85}
+            >
+              <Ionicons
+                name={isActionMenuOpen ? 'close' : 'ellipsis-vertical'}
+                size={26}
+                color={colors.white}
+              />
+            </TouchableOpacity>
+          )}
+          {/* Speaker Button */}
+          <TouchableOpacity
+            style={[
+              styles.controlButton,
+              isSpeakerOn && styles.controlButtonActive,
+            ]}
+            onPress={toggleSpeaker}
+          >
+            <Ionicons
+              name={isSpeakerOn ? 'volume-high' : 'volume-mute'}
+              size={28}
+              color={colors.white}
+            />
+          </TouchableOpacity>
+
+          {/* Mute Button */}
+          <TouchableOpacity
+            style={[
+              styles.controlButton,
+              isMuted && styles.controlButtonActive,
+            ]}
+            onPress={toggleMute}
+          >
+            <Ionicons
+              name={isMuted ? 'mic-off' : 'mic'}
+              size={28}
+              color={colors.white}
+            />
+          </TouchableOpacity>
+
+          {/* End Call Button */}
+          <TouchableOpacity
+            style={styles.endCallButton}
+            onPress={handleEndCall}
+          >
+            <Ionicons name="close" size={32} color={colors.white} />
+          </TouchableOpacity>
+        </View>
         </SafeAreaView>
-        <ConsultationEndedModal
-          visible={modalVisible}
-          onClose={handleClose}
-          onGetPrescription={handleGetPrescription}
-        />
-      </ImageBackground>
+      </View>
+      
+      <ConsultationEndedModal
+        visible={modalVisible}
+        onClose={handleClose}
+        onGetPrescription={handleGetPrescription}
+        isDoctor={true}
+        hasPrescription={hasPrescription}
+        onAddPrescription={!hasPrescription ? handleAddPrescription : undefined}
+        onEndConsultation={undefined} // No "End Consultation" button since call is already ended
+      />
+      <PrescriptionBottomSheet
+        visible={prescriptionBottomSheetVisible}
+        onClose={() => setPrescriptionBottomSheetVisible(false)}
+        onSave={handleSavePrescription}
+        consultationID={consultationID ? String(consultationID) : ''}
+        consultationData={consultationData}
+      />
     </View>
   );
 }
-
-import { styles } from './style';

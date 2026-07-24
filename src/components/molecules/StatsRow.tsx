@@ -22,7 +22,7 @@ const StatsRow = ({
       />
       <StatsCard
         icon="calendar"
-        title="This Month Consul..."
+        title="This Month Consultation"
         value={thisMonth}
         color="#FF6B6B"
       />

@@ -9,13 +9,15 @@ import { colors } from '../../../styles/colors';
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 export const ClinicScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header2 title="Clinic" />
+      <Header2 title={t('screens.clinic')} />
       <SearchServicesBar
         value={searchQuery}
         onChangeText={setSearchQuery}

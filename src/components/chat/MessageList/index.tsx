@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { ScrollView, Keyboard, Platform } from 'react-native';
 import { Message } from '../Message';
 import { Message as MessageType, Service } from '../../../types/chat.types';
 import { styles } from './style';
@@ -13,6 +13,22 @@ interface MessageListProps {
 }
 
 export const MessageList: React.FC<MessageListProps> = ({ messages, scrollRef, showAvatar, handleServicePress }) => {
+  // Auto-scroll to bottom when keyboard shows
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, [scrollRef]);
+
   return (
     <ScrollView
       ref={scrollRef}
@@ -20,6 +36,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, scrollRef, s
       contentContainerStyle={styles.messagesContent}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
     >
       {messages.map((msg, index) => (
         <Message key={msg.id || `msg-${index}`} msg={msg} showAvatar={showAvatar} handleServicePress={handleServicePress} />

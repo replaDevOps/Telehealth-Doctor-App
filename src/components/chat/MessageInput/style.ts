@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 12,
         borderTopWidth: 1,
         borderTopColor: '#f0f0f0',
+        backgroundColor: colors.white,
         gap: 5,
       },
       preButton: {
@@ -34,6 +35,8 @@ export const styles = StyleSheet.create({
         marginRight: 8,
         borderColor: colors.border,
         borderWidth: 1,
+        maxHeight: 100, // Limit input height to prevent excessive expansion
+        minHeight: 44, // Minimum height for single line
       },
       sendButton: {
         width: 44,

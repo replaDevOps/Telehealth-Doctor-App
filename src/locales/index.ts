@@ -1,0 +1,3 @@
+export { default as i18n } from './i18n';
+export { default as en } from './en.json';
+export { default as ar } from './ar.json';

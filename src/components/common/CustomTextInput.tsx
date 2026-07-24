@@ -32,7 +32,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   secureTextEntry,
   ...props
 }) => {
-  const [showPassword, setShowPassword] = useState(!!secureTextEntry); // Start hidden if secureTextEntry is true
+  const [showPassword, setShowPassword] = useState(false); // Start with password hidden
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
@@ -59,7 +59,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
             disabled={props.editable === false}
           >
             <Icon
-              name={showPassword ? 'visibility-off' : 'visibility'}
+              name={showPassword ? 'visibility' : 'visibility-off'}
               size={mvs(20)}
               color={colors.black}
             />

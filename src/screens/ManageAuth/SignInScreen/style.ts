@@ -15,8 +15,8 @@ export const styles = StyleSheet.create({
     marginVertical: mvs(20),
   },
   logo: {
-    width: mvs(120),
-    height: mvs(60),
+    width: mvs(240),
+    height: mvs(120),
   },
   title: {
     alignItems: 'center',
@@ -181,5 +181,5 @@ export const styles = StyleSheet.create({
     color: colors.primary,
     textDecorationLine: 'underline',
   },
-  CheckBox:{ flexDirection: 'row', gap: mvs(5), alignItems: 'center' }
+  CheckBox:{ flexDirection: 'row', gap: mvs(5), alignItems: 'center' },
 });

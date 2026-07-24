@@ -75,6 +75,11 @@ export const styles = StyleSheet.create({
     content: {
       padding: 16,
     },
+    loadingContentContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     card: {
       backgroundColor: colors.white,
 

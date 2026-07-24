@@ -16,15 +16,16 @@ import { HistoryScreen } from '@screens/ManageHistory';
 import {
   ChangePassword,
   FAQs,
-  ProfileSetting,
   RefundRequest2,
   SettingScreen,
+  NotificationScreen,
 } from '@screens/ManageSetting';
 import {
   CardDetails,
   ChatScreen,
   RefundRequest,
   PrescriptionScreen,
+  PrescriptionDetail,
   CartScreen,
 } from '@screens/Comman';
 
@@ -63,6 +64,9 @@ export const MainNavigator = () => {
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
       <Stack.Screen name="CardDetails" component={CardDetails} />
       <Stack.Screen name="Refund" component={RefundRequest} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="AudioConsultation" component={AudioConsultation} />
+      <Stack.Screen name="VideoConsultation" component={VideoConsultation} />
       <ClinicStack.Screen name="CheckoutScreen" component={CheckoutScreen} />
       <ClinicStack.Screen name="CartScreen" component={CartScreen} />
       <ClinicStack.Screen
@@ -79,6 +83,7 @@ export const HomeNavigator = () => {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="NearbyClinics" component={NearbyClinics} />
       <Stack.Screen name="SelectLocation" component={SelectLocation} />
+      <Stack.Screen name="PrescriptionDetail" component={PrescriptionDetail} />
     </Stack.Navigator>
   );
 };
@@ -118,6 +123,8 @@ export const HistoryNavigator = () => {
       initialRouteName="HistoryScreen"
     >
       <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
+      <Stack.Screen name="PrescriptionDetail" component={PrescriptionDetail} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };
@@ -126,10 +133,11 @@ export const SettingNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SettingScreen" component={SettingScreen} />
-      <Stack.Screen name="ProfileSetting" component={ProfileSetting} />
       <Stack.Screen name="ChangePassword" component={ChangePassword} />
       <Stack.Screen name="FAQs" component={FAQs} />
       <Stack.Screen name="RefundRequest2" component={RefundRequest2} />
+
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
     </Stack.Navigator>
   );
 };

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -6,53 +7,193 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  Linking,
 } from 'react-native';
+import { LogoPng } from '../../../assets/images';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
 import { CustomButton } from '../../../components/common/CustomButton';
 import { Header2 } from '../../../components/common/Header2';
-import { LogoSvg } from '../../../assets/icons';
 import { CustomText } from '../../../components/common/CustomText';
 import PhoneNumberInput from '../../../components/common/PhoneTextInput';
 import { styles } from './style';
 import { CustomTextInput } from '../../../components/common/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import parsePhoneNumberFromString from 'libphonenumber-js';
+import { login } from '../../../services/api/authService';
+import { useAuthStore, User, useProfileStore } from '../../../store';
+import { Toast } from 'toastify-react-native';
 
 export function SignInScreen({ navigation }) {
+  const { t } = useTranslation();
+  const { login: setAuth } = useAuthStore();
+  const { fetchProfile } = useProfileStore();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [phoneError, setPhoneError] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const [passwordError, setPasswordError] = useState('');
-  const [countryCode, setCountryCode] = useState('PK');
+  const [countryCode, setCountryCode] = useState('SA');
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(false);
 
-  const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
-  const formattedPhone = phoneNumber
-    ? `+${phoneNumber.countryCallingCode}${phoneNumber.nationalNumber}`
-    : `+${phone}`;
-
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
+    // Clear previous validation errors (user errors only)
+    setPhoneError('');
+    setPasswordError('');
+    
     let valid = true;
 
-    // Phone validation
-    if (!phone.trim() || !isPhoneValid) {
-      setPhoneError('Invalid phone number');
+    // Phone validation: only require non-empty for API call (format validation commented out)
+    if (!phone.trim()) {
+      setPhoneError(t('auth.phoneRequired'));
       valid = false;
-    } else setPhoneError('');
+    } else {
+      setPhoneError('');
+    }
+    // else if (!isPhoneValid) {
+    //   setPhoneError(t('auth.invalidPhone'));
+    //   valid = false;
+    // }
 
-    // Password validation
+    // Password validation (user error - show under input)
     if (!password.trim()) {
-      setPasswordError('Password is required');
+      setPasswordError(t('auth.passwordRequired'));
       valid = false;
-    } else setPasswordError('');
+    } else {
+      setPasswordError('');
+    }
 
-    // Final navigation
-    if (valid) {
-      navigation.navigate('Main', { screen: 'Home' });
+    if (!valid) {
+      return;
+    }
+
+    setLoading(true);
+    console.log('Phone:', phone);
+    console.log('Password:', password);
+    try {
+      // Call login API
+      const response = await login({
+        phoneNo: phone.trim(),
+        password: password.trim(),
+      });
+
+      console.log('Login response:', response);
+
+      // API response structure: { status: true, message: "...", user: { id, name, email, type, token, refreshToken } }
+      if (response.status === true && response.user) {
+        const userInfo = response.user;
+        
+        // Extract token and refreshToken from user object
+        const token = userInfo.token;
+        const refreshToken = userInfo.refreshToken;
+        
+        if (!token) {
+          throw new Error('Token not found in response');
+        }
+
+        // Map API response to User interface
+        const userData: User = {
+          id: String(userInfo.id),
+          email: userInfo.email || '',
+          name: userInfo.name || '',
+          role: 'doctor',
+          phone: userInfo.phoneNo || phone.trim(),
+        };
+
+        // Store user, token, and refreshToken in auth store
+        setAuth(userData, token, refreshToken);
+
+        // Fetch profile data after successful login
+        try {
+          await fetchProfile();
+        } catch (profileError) {
+          console.error('Failed to fetch profile after login:', profileError);
+          // Don't block navigation if profile fetch fails
+        }
+
+        // Navigate to main screen
+        navigation.replace('Main', { screen: 'Home' });
+        
+        // Save credentials if remember me is checked
+        try {
+          if (remember) {
+            await AsyncStorage.setItem('rememberMePhone', phone.trim());
+            await AsyncStorage.setItem('rememberMePassword', password.trim());
+            await AsyncStorage.setItem('rememberMeCountryCode', countryCode);
+          } else {
+            await AsyncStorage.multiRemove([
+              'rememberMePhone',
+              'rememberMePassword',
+              'rememberMeCountryCode',
+            ]);
+          }
+        } catch (e) {
+          console.warn('Failed to persist credentials', e);
+        }
+
+        // Show success message after navigation (to avoid blocking navigation)
+        setTimeout(() => {
+          try {
+            const successMsg = response.message || 'Login successful';
+            Toast.success(successMsg);
+          } catch (toastError) {
+            console.log('Toast error (non-critical):', toastError);
+          }
+        }, 100);
+      } else {
+        // If status is false or user is missing
+        throw new Error(response.message || 'Login failed. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Extract error message from various possible API error structures
+      // Structure 1: { status: 401, message: "...", data: { success: false, message: "...", error: "..." } }
+      // Structure 2: { data: { message: "..." } }
+      // Structure 3: { message: "..." }
+      const errorMsg = 
+        error?.response?.data?.data?.error || // Most specific error message (e.g., "Invalid email, password, or user type")
+        error?.response?.data?.data?.message || // Message from nested data (e.g., "Unauthorized")
+        error?.response?.data?.message || // Message from data (e.g., "Unauthorized")
+        error?.response?.message || // Message from response (e.g., "Unauthorized")
+        error?.message || // General error message
+        'Login failed. Please check your credentials and try again.';
+      
+      console.log('Extracted error message:', errorMsg);
+      
+      // Show API error in toast
+      try {
+        Toast.error(errorMsg);
+      } catch (toastError) {
+        console.log('Toast error (non-critical):', toastError);
+      }
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadSaved = async () => {
+      try {
+        const savedPhone = await AsyncStorage.getItem('rememberMePhone');
+        const savedPassword = await AsyncStorage.getItem('rememberMePassword');
+        const savedCountry = await AsyncStorage.getItem('rememberMeCountryCode');
+        if (savedPhone) {
+          setPhone(savedPhone);
+          setRemember(true);
+        }
+        if (savedPassword) setPassword(savedPassword);
+        if (savedCountry) setCountryCode(savedCountry);
+      } catch (e) {
+        console.warn('Failed to load saved credentials', e);
+      }
+    };
+
+    loadSaved();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
@@ -71,29 +212,34 @@ export function SignInScreen({ navigation }) {
 
           {/* Logo */}
           <View style={styles.logoContainer}>
-            <LogoSvg />
+            <Image source={LogoPng} style={styles.logo} resizeMode="contain" />
           </View>
 
           {/* Title */}
           <View style={styles.title}>
-            <CustomText text="Welcome Back" />
+            <CustomText text={t('auth.welcomeBack')} />
           </View>
           <View style={styles.content}>
             <Text style={styles.TextContent}>
-              Login and continue your healthy journey today!
+              {t('auth.loginSubtitle')}
             </Text>
           </View>
 
           {/* Phone Input */}
           <View style={{ marginTop: mvs(25) }}>
-            <Text style={styles.label}>Phone Number</Text>
+            <Text style={styles.label}>{t('auth.phoneNumber')}</Text>
             <PhoneNumberInput
               phone={phone}
-              setPhone={setPhone}
+              setPhone={(v) => {
+                setPhone(v);
+                if (phoneError) setPhoneError('');
+              }}
               countryCode={countryCode}
-              setCountryCode={setCountryCode}
+              setCountryCode={(code) => {
+                setCountryCode(code);
+                if (phoneError) setPhoneError('');
+              }}
               phoneError={phoneError}
-              errorMessage={errorMessage}
               onValidationChange={setIsPhoneValid}
               CustomStyle={{ backgroundColor: colors.white }}
             />
@@ -101,22 +247,51 @@ export function SignInScreen({ navigation }) {
 
           {/* Password Input */}
           <CustomTextInput
-            label="Password"
-            placeholder="Enter your password"
+            label={t('auth.password')}
+            placeholder={t('auth.enterPassword')}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text: string) => {
+              // Clear previous password error when user starts typing
+              if (passwordError) setPasswordError('');
+              setPassword(text);
+            }}
             secureTextEntry={true}
             errorMessage={passwordError}
           />
 
+          {/* <View style={styles.PasswordRemember}>
+            <View style={styles.CheckBox}>
+              <TouchableOpacity
+                onPress={() => setRemember(!remember)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: remember }}
+              >
+                <Ionicons
+                  name={remember ? 'checkbox' : 'square-outline'}
+                  size={22}
+                  color={remember ? colors.primary : colors.border}
+                />
+              </TouchableOpacity>
+              <Text style={styles.TextContent}>Remember me</Text>
+            </View>
+
+            <TouchableOpacity onPress={() => {}}>
+              <Text style={styles.signinLink}>Forgot password?</Text>
+            </TouchableOpacity>
+          </View> */}
+
           {/* Sign In Button */}
-          <CustomButton title="Sign In" onPress={handleSignIn} />
+          <CustomButton
+            title={t('auth.signIn')}
+            onPress={handleSignIn}
+            loading={loading}
+          />
 
           {/* Sign Up Link */}
           <View style={styles.signinRow}>
-            <Text style={styles.TextContent}>Need Help? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.signinLink}>Contact admin</Text>
+            <Text style={styles.TextContent}>{t('common.needHelp')} </Text>
+            <TouchableOpacity onPress={() => Linking.openURL('mailto:Info@vena-app.com')}>
+              <Text style={styles.signinLink}>{t('common.contactAdmin')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

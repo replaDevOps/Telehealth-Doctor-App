@@ -13,7 +13,6 @@ import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { Header2 } from '@components/common/Header2';
 import { CustomButton } from '@components/common/CustomButton';
-import { RecommandImage } from '@assets/images';
 import RatingBottomSheet from '@components/molecules/RatingBottomSheet';
 import { RouteProp, useRoute } from '@react-navigation/native';
 
@@ -88,11 +87,26 @@ export function CardDetails({ navigation }: { navigation: any }) {
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
         <View style={styles.clinicInfo}>
           <View style={styles.clinicLeft}>
-            <Image
-              source={params.image || RecommandImage}
-              style={styles.clinicImage}
-              resizeMode="cover"
-            />
+            {params.image ? (
+              <Image
+                source={params.image}
+                style={styles.clinicImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={[styles.clinicImage, styles.initialsAvatar]}>
+                <Text style={styles.initialsText}>
+                  {(() => {
+                    const parts = params.clinicName
+                      ? params.clinicName.trim().split(/\s+/).filter(Boolean)
+                      : [];
+                    if (parts.length === 0) return '?';
+                    if (parts.length === 1) return parts[0][0].toUpperCase();
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                  })()}
+                </Text>
+              </View>
+            )}
             <View>
               <Text style={styles.clinicName}>{params.clinicName}</Text>
               <Text style={styles.clinicLocation}>{params.clinicLocation}</Text>
@@ -225,7 +239,7 @@ export function CardDetails({ navigation }: { navigation: any }) {
         </View>
       </ScrollView>
 
-      {!reason && (
+      {/* {!reason && (
         <View style={styles.bottomButtonContainer}>
           {isAppointment ? (
             <CustomButton title="Request for Refund" onPress={handleRefund} />
@@ -236,7 +250,7 @@ export function CardDetails({ navigation }: { navigation: any }) {
             />
           )}
         </View>
-      )}
+      )} */}
 
       <RatingBottomSheet
         visible={showRating}

@@ -1,0 +1,161 @@
+{
+  "common": {
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "skip": "Skip",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "close": "Close",
+    "search": "Search",
+    "submit": "Submit",
+    "continue": "Continue",
+    "needHelp": "Need Help?",
+    "contactAdmin": "Contact admin"
+  },
+  "language": {
+    "title": "Select Language",
+    "subtitle": "Choose your preferred language.",
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Login and continue your healthy journey today!",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "phoneNumber": "Phone Number",
+    "password": "Password",
+    "enterPassword": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "phoneRequired": "Phone number is required",
+    "invalidPhone": "Please enter a valid phone number",
+    "passwordRequired": "Password is required",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed. Please check your credentials and try again.",
+    "otpCode": "OTP Code",
+    "enterOtpDescription": "Enter the 5 digit OTP code sent to your email {{email}}.",
+    "confirm": "Confirm",
+    "verifying": "Verifying…",
+    "createPassword": "Create Password",
+    "setNewPassword": "Set a New Password",
+    "forgetPasswordTitle": "Forget Password"
+  },
+  "forget": {
+    "description": "Enter the email address or phone number to send you the OTP code.",
+    "emailTab": "Email Address",
+    "phoneTab": "Phone Number",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter email address",
+    "invalidEmail": "Enter a valid email",
+    "invalidPhone": "Invalid phone number",
+    "rememberPassword": "Remember Password?",
+    "signIn": "Sign in"
+  },
+  "otp": {
+    "didntReceiveCode": "Didn’t receive code?",
+    "resendCode": "Resend Code"
+  },
+  "onboarding": {
+    "getStarted": "Get Started",
+    "skip": "Skip"
+  },
+  "home": {
+    "title": "Home",
+    "welcome": "Welcome"
+  },
+  "recent": {
+    "recentConsultations": "Recent Consultations",
+    "loadingConsultations": "Loading consultations...",
+    "noRecentConsultations": "No recent consultations found."
+  },
+  "rating": {
+    "title": "Rate Your Experience",
+    "subtitle": "Share your feedback to help us improve.",
+    "labels": {
+      "1": "Unsatisfied",
+      "2": "Needs improvement",
+      "3": "Average",
+      "4": "Satisfied",
+      "5": "Excellent"
+    },
+    "feedbackLabel": "Tell us more (optional)",
+    "placeholder": "Share any comments or suggestions...",
+    "submit": "Submit Feedback"
+  },
+  "settings": {
+    "title": "Settings",
+    "signature": "My Signature",
+    "passwordManager": "Password Manager",
+    "password": "Password",
+    "profile": "Profile",
+    "language": "Language",
+    "notifications": "Notifications",
+    "logout": "Log Out",
+    "deleteAccount": "Delete Account",
+    "faqs": "FAQ's",
+    "contactAdmin": "Contact Admin"
+  },
+  "settingsScreen": {
+    "personalInformation": "Personal Information",
+    "workingHour": "Working Hour",
+    "specialization": "Specialization",
+    "yearsExperience": "Years of Experience",
+    "dayOff": "Day Off",
+    "noWorkingHours": "No working hours available",
+    "logoutConfirmTitle": "Log Out",
+    "logoutConfirmMessage": "Are you sure you want to log out?",
+    "loggingOut": "Logging out..."
+  },
+  "chat": {
+    "title": "Chat",
+    "end": "End",
+    "aiChatHistory": "AI Chat History"
+  },
+  "history": {
+    "title": "History",
+    "searchPlaceholder": "Search by patient or service name..."
+  },
+  "profile": {
+    "title": "Profile Setting",
+    "setupTitle": "Setup Your Profile",
+    "setupDescription": "Setup your profile with a basic details.",
+    "personalInfo": "Personal Information",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "gender": "Gender",
+    "age": "Age",
+    "selectGender": "Select Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "validEmail": "Valid email required",
+    "validPhone": "Valid phone required",
+    "selectNationality": "Select nationality",
+    "idRequired": "ID required",
+    "selectGender": "Select gender",
+    "ageRequired": "Age is required"
+  },
+  "screens": {
+    "cart": "Cart",
+    "prescription": "Prescription",
+    "clinic": "Clinic",
+    "checkout": "Checkout",
+    "refund": "Refund Request",
+    "nearbyClinic": "Nearby Clinic",
+    "selectLocation": "Select Location",
+    "noSignature": "No signature added yet",
+    "currentSignature": "Current Signature",
+    "prescription_saved_successfully": "Prescription saved as PDF successfully"
+  }
+}

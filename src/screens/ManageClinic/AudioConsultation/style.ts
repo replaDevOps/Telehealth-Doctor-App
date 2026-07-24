@@ -7,23 +7,129 @@ const { width, height } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'relative',
   },
   backgroundImage: {
     flex: 1,
     width: width,
     height: height,
   },
+  darkBackground: {
+    flex: 1,
+    width: width,
+    height: height,
+    backgroundColor: '#1a1a1a', // Dark background color
+  },
   overlay: {
     ...StyleSheet.absoluteFillObject,
+  },
+  contentContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   safeArea: {
     flex: 1,
     justifyContent: 'space-between',
   },
   topSection: {
-    alignItems: 'center',
     paddingTop: 20,
     paddingHorizontal: 20,
+    width: '100%',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  patientInfoCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickActionWrapper: {
+    position: 'relative',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+  },
+  floatingActionMenu: {
+    position: 'absolute',
+    bottom: 100,
+    left: 16,
+    zIndex: 100,
+  },
+  moreButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...colors.shadow,
+  },
+  moreButtonActive: {
+    backgroundColor: '#5e1cb8',
+  },
+  actionMenu: {
+    position: 'absolute',
+    bottom: 70,
+    right: 0,
+    alignItems: 'flex-end',
+    zIndex: 999,
+    elevation: 999,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  actionRowDisabled: {
+    opacity: 0.7,
+  },
+  actionCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 14,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  actionCircleSecondary: {
+    backgroundColor: '#22c55e',
+  },
+  actionLabelBubble: {
+    backgroundColor: 'rgba(255, 255, 255, 0.96)',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 18,
+    minWidth: 170,
+    marginRight: 6,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  actionLabelText: {
+    color: colors.black,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  actionLabelTextDisabled: {
+    color: 'rgba(21, 21, 21, 0.55)',
   },
   doctorName: {
     fontSize: 22,

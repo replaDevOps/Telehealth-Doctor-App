@@ -6,11 +6,13 @@ import {
   StyleSheet,
   Image,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import { mvs } from '@config/metrices';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface HomeHeaderProps {
   centerName?: string;
@@ -19,22 +21,27 @@ interface HomeHeaderProps {
   doctorSpecialty?: string;
   doctorImage?: any;
   isActive?: boolean;
+  isStatusLoading?: boolean;
   onToggleActive?: (value: boolean) => void;
   onNotificationPress?: () => void;
   onLocationPress?: () => void;
+  notificationCount?: number;
 }
 
 const HomeHeader = ({
   centerName = 'Eden Medical Center',
   location = 'Makkah',
-  doctorName = 'Dr. Sultan Khan',
+  doctorName = 'Sultan Khan',
   doctorSpecialty = 'Dermatologist',
   doctorImage,
   isActive = true,
+  isStatusLoading = false,
   onToggleActive,
   onNotificationPress,
   onLocationPress,
+  notificationCount = 0,
 }: HomeHeaderProps) => {
+  const inset = useSafeAreaInsets()
   return (
     <LinearGradient
       colors={['#7625D7', '#591CA2', '#3E1371']}
@@ -42,7 +49,7 @@ const HomeHeader = ({
       end={{ x: 0.5, y: 1 }}
       style={styles.linearGradientContainer}
     >
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer, { paddingTop: inset.top+20 }]}>
         {/* Top Section - Medical Center Name & Notification */}
         <View style={styles.topRow}>
           <View style={styles.centerInfoContainer}>
@@ -62,11 +69,20 @@ const HomeHeader = ({
             onPress={onNotificationPress}
             activeOpacity={0.7}
           >
-            <Ionicons
-              name="notifications-outline"
-              size={24}
-              color={colors.black}
-            />
+            <View style={styles.notificationIconContainer}>
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color={colors.black}
+              />
+              {notificationCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {notificationCount > 99 ? '99+' : notificationCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -103,19 +119,25 @@ const HomeHeader = ({
             {/* Doctor Details */}
             <View style={styles.doctorDetails}>
               <Text style={styles.doctorName}>{doctorName}</Text>
-              <Text style={styles.doctorSpecialty}>{doctorSpecialty}</Text>
+              {/* <Text style={styles.doctorSpecialty}>{doctorSpecialty}</Text> */}
             </View>
           </View>
 
           {/* Active Toggle */}
-          <Switch
-            value={isActive}
-            onValueChange={onToggleActive}
-            trackColor={{ false: '#D1D1D6', true: '#34C759' }}
-            thumbColor={colors.white}
-            ios_backgroundColor="#D1D1D6"
-            style={styles.switch}
-          />
+          {isStatusLoading ? (
+            <View style={styles.switchLoaderContainer}>
+              <ActivityIndicator size="small" color={colors.white} />
+            </View>
+          ) : (
+            <Switch
+              value={isActive}
+              onValueChange={onToggleActive}
+              trackColor={{ false: '#D1D1D6', true: '#34C759' }}
+              thumbColor={colors.white}
+              ios_backgroundColor="#D1D1D6"
+              style={styles.switch}
+            />
+          )}
         </View>
       </View>
     </LinearGradient>
@@ -128,7 +150,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
   },
   headerContainer: {
-    paddingTop: 70,
     paddingBottom: 10,
     paddingHorizontal: 20,
   },
@@ -136,7 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   centerInfoContainer: {
     flex: 1,
@@ -164,6 +185,28 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  notificationIconContainer: {
+    position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: colors.red,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  notificationBadgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   doctorCard: {
     borderRadius: 16,
@@ -223,6 +266,12 @@ const styles = StyleSheet.create({
   },
   switch: {
     transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+  },
+  switchLoaderContainer: {
+    width: 51,
+    height: 31,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

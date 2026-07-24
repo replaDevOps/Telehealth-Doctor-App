@@ -33,5 +33,12 @@ export const styles = StyleSheet.create({
       },
       InputContainer:{
         marginTop:50
+      },
+      apiErrorText: {
+        color: colors.red,
+        fontSize: mvs(13),
+        fontWeight: '600',
+        textAlign: 'center',
+        marginTop: mvs(10),
       }
 });

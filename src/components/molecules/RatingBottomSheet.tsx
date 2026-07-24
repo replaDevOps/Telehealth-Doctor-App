@@ -1,6 +1,7 @@
 /*  RatingBottomSheet.tsx  */
 import { RatingSvg } from '@assets/icons';
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -27,12 +28,13 @@ const RatingBottomSheet = ({ visible, onClose, onSubmit }) => {
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const insets = useSafeAreaInsets();
 
+  const { t } = useTranslation();
   const ratingLabels = {
-    1: 'Unsatisfied',
-    2: 'Needs improvement',
-    3: 'Average',
-    4: 'Satisfied',
-    5: 'Excellent',
+    1: t('rating.labels.1'),
+    2: t('rating.labels.2'),
+    3: t('rating.labels.3'),
+    4: t('rating.labels.4'),
+    5: t('rating.labels.5'),
   };
 
   /* ----------  Modal animation  ---------- */
@@ -155,19 +157,17 @@ const RatingBottomSheet = ({ visible, onClose, onSubmit }) => {
             bounces={false}
           >
             <View style={styles.content}>
-              <Text style={styles.title}>Rate Your Experience</Text>
-              <Text style={styles.subtitle}>
-                Share your feedback to help us improve.
-              </Text>
+              <Text style={styles.title}>{t('rating.title')}</Text>
+              <Text style={styles.subtitle}>{t('rating.subtitle')}</Text>
 
               {renderStars()}
               <Text style={styles.ratingLabel}>{ratingLabels[rating]}</Text>
 
-              <Text style={styles.feedbackLabel}>Tell us more (optional)</Text>
+              <Text style={styles.feedbackLabel}>{t('rating.feedbackLabel')}</Text>
 
               <View style={styles.textInputContainer}>
                 <TextInput
-                  placeholder="Share any comments or suggestions..."
+                  placeholder={t('rating.placeholder')}
                   placeholderTextColor="#999"
                   multiline
                   maxLength={100}
@@ -183,7 +183,7 @@ const RatingBottomSheet = ({ visible, onClose, onSubmit }) => {
 
           {/* Sticky submit button */}
           <View style={styles.submitWrapper}>
-            <CustomButton title="Submit Feedback" onPress={handleSubmit} />
+            <CustomButton title={t('rating.submit')} onPress={handleSubmit} />
           </View>
         </Animated.View>
       </KeyboardAvoidingView>

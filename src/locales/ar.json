@@ -1,0 +1,163 @@
+{
+  "common": {
+    "next": "التالي",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "skip": "تخطي",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "ok": "موافق",
+    "yes": "نعم",
+    "no": "لا",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "search": "بحث",
+    "submit": "إرسال",
+    "continue": "متابعة",
+    "needHelp": "تحتاج مساعدة؟",
+    "contactAdmin": "تواصل مع الإدارة"
+  },
+  "language": {
+    "title": "اختر اللغة",
+    "subtitle": "اختر لغتك المفضلة.",
+    "english": "الإنجليزية",
+    "arabic": "العربية"
+  },
+  "auth": {
+    "welcomeBack": "مرحباً بعودتك",
+    "loginSubtitle": "سجل دخولك واستمر في رحلتك الصحية اليوم!",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "phoneNumber": "رقم الهاتف",
+    "password": "كلمة المرور",
+    "enterPassword": "أدخل كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "phoneRequired": "رقم الهاتف مطلوب",
+    "invalidPhone": "يرجى إدخال رقم هاتف صالح",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "loginFailed": "فشل تسجيل الدخول. يرجى التحقق من بياناتك والمحاولة مرة أخرى."
+    ,"otpCode": "رمز التحقق",
+    "enterOtpDescription": "أدخل رمز التحقق المكون من 5 أرقام المُرسل إلى بريدك الإلكتروني {{email}}.",
+    "confirm": "تأكيد",
+    "verifying": "جارٍ التحقق…",
+    "createPassword": "إنشاء كلمة مرور",
+    "setNewPassword": "تعيين كلمة مرور جديدة",
+    "forgetPasswordTitle": "نسيت كلمة المرور"
+  },
+
+  "forget": {
+    "description": "أدخل عنوان البريد الإلكتروني أو رقم الهاتف لإرسال رمز التحقق (OTP).",
+    "emailTab": "البريد الإلكتروني",
+    "phoneTab": "رقم الهاتف",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل عنوان البريد الإلكتروني",
+    "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
+    "invalidPhone": "رقم هاتف غير صالح",
+    "rememberPassword": "تذكر كلمة المرور؟",
+    "signIn": "تسجيل الدخول"
+  },
+  "otp": {
+    "didntReceiveCode": "لم تستلم الرمز؟",
+    "resendCode": "إعادة إرسال الرمز"
+  },
+  "onboarding": {
+    "getStarted": "ابدأ الآن",
+    "skip": "تخطي"
+  },
+  "home": {
+    "title": "الرئيسية",
+    "welcome": "مرحباً"
+  },
+  "recent": {
+    "recentConsultations": "الاستشارات الأخيرة",
+    "loadingConsultations": "جارٍ تحميل الاستشارات...",
+    "noRecentConsultations": "لا توجد استشارات حديثة."
+  },
+  "rating": {
+    "title": "قيّم تجربتك",
+    "subtitle": "شاركنا ملاحظاتك لمساعدتنا على التحسين.",
+    "labels": {
+      "1": "غير راضٍ",
+      "2": "بحاجة لتحسين",
+      "3": "متوسط",
+      "4": "راضٍ",
+      "5": "ممتاز"
+    },
+    "feedbackLabel": "أخبرنا المزيد (اختياري)",
+    "placeholder": "شارك أي تعليقات أو اقتراحات...",
+    "submit": "إرسال التعليقات"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "signature": "توقيعي",
+    "passwordManager": "مدير كلمات المرور",
+    "password": "كلمة المرور",
+    "profile": "الملف الشخصي",
+    "language": "اللغة",
+    "notifications": "الإشعارات",
+    "logout": "تسجيل الخروج",
+    "deleteAccount": "حذف الحساب",
+    "faqs": "الأسئلة الشائعة",
+    "contactAdmin": "تواصل مع المسؤول"
+  },
+  "settingsScreen": {
+    "personalInformation": "المعلومات الشخصية",
+    "workingHour": "ساعات العمل",
+    "specialization": "التخصص",
+    "yearsExperience": "سنوات الخبرة",
+    "dayOff": "عطلة",
+    "noWorkingHours": "لا توجد ساعات عمل متاحة",
+    "logoutConfirmTitle": "تسجيل الخروج",
+    "logoutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "loggingOut": "جاري تسجيل الخروج..."
+  },
+  "chat": {
+    "title": "الدردشة",
+    "end": "إنهاء",
+    "aiChatHistory": "سجل الدردشة بالذكاء الاصطناعي"
+  },
+  "history": {
+    "title": "السجل",
+    "searchPlaceholder": "ابحث عن طريق اسم المريض أو الخدمة..."
+  },
+  "profile": {
+    "title": "إعدادات الملف الشخصي",
+    "setupTitle": "إعداد ملفك الشخصي",
+    "setupDescription": "قم بإعداد ملفك الشخصي بالتفاصيل الأساسية.",
+    "personalInfo": "المعلومات الشخصية",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "gender": "الجنس",
+    "age": "العمر",
+    "selectGender": "اختر الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "آخر"
+  }
+
+  ,"validation": {
+    "nameRequired": "الاسم مطلوب",
+    "validEmail": "بريد إلكتروني صالح مطلوب",
+    "validPhone": "رقم هاتف صالح مطلوب",
+    "selectNationality": "اختر الجنسية",
+    "idRequired": "الهوية مطلوبة",
+    "selectGender": "اختر الجنس",
+    "ageRequired": "العمر مطلوب"
+  },
+  "screens": {
+    "cart": "السلة",
+    "prescription": "الوصفة الطبية",
+    "clinic": "العيادة",
+    "checkout": "الدفع",
+    "refund": "طلب استرداد",
+    "nearbyClinic": "العيادات القريبة",
+    "selectLocation": "اختر الموقع",
+    "noSignature": "لم يتم إضافة توقيع بعد",
+    "currentSignature": "التوقيع الحالي",
+    "prescription_saved_successfully": "تم حفظ الوصفة كملف PDF بنجاح"
+  }
+}

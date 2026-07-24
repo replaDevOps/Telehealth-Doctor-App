@@ -49,7 +49,7 @@ export function ConsultationPayment({ navigation, route }) {
           chatType: 'doctor',
           doctorInfo: {
             id: 'doctor_1',
-            name: 'Dr. Sultan Khan',
+            name: 'Sultan Khan',
             avatar: 'https://i.pravatar.cc/150?img=12',
           },
           clinicInfo: {
@@ -62,7 +62,7 @@ export function ConsultationPayment({ navigation, route }) {
         // Navigate to Audio Consultation
         navigation.navigate('AudioConsultation', {
           doctorInfo: {
-            name: 'Dr. Yasmin Chowdhury',
+            name: 'Yasmin Chowdhury',
             avatar: doctor,
             specialization: 'Dermatologist',
           },
@@ -71,7 +71,7 @@ export function ConsultationPayment({ navigation, route }) {
         // Navigate to Video Consultation
         navigation.navigate('VideoConsultation', {
           doctorInfo: {
-            name: 'Dr. Yasmin Chowdhury',
+            name: 'Yasmin Chowdhury',
             avatar: doctor,
             specialization: 'Dermatologist',
           },

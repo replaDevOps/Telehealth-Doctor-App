@@ -2,8 +2,7 @@ import React from 'react';
 import {
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../../styles/colors';
@@ -13,7 +12,6 @@ interface MessageInputProps {
   message: string;
   setMessage: (message: string) => void;
   handleSend: () => void;
-  handleImagePick: () => void;
   canSendMessages: boolean;
 }
 
@@ -21,7 +19,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   message,
   setMessage,
   handleSend,
-  handleImagePick,
   canSendMessages,
 }) => {
   if (!canSendMessages) {
@@ -29,14 +26,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      style={styles.inputContainer}
-    >
-      <TouchableOpacity style={styles.preButton} onPress={handleImagePick}>
-        <Ionicons name="add-sharp" size={24} color={colors.white} />
-      </TouchableOpacity>
+    <View style={styles.inputContainer}>
       <TextInput
         style={styles.input}
         placeholder="Message"
@@ -55,6 +45,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       >
         <Ionicons name="send" size={24} color={colors.white} />
       </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </View>
   );
 };

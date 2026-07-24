@@ -1,8 +1,10 @@
-import React from 'react';
-import { View, Text, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, ActivityIndicator, TouchableOpacity, Modal, Pressable } from 'react-native';
+import FastImage from '@d11/react-native-fast-image';
 import { Suggestion } from '../Suggestion';
 import { Message as MessageType, Service } from '../../../types/chat.types';
 import { styles } from './style';
+import { formatTimestampToLocal } from '../../../constants/appData';
 
 interface MessageProps {
   msg: MessageType;
@@ -10,15 +12,33 @@ interface MessageProps {
   handleServicePress: (service: Service) => void;
 }
 
+const renderBoldText = (text: string, baseStyle: any) => {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  if (parts.length === 1) return <Text style={baseStyle}>{text}</Text>;
+  return (
+    <Text style={baseStyle}>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <Text key={i} style={{ fontWeight: 'bold' }}>{part}</Text>
+        ) : (
+          part
+        ),
+      )}
+    </Text>
+  );
+};
+
 export const Message: React.FC<MessageProps> = ({
   msg,
   showAvatar,
   handleServicePress,
 }) => {
+  const [loadingImages, setLoadingImages] = useState<{ [key: number]: boolean }>({});
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const isUser = msg.type === 'user';
   const hasText = msg.text && msg.text.trim().length > 0;
   const hasImages = msg.images && msg.images.length > 0;
-
+  const formattedTime = formatTimestampToLocal(msg.timestamp);
   return (
     <View style={styles.messageContainer}>
       {/* Bot Message */}
@@ -29,11 +49,58 @@ export const Message: React.FC<MessageProps> = ({
           )}
           <View style={styles.botMessageContent}>
             {showAvatar && msg.user && (
-              <Text style={styles.senderName}>{msg.user.name}</Text>
+              <View style={styles.messageHeader}>
+                <Text style={styles.senderName}>{msg.user.name}</Text>
+                <Text style={styles.timestamp}>{formattedTime}</Text>
+              </View>
             )}
-            {hasText && (
+            {(hasText || hasImages) && (
               <View style={styles.botMessage}>
-                <Text style={styles.botMessageText}>{msg.text}</Text>
+                {hasText && renderBoldText(msg.text, styles.botMessageText)}
+                {hasImages && (
+                  <View style={styles.botImagesRow}>
+                    {msg.images?.map((img, i) => {
+                      const imageUri = typeof img === 'string' ? img : img?.uri;
+                      const isUploading = typeof img === 'object' && img?.isUploading;
+                      const isLoading = loadingImages[i] || false;
+                      
+                      // If URI doesn't start with http or file://, prepend BASE_URL
+                      const fullImageUri = imageUri && !imageUri.startsWith('http') && !imageUri.startsWith('file://')
+                        ? `https://telehealth.repla-projects.com/${imageUri}`
+                        : imageUri;
+
+                      const handleLoadStart = () => {
+                        setLoadingImages(prev => ({ ...prev, [i]: true }));
+                      };
+
+                      const handleLoadEnd = () => {
+                        setLoadingImages(prev => ({ ...prev, [i]: false }));
+                      };
+                      return (
+                        <TouchableOpacity 
+                          key={`img-${i}`} 
+                          style={styles.imageContainer}
+                          onPress={() => setFullScreenImage(fullImageUri)}
+                          activeOpacity={0.8}
+                        >
+                          <FastImage
+                            source={{ uri: fullImageUri }}
+                            style={styles.uploadedImage}
+                            resizeMode={FastImage.resizeMode.cover}
+                            onLoadStart={handleLoadStart}
+                            onLoadEnd={handleLoadEnd}
+                            onError={handleLoadEnd}
+                          />
+                          {(isUploading || isLoading) && (
+                            <View style={styles.uploadingOverlay}>
+                              <ActivityIndicator size="small" color="#fff" />
+                            </View>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
               </View>
             )}
             {msg.suggestions && (
@@ -51,7 +118,7 @@ export const Message: React.FC<MessageProps> = ({
         <View style={styles.userMessageWrapper}>
           {showAvatar && msg.user && (
             <View style={styles.userMessageHeader}>
-              <Text style={styles.timestamp}>{msg.timestamp}</Text>
+              <Text style={styles.timestamp}>{formattedTime}</Text>
               <Text style={styles.senderName}>{msg.user.name}</Text>
               <Image source={msg.user.avatar} style={styles.avatar} />
             </View>
@@ -65,17 +132,43 @@ export const Message: React.FC<MessageProps> = ({
               {hasImages && (
                 <View style={styles.imagesRow}>
                   {msg.images?.map((img, i) => {
-                    console.log(`Image ${i}:`, img);
-                    console.log(`Image ${i} type:`, typeof img);
-                    console.log(`Image ${i} has uri:`, img?.uri);
-                    console.log(`Image ${i} uri type:`, typeof img?.uri);
+                    const imageUri = typeof img === 'string' ? img : img?.uri;
+                    const isUploading = typeof img === 'object' && img?.isUploading;
+                    const isLoading = loadingImages[i] || false;
+                    
+                    // If URI doesn't start with http or file://, prepend BASE_URL
+                    const fullImageUri = imageUri && !imageUri.startsWith('http') && !imageUri.startsWith('file://')
+                      ? `https://telehealth.repla-projects.com/${imageUri}`
+                      : imageUri;
 
+                    const handleLoadStart = () => {
+                      setLoadingImages(prev => ({ ...prev, [i]: true }));
+                    };
+
+                    const handleLoadEnd = () => {
+                      setLoadingImages(prev => ({ ...prev, [i]: false }));
+                    };
                     return (
-                      <Image
-                        key={`img-${i}`}
-                        source={img}
-                        style={styles.uploadedImage}
-                      />
+                      <TouchableOpacity 
+                        key={`img-${i}`} 
+                        style={styles.imageContainer}
+                        onPress={() => setFullScreenImage(fullImageUri)}
+                        activeOpacity={0.8}
+                      >
+                        <FastImage
+                          source={{ uri: fullImageUri }}
+                          style={styles.uploadedImage}
+                          resizeMode={FastImage.resizeMode.cover}
+                          onLoadStart={handleLoadStart}
+                          onLoadEnd={handleLoadEnd}
+                          onError={handleLoadEnd}
+                        />
+                        {(isUploading || isLoading) && (
+                          <View style={styles.uploadingOverlay}>
+                            <ActivityIndicator size="small" color="#fff" />
+                          </View>
+                        )}
+                      </TouchableOpacity>
                     );
                   })}
                 </View>
@@ -84,6 +177,33 @@ export const Message: React.FC<MessageProps> = ({
           )}
         </View>
       )}
+
+      {/* Full Screen Image Modal */}
+      <Modal
+        visible={!!fullScreenImage}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setFullScreenImage(null)}
+      >
+        <Pressable 
+          style={styles.fullScreenModal}
+          onPress={() => setFullScreenImage(null)}
+        >
+          <TouchableOpacity 
+            style={styles.closeButton}
+            onPress={() => setFullScreenImage(null)}
+          >
+            <Text style={styles.closeButtonText}>✕</Text>
+          </TouchableOpacity>
+          {fullScreenImage && (
+            <FastImage
+              source={{ uri: fullScreenImage }}
+              style={styles.fullScreenImage}
+              resizeMode={FastImage.resizeMode.contain}
+            />
+          )}
+        </Pressable>
+      </Modal>
     </View>
   );
 };

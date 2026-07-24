@@ -14,6 +14,10 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: mvs(20),
       },
+      logo: {
+        width: mvs(120),
+        height: mvs(120),
+      },
       title: {
         fontSize: mvs(22),
         fontWeight: '600',

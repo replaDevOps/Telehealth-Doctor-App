@@ -20,4 +20,5 @@ export * from './StatsRow'
 export * from './Organisms/RecentConsultations'
 export * from './Organisms/ConsultationRequestModal'
 export * from './ConsultationRequestCard'
+export { default as PrescriptionBottomSheet } from './PrescriptionBottomSheet'
 
