@@ -5,11 +5,11 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Animated,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
+import Avatar from '@components/common/Avatar';
 
 export type ConsultationType = 'chat' | 'video' | 'audio';
 
@@ -116,13 +116,14 @@ const ConsultationRequestCard = ({
       <View style={styles.cardContent}>
         {/* Patient Info */}
         <View style={styles.patientSection}>
-          {patientImage ? (
-            <Image source={patientImage} style={styles.patientImage} />
-          ) : (
-            <View style={styles.patientImagePlaceholder}>
-              <Text style={styles.patientInitial}>{patientName.charAt(0)}</Text>
-            </View>
-          )}
+          <Avatar
+            name={patientName}
+            source={patientImage}
+            size={50}
+            borderRadius={10}
+            fontSize={20}
+            style={styles.patientImage}
+          />
           <View style={styles.patientDetails}>
             <Text style={styles.patientName}>{patientName}</Text>
             <Text style={styles.patientInfo}>
@@ -208,24 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: mvs(16),
   },
   patientImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 10,
     marginRight: mvs(12),
-  },
-  patientImagePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: '#E8D5F7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: mvs(12),
-  },
-  patientInitial: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#7625D7',
   },
   patientDetails: {
     flex: 1,

@@ -3,7 +3,8 @@ import { ImageSourcePropType } from 'react-native';
 
 export interface UserInfo {
   name: string;
-  avatar: ImageSourcePropType;
+  /** Omitted when the user has no picture — the UI shows their initials instead. */
+  avatar?: ImageSourcePropType | string | null;
 }
 
 export interface DoctorInfo extends UserInfo {

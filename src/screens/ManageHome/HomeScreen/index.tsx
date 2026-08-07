@@ -4,7 +4,6 @@ import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
 import { mvs } from '../../../config/metrices';
-import { doctor } from '@assets/images';
 import { ConsultationRequest } from '@components/molecules';
 import HomeHeader from '@components/molecules/HomeHeadder';
 import RecentConsultations from '@components/molecules/Organisms/RecentConsultations';
@@ -271,7 +270,7 @@ console.log('HomeScreen render', consultationRequests)
         location={location}
         doctorName={profileData?.name || ''}
         doctorSpecialty={profileData?.specialization || 'Dermatologist'}
-        doctorImage={profileData?.image ? { uri: profileData.image } : doctor}
+        doctorImage={profileData?.image}
         isActive={isActive}
         isStatusLoading={isStatusLoading}
         onToggleActive={handleToggleActive}

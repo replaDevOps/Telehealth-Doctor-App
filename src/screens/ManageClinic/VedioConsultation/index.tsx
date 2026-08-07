@@ -13,9 +13,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RTCView } from 'react-native-webrtc';
 import { colors } from '../../../styles/colors';
-import { patient } from '@assets/images';
+import { mvs } from '@config/metrices';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
 import { PrescriptionBottomSheet } from '@components/molecules';
+import Avatar, { resolveAvatarSource } from '@components/common/Avatar';
 import { styles } from './style';
 import { useWebRTC } from '../../../hooks/useWebRTC';
 import { Toast } from 'toastify-react-native';
@@ -28,25 +29,11 @@ import { useBackgroundTimer } from '../../../hooks/useBackgroundTimer';
 export function VideoConsultation({ navigation, route }) {
   const patientInfo = route?.params?.patientInfo || route?.params?.doctorInfo || {
     name: 'Patient',
-    avatar: patient,
     specialization: 'Patient',
   };
 
+  // Null when the patient has no picture — the initials avatar is shown instead.
   const patientImageSource = useMemo<ImageSourcePropType | null>(() => {
-    const fallbackImage = patientInfo?.avatar || patient;
-
-    const mergeRemoteSource = (source: any) => {
-      if (!source) return null;
-      if (typeof source === 'number') return source;
-      if (typeof source === 'string') {
-        return { uri: source };
-      }
-      if (typeof source === 'object' && source?.uri) {
-        return { uri: source.uri };
-      }
-      return null;
-    };
-
     const prioritizedSources = [
       patientInfo?.avatar,
       patientInfo?.image,
@@ -57,13 +44,13 @@ export function VideoConsultation({ navigation, route }) {
     ];
 
     for (const source of prioritizedSources) {
-      const parsed = mergeRemoteSource(source);
+      const parsed = resolveAvatarSource(source);
       if (parsed) {
         return parsed;
       }
     }
 
-    return mergeRemoteSource(fallbackImage);
+    return null;
   }, [patientInfo]);
 
   // Get consultation parameters from route
@@ -440,8 +427,15 @@ export function VideoConsultation({ navigation, route }) {
           <View style={styles.overlay} />
         </ImageBackground>
       ) : (
-        <View style={styles.darkBackground}>
+        <View style={[styles.darkBackground, styles.darkBackgroundCenter]}>
           <View style={styles.overlay} />
+          <Avatar
+            name={patientInfo?.name}
+            size={mvs(140)}
+            fontSize={mvs(52)}
+            backgroundColor="rgba(255, 255, 255, 0.15)"
+            textColor={colors.white}
+          />
         </View>
       )}
 

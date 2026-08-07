@@ -13,8 +13,9 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { patient } from '@assets/images';
 import { Header2 } from '@components/common/Header2';
+import Avatar from '@components/common/Avatar';
+import { mvs } from '@config/metrices';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { CustomButton } from '@components/common/CustomButton';
@@ -25,7 +26,8 @@ interface Doctor {
   name: string;
   credentials: string;
   signatureImage?: ImageSourcePropType;
-  image?: ImageSourcePropType;
+  /** Raw path or url; empty means the initials avatar is shown. */
+  image?: ImageSourcePropType | string;
 }
 
 interface Clinic {
@@ -245,9 +247,7 @@ export function PrescriptionDetail({ route, navigation }: Props) {
 
     // Map doctor data from consultation data
     const doctorData = consultationData.doctor || {};
-    const doctorImage = doctorData.image 
-      ? { uri: doctorData.image } 
-      : patient;
+    const doctorImage = doctorData.image || undefined;
     const signatureImage = doctorData.signature
       ? { uri: doctorData.signature }
       : undefined;
@@ -478,9 +478,12 @@ export function PrescriptionDetail({ route, navigation }: Props) {
 const DoctorCard: React.FC<{ doctor: Doctor; date: string; time: string }> = ({ doctor, date, time }) => {
   return (
     <View style={styles.doctorCard}>
-      <Image 
-        source={doctor.image || patient} 
-        style={styles.avatar as any} 
+      <Avatar
+        name={doctor.name}
+        source={doctor.image}
+        size={mvs(56)}
+        fontSize={mvs(20)}
+        style={styles.avatar as any}
       />
       <View style={styles.doctorInfo}>
         <Text style={styles.doctorName}>{doctor.name}</Text>

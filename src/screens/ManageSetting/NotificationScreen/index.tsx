@@ -23,15 +23,27 @@ interface NotificationItem {
 
 export const NotificationScreen = () => {
   const { t } = useTranslation();
-  const { notifications, isLoading, fetchNotifications, removeNotification, clearAll } = useNotificationStore();
+  const { notifications, isLoading, fetchNotifications, markAllAsRead, removeNotification, clearAll } = useNotificationStore();
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [clearingAll, setClearingAll] = useState(false);
 
-  // Fetch notifications on mount and when screen is focused
+  // Fetch notifications on mount and when screen is focused. Opening the panel
+  // counts as reading them, so clear the unread badge once they are loaded.
   useFocusEffect(
     useCallback(() => {
-      fetchNotifications();
-    }, [fetchNotifications])
+      let isActive = true;
+
+      (async () => {
+        await fetchNotifications();
+        if (isActive) {
+          await markAllAsRead();
+        }
+      })();
+
+      return () => {
+        isActive = false;
+      };
+    }, [fetchNotifications, markAllAsRead])
   );
 
   // Delete single notification
@@ -120,8 +132,10 @@ export const NotificationScreen = () => {
     title: item.title || item.type || 'Notification',
     message: item.message || item.description || item.body || item.content || '',
     time: item.dateTime || item.created_at || item.time || item.date || '',
-    read: item.read !== false && item.is_read !== false,
-    is_read: item.read !== false && item.is_read !== false,
+    // Match the store: only an explicit true counts as read, so genuinely new
+    // notifications render highlighted until markAllAsRead lands.
+    read: item.read === true || item.is_read === true,
+    is_read: item.read === true || item.is_read === true,
   }));
 
   return (

@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Switch,
   ActivityIndicator,
 } from 'react-native';
@@ -13,6 +12,7 @@ import { colors } from '../../styles/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import { mvs } from '@config/metrices';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Avatar from '@components/common/Avatar';
 
 interface HomeHeaderProps {
   centerName?: string;
@@ -91,15 +91,15 @@ const HomeHeader = ({
           <View style={styles.doctorInfoContainer}>
             {/* Doctor Avatar */}
             <View style={styles.avatarContainer}>
-              {doctorImage ? (
-                <Image source={doctorImage} style={styles.avatar} />
-              ) : (
-                <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                  <Text style={styles.avatarText}>
-                    {doctorName?.charAt(3) || 'D'}
-                  </Text>
-                </View>
-              )}
+              <Avatar
+                name={doctorName}
+                source={doctorImage}
+                size={48}
+                style={styles.avatar}
+                backgroundColor={colors.white}
+                textColor="#7625D7"
+                fontSize={20}
+              />
               {isActive && (
                 <View style={styles.activeIndicator}>
                   <Text
@@ -228,16 +228,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-  },
-  avatarPlaceholder: {
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#7625D7',
   },
   activeIndicator: {
     position: 'absolute',

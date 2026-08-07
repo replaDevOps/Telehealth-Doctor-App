@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../../styles/colors';
 import { CustomButton } from '@components/common/CustomButton';
 import { ApplePaySvg, MastercardSvg, StcPaySvg } from '@assets/icons';
-import { RecommandImage, doctor } from '@assets/images';
+import { RecommandImage } from '@assets/images';
 import { styles } from './style';
 
 export function ConsultationPayment({ navigation, route }) {
@@ -50,7 +50,6 @@ export function ConsultationPayment({ navigation, route }) {
           doctorInfo: {
             id: 'doctor_1',
             name: 'Sultan Khan',
-            avatar: 'https://i.pravatar.cc/150?img=12',
           },
           clinicInfo: {
             name: 'Eden Medical Center',
@@ -63,7 +62,6 @@ export function ConsultationPayment({ navigation, route }) {
         navigation.navigate('AudioConsultation', {
           doctorInfo: {
             name: 'Yasmin Chowdhury',
-            avatar: doctor,
             specialization: 'Dermatologist',
           },
         });
@@ -72,7 +70,6 @@ export function ConsultationPayment({ navigation, route }) {
         navigation.navigate('VideoConsultation', {
           doctorInfo: {
             name: 'Yasmin Chowdhury',
-            avatar: doctor,
             specialization: 'Dermatologist',
           },
         });

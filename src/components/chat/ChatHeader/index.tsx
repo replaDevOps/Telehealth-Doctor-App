@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Header2 } from '@components/common/Header2';
+import Avatar from '@components/common/Avatar';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
 import { DoctorInfo } from '../../../types/chat.types';
-import { patient as defaultPatientImage } from '../../../assets/images';
 import { AiChatHistoryBottomSheet } from '../AiChatHistoryBottomSheet';
 
 export type PatientInfoHeader = {
@@ -80,10 +80,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   const patient = consultationData?.patient;
   const patientName = patient?.name || patientInfo?.name || 'Patient';
-  const patientImage =
-    (patient?.image && (patient.image.startsWith('http') ? { uri: patient.image } : { uri: `https://telehealth.repla-projects.com/${patient.image}` })) ||
-    (patientInfo?.image && (typeof patientInfo.image === 'string' ? (patientInfo.image.startsWith('http') ? { uri: patientInfo.image } : { uri: `https://telehealth.repla-projects.com/${patientInfo.image}` }) : patientInfo.image)) ||
-    defaultPatientImage;
+  // Avatar resolves relative paths against the media host and falls back to initials.
+  const patientImage = patient?.image || patientInfo?.image;
   const gender = patient?.gender ?? patientInfo?.gender ?? '';
   const age = patient?.age ?? patientInfo?.age ?? '';
   const genderAgeLine = formatGenderAge(gender, age);
@@ -130,7 +128,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       <View style={styles.patientCard}>
         <View style={styles.patientInfoRow}>
           <View style={styles.patientAvatarWrapper}>
-            <Image source={patientImage} style={styles.patientAvatar} resizeMode="cover" />
+            <Avatar
+              name={patientName}
+              source={patientImage}
+              size={44}
+              fontSize={18}
+            />
           </View>
           <View style={styles.patientTextBlock}>
             <Text style={styles.patientName} numberOfLines={1}>{patientName}</Text>

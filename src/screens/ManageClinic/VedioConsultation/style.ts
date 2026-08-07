@@ -25,6 +25,10 @@ export const styles = StyleSheet.create({
       height: height,
       backgroundColor: '#1a1a1a', // Dark background color
     },
+    darkBackgroundCenter: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     overlay: {
       ...StyleSheet.absoluteFillObject,
     },

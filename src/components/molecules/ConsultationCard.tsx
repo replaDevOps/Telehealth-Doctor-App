@@ -1,8 +1,9 @@
 import { mvs } from '@config/metrices';
 import { colors } from '../../styles/colors';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Avatar from '@components/common/Avatar';
 
 interface ConsultationCardProps {
   sevviceName: string;
@@ -85,15 +86,13 @@ const ConsultationCard = ({
         {/* Patient Info */}
         <View style={styles.patientSection}>
           <View style={styles.patientInfo}>
-            {patientImage ? (
-              <Image source={patientImage} style={styles.patientImage} />
-            ) : (
-              <View style={styles.patientImagePlaceholder}>
-                <Text style={styles.patientInitial}>
-                  {patientName?.charAt(0)?.toUpperCase() || '?'}
-                </Text>
-              </View>
-            )}
+            <Avatar
+              name={patientName}
+              source={patientImage}
+              size={40}
+              borderRadius={6}
+              fontSize={16}
+            />
             <View style={styles.patientDetails}>
               <Text style={styles.patientName}>{patientName || 'Unknown Patient'}</Text>
               <Text style={styles.patientGender}>{patientInfo || ''}</Text>
@@ -225,24 +224,6 @@ const styles = StyleSheet.create({
   },
   patientDetails: {
     flex: 1,
-  },
-  patientImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 6,
-  },
-  patientImagePlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 6,
-    backgroundColor: '#E8D5F7',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  patientInitial: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#7625D7',
   },
   patientName: {
     fontSize: 16,

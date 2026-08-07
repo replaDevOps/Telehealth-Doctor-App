@@ -1,8 +1,6 @@
 import {
-  Image,
   StyleSheet,
   View,
-  Text,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -15,19 +13,12 @@ import { EditSvg } from '../../assets/icons';
 
 import { updateProfileImage } from '../../services/api';
 import { useProfileStore } from '../../store';
+import Avatar from './Avatar';
 
 interface UserProfileProps {
   profileImage?: string;
   onImageSelected?: (uri: string) => void;
 }
-
-const getInitials = (name?: string): string => {
-  if (!name) return '?';
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0][0].toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-};
 
 const UserProfile: React.FC<UserProfileProps> = ({
   profileImage: initialProfileImage = '',
@@ -80,8 +71,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
   }, [onImageSelected, refreshProfile]);
 
 
-  const initials = getInitials(profileData?.name);
-
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -90,13 +79,13 @@ const UserProfile: React.FC<UserProfileProps> = ({
         activeOpacity={0.8}
         disabled={isUploading}
       >
-        {profileImage ? (
-          <Image source={{ uri: profileImage }} style={[styles.profileImage]} />
-        ) : (
-          <View style={[styles.profileImage, styles.initialsAvatar]}>
-            <Text style={styles.initialsText}>{initials}</Text>
-          </View>
-        )}
+        <Avatar
+          name={profileData?.name}
+          source={profileImage}
+          size={mvs(100)}
+          fontSize={mvs(36)}
+          style={styles.profileImage}
+        />
 
         {/* Edit / Loading overlay */}
         {isUploading ? (
@@ -133,16 +122,6 @@ const styles = StyleSheet.create({
     borderRadius: mvs(50),
     borderWidth: 2,
     borderColor: colors.primary,
-  },
-  initialsAvatar: {
-    backgroundColor: '#E8D5F7',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  initialsText: {
-    fontSize: mvs(36),
-    fontWeight: '600',
-    color: colors.primary,
   },
   iconOverlay: {
     position: 'absolute',

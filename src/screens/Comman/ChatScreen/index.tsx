@@ -9,7 +9,6 @@ import { View, Text, ActivityIndicator, ScrollView, BackHandler, KeyboardAvoidin
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ServiceDetailBottomSheet, PrescriptionBottomSheet } from '@components/molecules';
 import { styles } from './style';
-import { patient } from '@assets/images';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
 import { launchImageLibrary } from 'react-native-image-picker';
 import {
@@ -68,13 +67,9 @@ export function ChatScreen({ navigation, route }) {
   const { profileData } = useProfileStore();
   const doctorID = user?.id;
   
-  // Get profile image from store (prioritize profileData.image over user.avatar)
-  const doctorProfileImage = profileData?.image || user?.avatar;
-  const doctorProfileAvatar = doctorProfileImage 
-    ? (doctorProfileImage.startsWith('http') 
-        ? { uri: doctorProfileImage } 
-        : { uri: `https://telehealth.repla-projects.com/${doctorProfileImage}` })
-    : doctorInfo.avatar;
+  // Get profile image from store (prioritize profileData.image over user.avatar).
+  // Left as a raw path — Avatar resolves it and falls back to initials when empty.
+  const doctorProfileAvatar = profileData?.image || user?.avatar || doctorInfo.avatar;
   
   // State to store patientID from consultation data
   const [consultationPatientID, setConsultationPatientID] = useState<string | number | undefined>(patientID);
@@ -109,17 +104,17 @@ export function ChatScreen({ navigation, route }) {
           ? { 
               // Use sender info from API if available, otherwise fallback to user/doctorInfo
               name: senderInfo?.name || user?.name || doctorInfo.name, 
-              avatar: senderInfo?.image ? { uri: senderInfo.image } : doctorInfo.avatar 
+              avatar: senderInfo?.image || doctorProfileAvatar 
             }
           : { 
               // Use sender info from API if available (patient), otherwise fallback to patientInfo
               name: senderInfo?.name || patientInfo?.name || 'Patient', 
-              avatar: senderInfo?.image ? { uri: senderInfo.image } : (patientInfo?.image || patient)
+              avatar: senderInfo?.image || patientInfo?.image
             },
         images: apiMsg.file ? [{ uri: apiMsg.file }] : undefined,
       };
     });
-  }, [user, doctorInfo, patientInfo, doctorID]);
+  }, [user, doctorInfo, patientInfo, doctorID, doctorProfileAvatar]);
 
   // Fetch consultation messages
   const fetchMessages = useCallback(async (silent: boolean = false) => {
@@ -299,12 +294,12 @@ export function ChatScreen({ navigation, route }) {
               ? { 
                   // Use sender info from Pusher if available, otherwise use consultation data or fallback
                   name: senderInfo?.name || doctorData?.name || user?.name || doctorInfo.name, 
-                  avatar: senderInfo?.image ? { uri: senderInfo.image } : (doctorData?.image ? { uri: doctorData.image } : doctorInfo.avatar)
+                  avatar: senderInfo?.image || doctorData?.image || doctorProfileAvatar
                 }
               : { 
                   // Use sender info from Pusher if available, otherwise use consultation data or fallback
                   name: senderInfo?.name || patientData?.name || patientInfo?.name || 'Patient', 
-                  avatar: senderInfo?.image ? { uri: senderInfo.image } : (patientData?.image ? { uri: patientData.image } : (patientInfo?.image ? { uri: patientInfo.image } : patient))
+                  avatar: senderInfo?.image || patientData?.image || patientInfo?.image
                 },
             images: (() => {
               const imagePath = messageData.file || messageData.image || messageData.fileUrl;
@@ -558,7 +553,7 @@ export function ChatScreen({ navigation, route }) {
         text: trimmedMessage,
         timestamp: getCurrentTimestamp(),
         user: showAvatar
-          ? { name: user?.name || doctorInfo.name, avatar: doctorInfo.avatar }
+          ? { name: profileData?.name || user?.name || doctorInfo.name, avatar: doctorProfileAvatar }
           : undefined,
       };
 

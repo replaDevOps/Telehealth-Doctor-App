@@ -1,4 +1,4 @@
-import { PipsImage, RecommandImage, doctor, onboarding1, onboarding2, onboarding3, patient, pimples } from "@assets/images";
+import { PipsImage, RecommandImage, onboarding1, onboarding2, onboarding3, pimples } from "@assets/images";
 import { DoctorInfo, ClinicInfo, Message } from '../types/chat.types';
 
 export const ONBOARDING_STEPS = [
@@ -338,7 +338,6 @@ export const CONSULTATION_HISTORY = [
     type: 'Chat',
     icon: 'chatbubble',
     doctorName: 'Doctor Name',
-    doctorAvatar: 'https://i.pravatar.cc/100?img=1',
     clinicName: 'Clinic Name',
     price: 'SAR 20',
   },
@@ -350,7 +349,6 @@ export const CONSULTATION_HISTORY = [
     type: 'Audio',
     icon: 'mic',
     doctorName: 'Doctor Name',
-    doctorAvatar: 'https://i.pravatar.cc/100?img=2',
     clinicName: 'Clinic Name',
     price: 'SAR 20',
   },
@@ -382,7 +380,6 @@ export const PAYMENT_HISTORY = [
     duration: '19 min',
     serviceName: 'Acne Itching Treatm...',
     doctorName: 'Doctor Name',
-    doctorAvatar: 'https://i.pravatar.cc/100?img=4',
     clinicName: 'Eden Medical Center',
     clinicLocation: 'Makkah, Saudi Arabia, 2.2km',
     price: 'SAR 20',
@@ -464,7 +461,6 @@ export const PAYMENT_HISTORY = [
 export const DEFAULT_DOCTOR_INFO: DoctorInfo = {
   id: 'doctor_1',
   name: 'Sultan Khan',
-  avatar: doctor,
   serviceName: '',
 };
 
@@ -552,21 +548,21 @@ export function getInitialMessages(
         type: 'bot',
         text: 'Hello',
         timestamp,
-        user: { name: doctorInfo.name, avatar: doctor },
+        user: { name: doctorInfo.name },
       },
       {
         id: '2',
         type: 'user',
         text: "I've been having some redness and small bumps on my cheeks for past few days.",
         timestamp,
-        user: { name: 'Bassil Kuncill Saadeh', avatar: patient },
+        user: { name: 'Bassil Kuncill Saadeh' },
       },
       {
         id: '3',
         type: 'bot',
         text: 'I recommend using a gentle cleanser and applying a hydrating cream twice daily...',
         timestamp,
-        user: { name: doctorInfo.name, avatar: doctor },
+        user: { name: doctorInfo.name },
         suggestions: [
           {
             id: '1',
@@ -647,7 +643,6 @@ export const CONSULTATION_REQUESTS = [
   {
     id: '1',
     patientName: 'Patient 1',
-    patientImage: doctor,
     sevviceName: 'Acne Treatment',
     gender: 'Male',
     date: '8/30/2024 11:35 am',
@@ -659,7 +654,6 @@ export const CONSULTATION_REQUESTS = [
   {
     id: '2',
     patientName: 'Patient 2',
-    patientImage: doctor,
     sevviceName: 'Acne Treatment',
     gender: 'Female',
     date: '8/30/2024 11:35 am',

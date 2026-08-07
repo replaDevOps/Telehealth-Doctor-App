@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, Image, ActivityIndicator, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, Modal, Pressable } from 'react-native';
 import FastImage from '@d11/react-native-fast-image';
+import Avatar from '../../common/Avatar';
 import { Suggestion } from '../Suggestion';
 import { Message as MessageType, Service } from '../../../types/chat.types';
 import { styles } from './style';
@@ -45,7 +46,13 @@ export const Message: React.FC<MessageProps> = ({
       {!isUser && (
         <View style={showAvatar && styles.botMessageWithAvatar}>
           {showAvatar && msg.user && (
-            <Image source={msg.user.avatar} style={styles.avatar} />
+            <Avatar
+              name={msg.user.name}
+              source={msg.user.avatar}
+              size={32}
+              fontSize={13}
+              style={styles.avatar}
+            />
           )}
           <View style={styles.botMessageContent}>
             {showAvatar && msg.user && (
@@ -120,7 +127,13 @@ export const Message: React.FC<MessageProps> = ({
             <View style={styles.userMessageHeader}>
               <Text style={styles.timestamp}>{formattedTime}</Text>
               <Text style={styles.senderName}>{msg.user.name}</Text>
-              <Image source={msg.user.avatar} style={styles.avatar} />
+              <Avatar
+                name={msg.user.name}
+                source={msg.user.avatar}
+                size={32}
+                fontSize={13}
+                style={styles.avatar}
+              />
             </View>
           )}
 
