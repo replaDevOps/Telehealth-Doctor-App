@@ -1,4 +1,13 @@
-import { PipsImage, RecommandImage, onboarding1, onboarding2, onboarding3, pimples } from "@assets/images";
+import {
+  PipsImage,
+  RecommandImage,
+  onboarding1,
+  onboarding2,
+  onboarding3,
+  onboardingArabic1,
+  onboardingArabic2,
+  pimples
+} from "@assets/images";
 import { DoctorInfo, ClinicInfo, Message } from '../types/chat.types';
 
 export const ONBOARDING_STEPS = [
@@ -13,6 +22,21 @@ export const ONBOARDING_STEPS = [
     imgSrc: onboarding2,
     content:
       'You can manage all consultations easily in one app.',
+  },
+];
+
+export const ONBOARDING_STEPS_ARABIC = [
+  {
+    title: 'تواصل مع مرضاك',
+    imgSrc: onboardingArabic1,
+    content:
+      'تواصل مع مرضاك بسهولة من خلال المحادثات المباشرة.',
+  },
+  {
+    title: 'إدارة استشاراتك',
+    imgSrc: onboardingArabic2,
+    content:
+      'يمكنك إدارة جميع الاستشارات بكل يسر وسهولة في تطبيق واحد.',
   },
 ];
 

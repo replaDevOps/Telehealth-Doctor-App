@@ -5,12 +5,17 @@ import { Header2 } from '../../../components/common/Header2';
 import { CustomButton } from '../../../components/common/CustomButton';
 import { styles } from './styles';
 import { FeatureItem } from './Components';
-import { ONBOARDING_STEPS } from '../../../constants';
+import { ONBOARDING_STEPS, ONBOARDING_STEPS_ARABIC } from '../../../constants';
 import { colors } from '../../../styles/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 export function OnboardingScreen({ navigation }: any) {
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const { t, i18n } = useTranslation();
+
+  const isArabic = i18n.language === 'ar' || i18n.language?.startsWith('ar');
+  const onboardingSteps = isArabic ? ONBOARDING_STEPS_ARABIC : ONBOARDING_STEPS;
 
   const markOnboardingComplete = async () => {
     try {
@@ -23,7 +28,7 @@ export function OnboardingScreen({ navigation }: any) {
   const handleNext = () => {
     console.log('Next button pressed');
     setCurrentStep(prev => {
-      if (prev === ONBOARDING_STEPS.length - 1) {
+      if (prev === onboardingSteps.length - 1) {
         // Mark onboarding as completed
         markOnboardingComplete();
         navigation.replace('SignIn');
@@ -33,7 +38,7 @@ export function OnboardingScreen({ navigation }: any) {
     });
   };
 
-  const activeStep = ONBOARDING_STEPS[currentStep];
+  const activeStep = onboardingSteps[currentStep];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
@@ -59,7 +64,7 @@ export function OnboardingScreen({ navigation }: any) {
       </ScrollView>
 
       <View style={styles.button}>
-        <CustomButton title="Next" onPress={handleNext} />
+        <CustomButton title={t('common.next', 'Next')} onPress={handleNext} />
       </View>
     </SafeAreaView>
   );
