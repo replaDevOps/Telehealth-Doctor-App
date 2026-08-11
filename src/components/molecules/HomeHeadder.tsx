@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { mvs } from '@config/metrices';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Avatar from '@components/common/Avatar';
+import { useTranslation } from 'react-i18next';
 
 interface HomeHeaderProps {
   centerName?: string;
@@ -41,6 +42,7 @@ const HomeHeader = ({
   onLocationPress,
   notificationCount = 0,
 }: HomeHeaderProps) => {
+  const { t } = useTranslation();
   const inset = useSafeAreaInsets()
   return (
     <LinearGradient
@@ -110,7 +112,7 @@ const HomeHeader = ({
                       fontWeight: '600',
                     }}
                   >
-                    Active
+                    {t('home.active')}
                   </Text>
                 </View>
               )}

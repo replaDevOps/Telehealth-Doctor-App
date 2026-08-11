@@ -31,21 +31,21 @@ export const ChangePassword = ({ navigation }: { navigation: any }) => {
     const validationErrors: typeof errors = {};
 
     if (!oldPassword.trim()) {
-      validationErrors.oldPassword = 'Old password is required.';
+      validationErrors.oldPassword = t('changePassword.oldPasswordRequired');
     }
 
     if (!newPassword.trim()) {
-      validationErrors.newPassword = 'New password is required.';
+      validationErrors.newPassword = t('changePassword.newPasswordRequired');
     } else {
       // Validate password (min 8 chars, at least one number and one special character)
       const pwdRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
       if (!pwdRegex.test(newPassword)) {
-        validationErrors.newPassword = 'Password must be at least 8 characters long and include a number and a special character.';
+        validationErrors.newPassword = t('changePassword.passwordCriteria');
       }
     }
 
     if (!confirmPassword.trim()) {
-      validationErrors.confirmPassword = 'Please re-type the new password.';
+      validationErrors.confirmPassword = t('changePassword.retypePasswordRequired');
     }
 
     if (
@@ -53,7 +53,7 @@ export const ChangePassword = ({ navigation }: { navigation: any }) => {
       confirmPassword.trim() &&
       newPassword !== confirmPassword
     ) {
-      validationErrors.confirmPassword = 'Passwords do not match.';
+      validationErrors.confirmPassword = t('changePassword.passwordsDoNotMatch');
     }
 
     if (Object.keys(validationErrors).length) {
@@ -85,14 +85,14 @@ const [loading, setLoading] = useState(false);
       });
 
       // Show toast on success
-      Toast.success('Password changed successfully');
+      Toast.success(t('changePassword.passwordChangedSuccess'));
       navigation.goBack();
     } catch (err: any) {
       console.error('Change password error:', err);
       const apiError =
         err?.response?.data?.message ||
         err?.message ||
-        'Failed to change password';
+        t('changePassword.passwordChangeFailed');
       // Show API error as toast
       Toast.error(apiError);
     } finally {
@@ -108,8 +108,8 @@ const [loading, setLoading] = useState(false);
         <View style={styles.container}>
           <View style={styles.InputContainer}>
             <CustomTextInput
-              label="Old Password"
-              placeholder="Enter old password"
+              label={t('changePassword.oldPassword')}
+              placeholder={t('changePassword.enterOldPassword')}
               value={oldPassword}
               onChangeText={text => {
                 setOldPassword(text);
@@ -119,8 +119,8 @@ const [loading, setLoading] = useState(false);
               errorMessage={errors.oldPassword}
             />
             <CustomTextInput
-              label="New Password"
-              placeholder="Enter new password"
+              label={t('changePassword.newPassword')}
+              placeholder={t('changePassword.enterNewPassword')}
               value={newPassword}
               onChangeText={text => {
                 setNewPassword(text);
@@ -130,8 +130,8 @@ const [loading, setLoading] = useState(false);
               errorMessage={errors.newPassword}
             />
             <CustomTextInput
-              label="Re-Type Password"
-              placeholder="Re-Type New Password"
+              label={t('changePassword.retypePassword')}
+              placeholder={t('changePassword.retypeNewPassword')}
               secureTextEntry
               value={confirmPassword}
               onChangeText={text => {

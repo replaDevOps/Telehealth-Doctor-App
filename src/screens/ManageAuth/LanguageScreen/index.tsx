@@ -24,31 +24,20 @@ export function LanguageScreen() {
     setSelectedLang(language);
   }, [language]);
 
-  const handleNext = async () => {
-    console.log('Selected Language:', selectedLang);
-    console.log('Current language before update:', language);
-
+  const handleSelectLanguage = async (lang: 'en' | 'ar') => {
+    setSelectedLang(lang);
     try {
-      // Update language in context (which also saves to AsyncStorage)
-      await setLanguage(selectedLang);
-      console.log('Language updated successfully to:', selectedLang);
-
-      // Add a small delay to ensure state is updated
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      } else {
-        navigation.navigate('Auth', { screen: 'Onboarding' });
-      }
+      await setLanguage(lang);
     } catch (error) {
-      console.error('Error saving language selection:', error);
-      // Still navigate even if save fails
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      } else {
-        navigation.navigate('Auth', { screen: 'Onboarding' });
-      }
+      console.error('Error applying language selection:', error);
+    }
+  };
+
+  const handleNext = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('Auth', { screen: 'Onboarding' });
     }
   };
 
@@ -82,7 +71,7 @@ export function LanguageScreen() {
                 styles.langOption,
                 selectedLang === 'en' && styles.activeLangOption,
               ]}
-              onPress={() => setSelectedLang('en')}
+              onPress={() => handleSelectLanguage('en')}
             >
               <View style={{ flexDirection: 'row', gap: mvs(10) }}>
                 <View style={styles.radioOuter}>
@@ -98,7 +87,7 @@ export function LanguageScreen() {
                 styles.langOption,
                 selectedLang === 'ar' && styles.activeLangOption,
               ]}
-              onPress={() => setSelectedLang('ar')}
+              onPress={() => handleSelectLanguage('ar')}
             >
               <View style={{ flexDirection: 'row', gap: mvs(10) }}>
                 <View style={styles.radioOuter}>

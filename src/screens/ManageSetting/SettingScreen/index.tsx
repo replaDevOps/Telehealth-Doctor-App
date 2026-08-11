@@ -60,12 +60,12 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out?',
+      t('settingsScreen.logoutConfirmTitle'),
+      t('settingsScreen.logoutConfirmMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Log Out',
+          text: t('settingsScreen.logoutConfirmTitle'),
           style: 'destructive',
           onPress: async () => {
             setIsLoggingOut(true);
@@ -98,11 +98,15 @@ export const SettingScreen = ({ navigation }: { navigation: any }) => {
   };
 
   // Format working hours from API
-  const displayWorkingHours = profileData?.working_hours?.map(item => ({
-    day: item.day.charAt(0).toUpperCase() + item.day.slice(1).toLowerCase(),
-    time: item.status === 1 ? `${item.fromTime} - ${item.toTime}` : 'Day Off',
-    isDayOff: item.status !== 1,
-  })) || [];
+  const displayWorkingHours = profileData?.working_hours?.map(item => {
+    const rawDay = (item.day || '').toLowerCase();
+    const formattedDefault = item.day ? item.day.charAt(0).toUpperCase() + item.day.slice(1).toLowerCase() : '';
+    return {
+      day: t(`days.${rawDay}`, { defaultValue: formattedDefault }),
+      time: item.status === 1 ? `${item.fromTime} - ${item.toTime}` : t('settingsScreen.dayOff'),
+      isDayOff: item.status !== 1,
+    };
+  }) || [];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['top']}>

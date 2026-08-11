@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { View, Text, ActivityIndicator, ScrollView, BackHandler, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { ServiceDetailBottomSheet, PrescriptionBottomSheet } from '@components/molecules';
 import { styles } from './style';
 import ConsultationEndedModal from '@components/molecules/EndSectionModal';
@@ -34,6 +35,7 @@ import { useBackgroundTimer } from '../../../hooks/useBackgroundTimer';
 
 // ---------- Main Component ----------
 export function ChatScreen({ navigation, route }) {
+  const { t } = useTranslation();
   // Extract route params with defaults
   const consultationId = route?.params?.id || route?.params?.consultationId;
   const chatType = route?.params?.chatType || (consultationId ? 'doctor' : 'ai');
@@ -829,7 +831,7 @@ export function ChatScreen({ navigation, route }) {
       {isLoadingMessages ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#7625D7" />
-          <Text style={styles.loadingText}>Loading messages...</Text>
+          <Text style={styles.loadingText}>{t('chat.loadingMessages')}</Text>
         </View>
       ) : messages.length > 0 ? (
         <MessageList
@@ -841,11 +843,11 @@ export function ChatScreen({ navigation, route }) {
       ) : (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>💬</Text>
-          <Text style={styles.emptyTitle}>No messages yet</Text>
+          <Text style={styles.emptyTitle}>{t('chat.noMessages')}</Text>
           <Text style={styles.emptyMessage}>
             {consultationId 
-              ? 'Start the conversation by sending a message to the patient.'
-              : 'Start the conversation by sending a message.'}
+              ? t('chat.startConversationPatient')
+              : t('chat.startConversation')}
           </Text>
         </View>
       )}

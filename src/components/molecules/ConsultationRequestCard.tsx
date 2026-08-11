@@ -10,6 +10,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles/colors';
 import Avatar from '@components/common/Avatar';
+import { useTranslation } from 'react-i18next';
 
 export type ConsultationType = 'chat' | 'video' | 'audio';
 
@@ -36,6 +37,7 @@ const ConsultationRequestCard = ({
   onAccept,
   onDecline,
 }: ConsultationRequestCardProps) => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const progress = useRef(new Animated.Value(1)).current;
 
@@ -81,13 +83,13 @@ const ConsultationRequestCard = ({
   const getConsultationLabel = () => {
     switch (consultationType) {
       case 'video':
-        return 'Video';
+        return t('chat.video');
       case 'audio':
-        return 'Audio';
+        return t('chat.audio');
       case 'chat':
-        return 'Chat';
+        return t('chat.title');
       default:
-        return 'Chat';
+        return t('chat.title');
     }
   };
 
@@ -127,7 +129,7 @@ const ConsultationRequestCard = ({
           <View style={styles.patientDetails}>
             <Text style={styles.patientName}>{patientName}</Text>
             <Text style={styles.patientInfo}>
-              {capitalizeFirst(String(patientGender))}, {patientAge} Year old
+              {capitalizeFirst(String(patientGender))}, {patientAge} {t('consultation.yearOld')}
             </Text>
           </View>
           {/* <Text style={styles.timerText}>{timeLeft}s</Text> */}
@@ -140,14 +142,14 @@ const ConsultationRequestCard = ({
             onPress={onDecline}
             activeOpacity={0.7}
           >
-            <Text style={styles.declineButtonText}>Decline</Text>
+            <Text style={styles.declineButtonText}>{t('consultation.decline')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.acceptButton}
             onPress={onAccept}
             activeOpacity={0.7}
           >
-            <Text style={styles.acceptButtonText}>Accept</Text>
+            <Text style={styles.acceptButtonText}>{t('consultation.accept')}</Text>
           </TouchableOpacity>
         </View>
       </View>

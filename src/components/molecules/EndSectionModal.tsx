@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { colors } from '../../styles/colors'; // Adjust path as needed
 import { mvs } from '@config/metrices';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 const MODAL_WIDTH = width * 0.85;
@@ -32,23 +33,24 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
   onEndConsultation,
   hasPrescription = false,
 }) => {
+  const { t } = useTranslation();
   const shouldPromptForPrescription = isDoctor && !hasPrescription && onAddPrescription && onEndConsultation;
   const isPrescriptionAddedButNotEnded = isDoctor && hasPrescription && onEndConsultation;
   const isConsultationEnded = isDoctor && !onEndConsultation; // Consultation has ended
 
   const titleText = isConsultationEnded
-    ? 'Consultation Ended!'
-    : 'End Consultation?';
+    ? t('endModal.titleEnded')
+    : t('endModal.titleEndPrompt');
 
   const descriptionText = isPrescriptionAddedButNotEnded
-    ? 'Are you ready to end this consultation?'
+    ? t('endModal.descReadyToEnd')
     : isDoctor && hasPrescription
-      ? 'The consultation has ended successfully.'
+      ? t('endModal.descEndedSuccess')
       : isDoctor && isConsultationEnded
-        ? 'The consultation has ended.'
+        ? t('endModal.descEnded')
         : isDoctor
-          ? 'Are you ready to end this consultation?'
-          : 'The consultation has ended.';
+          ? t('endModal.descReadyToEnd')
+          : t('endModal.descEnded');
 
   const handleEndPress = () => {
     if (onEndConsultation) {
@@ -86,7 +88,7 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                 onPress={handleEndPress}
               >
                 <Text style={[styles.actionButtonText, styles.secondaryActionText]}>
-                  End Consultation
+                  {t('endModal.endConsultation')}
                 </Text>
               </TouchableOpacity>
               {/* {!hasPrescription && (
@@ -95,38 +97,38 @@ const ConsultationEndedModal: React.FC<ConsultationEndedModalProps> = ({
                   onPress={onAddPrescription || onClose}
                   disabled={!onAddPrescription}
                 >
-                  <Text style={styles.primaryActionText}>Write Prescription</Text>
+                  <Text style={styles.primaryActionText}>{t('endModal.writePrescription')}</Text>
                 </TouchableOpacity>
               )} */}
             </View>
           ) : onEndConsultation ? (
             <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text style={styles.closeButtonText}>{t('endModal.close')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.closeButton, styles.endConsultationButton]}
                 onPress={onEndConsultation}
               >
-                <Text style={styles.endConsultationButtonText}>End Consultation</Text>
+                <Text style={styles.endConsultationButtonText}>{t('endModal.endConsultation')}</Text>
               </TouchableOpacity>
             </View>
           ) : isConsultationEnded && !hasPrescription && onAddPrescription ? (
             <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text style={styles.closeButtonText}>{t('endModal.close')}</Text>
               </TouchableOpacity>
               {/* <TouchableOpacity 
                 style={[styles.closeButton, styles.endConsultationButton]} 
                 onPress={onAddPrescription}
               >
-                <Text style={styles.endConsultationButtonText}>Add Prescription</Text>
+                <Text style={styles.endConsultationButtonText}>{t('endModal.addPrescription')}</Text>
               </TouchableOpacity> */}
             </View>
           ) : (
             <View style={styles.buttonRow}>
               <TouchableOpacity style={[styles.closeButton, { flex: 1 }]} onPress={onClose}>
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text style={styles.closeButtonText}>{t('endModal.close')}</Text>
               </TouchableOpacity>
             </View>
           )}

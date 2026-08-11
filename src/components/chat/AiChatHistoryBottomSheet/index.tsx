@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../../styles/colors';
 import {
   venaAIService,
@@ -67,6 +68,7 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
   onClose,
   onSessionPress,
 }) => {
+  const { t } = useTranslation();
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const insets = useSafeAreaInsets();
 
@@ -160,7 +162,7 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
       </View>
       <View style={styles.sessionBody}>
         <View style={styles.sessionRow}>
-          <Text style={styles.sessionIndex}>Session #{index + 1}</Text>
+          <Text style={styles.sessionIndex}>{t('chat.session')} #{index + 1}</Text>
           <Text style={styles.sessionDate}>{formatDate(item.createdAt)}</Text>
         </View>
         {item.lastMessage ? (
@@ -168,11 +170,11 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
             {item.lastMessage}
           </Text>
         ) : (
-          <Text style={styles.sessionNoMessage}>No messages yet</Text>
+          <Text style={styles.sessionNoMessage}>{t('chat.noMessages')}</Text>
         )}
         <View style={styles.sessionMeta}>
           <Ionicons name="chatbubble-ellipses-outline" size={12} color={colors.secondaryText} />
-          <Text style={styles.sessionMetaText}>{item.messageCount} messages</Text>
+          <Text style={styles.sessionMetaText}>{item.messageCount} {t('chat.messagesCount')}</Text>
           {item.lastMessageAt ? (
             <>
               <Text style={styles.sessionMetaDot}>·</Text>
@@ -253,7 +255,7 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
     );
   };
 
-  const headerTitle = mode === 'chat' ? 'Chat With Vena AI' : 'Sessions';
+  const headerTitle = mode === 'chat' ? t('chat.chatWithVenaAI') : t('chat.sessions');
 
   return (
     <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
@@ -296,14 +298,14 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
               <Ionicons name="alert-circle-outline" size={40} color="#ef4444" />
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity style={styles.retryButton} onPress={fetchSessions}>
-                <Text style={styles.retryButtonText}>Retry</Text>
+                <Text style={styles.retryButtonText}>{t('chat.retry')}</Text>
               </TouchableOpacity>
             </View>
           ) : sessions.length === 0 ? (
             <View style={styles.centered}>
               <Ionicons name="chatbubbles-outline" size={48} color={colors.border} />
-              <Text style={styles.emptyTitle}>No AI Chat History</Text>
-              <Text style={styles.emptySubtitle}>Previous AI conversations will appear here.</Text>
+              <Text style={styles.emptyTitle}>{t('chat.noAiChatHistory')}</Text>
+              <Text style={styles.emptySubtitle}>{t('chat.noAiChatHistoryDesc')}</Text>
             </View>
           ) : (
             <FlatList
@@ -327,13 +329,13 @@ export const AiChatHistoryBottomSheet: React.FC<AiChatHistoryBottomSheetProps> =
               style={styles.retryButton}
               onPress={() => activeChatId && fetchChat(activeChatId)}
             >
-              <Text style={styles.retryButtonText}>Retry</Text>
+              <Text style={styles.retryButtonText}>{t('chat.retry')}</Text>
             </TouchableOpacity>
           </View>
         ) : messages.length === 0 ? (
           <View style={styles.centered}>
             <Ionicons name="chatbubbles-outline" size={48} color={colors.border} />
-            <Text style={styles.emptyTitle}>No messages</Text>
+            <Text style={styles.emptyTitle}>{t('chat.noMessages')}</Text>
           </View>
         ) : (
           <FlatList

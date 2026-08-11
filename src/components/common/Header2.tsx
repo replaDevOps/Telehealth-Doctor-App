@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator, Modal, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { mvs } from '../../config/metrices';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -63,9 +63,17 @@ const Header2: React.FC<Header2Props> = ({
   logo = false,
 }) => {
   const navigation = useNavigation<NavigationProp>();
-  const { language } = useLanguage();
-
+  const { language, setLanguage } = useLanguage();
   const { t } = useTranslation();
+
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const langButtonRef = useRef<View>(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0, width: mvs(120) });
+
+  const data = [
+    { label: t('language.english'), value: 'en' as const },
+    { label: t('language.arabic'), value: 'ar' as const },
+  ];
 
   const onBackPress = () => {
     if (handleBackPress) {
@@ -75,15 +83,32 @@ const Header2: React.FC<Header2Props> = ({
     }
   };
 
-  const handleLanguagePress = () => {
-    console.log('Opening language selection. Current language:', language);
-    navigation.navigate('LanguageSelection');
+  const handleLanguageChange = async (item: { label: string; value: 'en' | 'ar' }) => {
+    await setLanguage(item.value);
+    setIsLangMenuOpen(false);
   };
 
-  // Get language display text - Arabic shows 'العربية', English shows 'English'
-  const languageText = language === 'ar' ? 'العربية' : 'English';
+  const handleOpenLangMenu = () => {
+    if (langButtonRef.current) {
+      langButtonRef.current.measureInWindow((x, y, width, height) => {
+        const screenWidth = Dimensions.get('window').width;
+        const top = y + height + 4;
+        const right = screenWidth - (x + width);
 
-  console.log('Header2 rendering with language:', language, '- Display:', languageText);
+        setMenuPos({
+          top: top > 0 ? top : mvs(50),
+          right: Math.max(right, mvs(10)),
+          width: Math.max(width, mvs(120)),
+        });
+        setIsLangMenuOpen(true);
+      });
+    } else {
+      setIsLangMenuOpen(true);
+    }
+  };
+
+  // Get language display text
+  const languageText = language === 'ar' ? t('language.arabic') : t('language.english');
 
   return (
     <View style={styles.container}>
@@ -134,11 +159,93 @@ const Header2: React.FC<Header2Props> = ({
           </View>
         </TouchableOpacity>
       ) : showLanguage ? (
-        <TouchableOpacity style={styles.icon} onPress={handleLanguagePress}>
-          <Ionicons name="globe" size={18} color={colors.black} />
-          <Text style={styles.languageText}>{languageText}</Text>
-          <Ionicons name="chevron-down" size={16} color={colors.black} />
-        </TouchableOpacity>
+        <View style={styles.rightHeaderControls}>
+          <TouchableOpacity
+            ref={langButtonRef}
+            activeOpacity={0.8}
+            style={styles.langPillButton}
+            onPress={handleOpenLangMenu}
+          >
+            <Ionicons
+              name="globe-outline"
+              size={mvs(16)}
+              color={colors.black}
+              style={{ marginRight: mvs(4) }}
+            />
+            <Text style={styles.langPillText}>{languageText}</Text>
+            <Ionicons
+              name={isLangMenuOpen ? 'chevron-up' : 'chevron-down'}
+              size={mvs(14)}
+              color={colors.black}
+              style={{ marginLeft: mvs(4) }}
+            />
+          </TouchableOpacity>
+
+          <Modal
+            transparent
+            visible={isLangMenuOpen}
+            animationType="fade"
+            statusBarTranslucent
+            onRequestClose={() => setIsLangMenuOpen(false)}
+          >
+            <TouchableOpacity
+              style={styles.modalBackdrop}
+              activeOpacity={1}
+              onPress={() => setIsLangMenuOpen(false)}
+            >
+              <View
+                style={[
+                  styles.langDropdownCard,
+                  {
+                    top: menuPos.top,
+                    right: menuPos.right,
+                    width: menuPos.width,
+                  },
+                ]}
+              >
+                {data.map((item, idx) => {
+                  const isSelected = language === item.value;
+                  return (
+                    <TouchableOpacity
+                      key={item.value}
+                      activeOpacity={0.7}
+                      style={[
+                        styles.langOptionItem,
+                        idx < data.length - 1 && {
+                          borderBottomWidth: 1,
+                          borderBottomColor: '#F0F0F5',
+                        },
+                        isSelected && {
+                          backgroundColor: '#F5F3FF',
+                        },
+                      ]}
+                      onPress={() => handleLanguageChange(item)}
+                    >
+                      <Text
+                        style={[
+                          styles.langOptionText,
+                          {
+                            color: isSelected ? '#7625D7' : colors.black,
+                            fontWeight: isSelected ? '600' : '400',
+                          },
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+                      {isSelected && (
+                        <Ionicons
+                          name="checkmark"
+                          size={mvs(16)}
+                          color="#7625D7"
+                        />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        </View>
       ) : showEdit ? (
         <TouchableOpacity style={styles.icon} onPress={onEditPress}>
           <Ionicons name="create" size={25} color={colors.black} />
@@ -235,6 +342,52 @@ const styles = StyleSheet.create({
   },
   emptySpace: {
     width: 45,
+  },
+  rightHeaderControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  langPillButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: mvs(36),
+    paddingHorizontal: mvs(10),
+    borderRadius: mvs(18),
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: '#FFFFFF',
+  },
+  langPillText: {
+    fontSize: mvs(13),
+    color: colors.black,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  langDropdownCard: {
+    position: 'absolute',
+    backgroundColor: '#FFFFFF',
+    borderRadius: mvs(12),
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: mvs(4),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  langOptionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: mvs(10),
+    paddingHorizontal: mvs(14),
+  },
+  langOptionText: {
+    fontSize: mvs(14),
   },
 });
 

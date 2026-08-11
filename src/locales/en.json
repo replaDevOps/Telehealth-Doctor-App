@@ -58,6 +58,22 @@
     "rememberPassword": "Remember Password?",
     "signIn": "Sign in"
   },
+  "changePassword": {
+    "title": "Password",
+    "oldPassword": "Old Password",
+    "enterOldPassword": "Enter old password",
+    "newPassword": "New Password",
+    "enterNewPassword": "Enter new password",
+    "retypePassword": "Re-Type Password",
+    "retypeNewPassword": "Re-Type New Password",
+    "oldPasswordRequired": "Old password is required.",
+    "newPasswordRequired": "New password is required.",
+    "passwordCriteria": "Password must be at least 8 characters long and include a number and a special character.",
+    "retypePasswordRequired": "Please re-type the new password.",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "passwordChangedSuccess": "Password changed successfully",
+    "passwordChangeFailed": "Failed to change password"
+  },
   "otp": {
     "didntReceiveCode": "Didn’t receive code?",
     "resendCode": "Resend Code"
@@ -68,12 +84,15 @@
   },
   "home": {
     "title": "Home",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "connectingWithPatient": "Connecting with patient, please wait...",
+    "active": "Active"
   },
   "recent": {
     "recentConsultations": "Recent Consultations",
     "loadingConsultations": "Loading consultations...",
-    "noRecentConsultations": "No recent consultations found."
+    "noRecentConsultations": "No recent consultations found.",
+    "viewAll": "View all"
   },
   "rating": {
     "title": "Rate Your Experience",
@@ -102,6 +121,34 @@
     "faqs": "FAQ's",
     "contactAdmin": "Contact Admin"
   },
+  "stats": {
+    "totalConsultations": "Total Consultations",
+    "thisMonthConsultation": "This Month Consultation"
+  },
+  "consultation": {
+    "service": "Service",
+    "status": "Status",
+    "viewChat": "View Chat",
+    "yearOld": "Year old",
+    "year": "Year",
+    "decline": "Decline",
+    "accept": "Accept",
+    "yearsOldPlural": "Years old",
+    "yearsOldSingular": "Year old",
+    "yearsPlural": "Years",
+    "yearsSingular": "Year"
+  },
+  "endModal": {
+    "titleEnded": "Consultation Ended!",
+    "titleEndPrompt": "End Consultation?",
+    "descReadyToEnd": "Are you ready to end this consultation?",
+    "descEndedSuccess": "The consultation has ended successfully.",
+    "descEnded": "The consultation has ended.",
+    "endConsultation": "End Consultation",
+    "writePrescription": "Write Prescription",
+    "addPrescription": "Add Prescription",
+    "close": "Close"
+  },
   "settingsScreen": {
     "personalInformation": "Personal Information",
     "workingHour": "Working Hour",
@@ -113,10 +160,43 @@
     "logoutConfirmMessage": "Are you sure you want to log out?",
     "loggingOut": "Logging out..."
   },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
   "chat": {
     "title": "Chat",
     "end": "End",
-    "aiChatHistory": "AI Chat History"
+    "aiChatHistory": "AI Chat History",
+    "video": "Video",
+    "audio": "Audio",
+    "customerSupport": "Customer Support",
+    "noMessages": "No messages yet",
+    "startConversationPatient": "Start the conversation by sending a message to the patient.",
+    "startConversation": "Start the conversation by sending a message.",
+    "loadingMessages": "Loading messages...",
+    "placeholder": "Message",
+    "sessions": "Sessions",
+    "session": "Session",
+    "chatWithVenaAI": "Chat With Vena AI",
+    "messagesCount": "messages",
+    "noAiChatHistory": "No AI Chat History",
+    "noAiChatHistoryDesc": "Previous AI conversations will appear here.",
+    "retry": "Retry"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear All",
+    "clearAllConfirmTitle": "Clear All Notifications",
+    "clearAllConfirmMessage": "Are you sure you want to clear all notifications?",
+    "loadingNotifications": "Loading notifications...",
+    "noNotifications": "No Notifications",
+    "noNotificationsDescription": "You don't have any notifications yet. When you receive notifications, they will appear here."
   },
   "history": {
     "title": "History",

@@ -59,6 +59,22 @@
     "rememberPassword": "تذكر كلمة المرور؟",
     "signIn": "تسجيل الدخول"
   },
+  "changePassword": {
+    "title": "كلمة المرور",
+    "oldPassword": "كلمة المرور القديمة",
+    "enterOldPassword": "أدخل كلمة المرور القديمة",
+    "newPassword": "كلمة المرور الجديدة",
+    "enterNewPassword": "أدخل كلمة المرور الجديدة",
+    "retypePassword": "إعادة كتابة كلمة المرور",
+    "retypeNewPassword": "إعادة كتابة كلمة المرور الجديدة",
+    "oldPasswordRequired": "كلمة المرور القديمة مطلوبة.",
+    "newPasswordRequired": "كلمة المرور الجديدة مطلوبة.",
+    "passwordCriteria": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتتضمن رقمًا ورمزًا خاصًا.",
+    "retypePasswordRequired": "يرجى إعادة كتابة كلمة المرور الجديدة.",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
+    "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح",
+    "passwordChangeFailed": "فشل تغيير كلمة المرور"
+  },
   "otp": {
     "didntReceiveCode": "لم تستلم الرمز؟",
     "resendCode": "إعادة إرسال الرمز"
@@ -69,12 +85,15 @@
   },
   "home": {
     "title": "الرئيسية",
-    "welcome": "مرحباً"
+    "welcome": "مرحباً",
+    "connectingWithPatient": "جارٍ الاتصال بالمريض، يرجى الانتظار...",
+    "active": "نشط"
   },
   "recent": {
     "recentConsultations": "الاستشارات الأخيرة",
     "loadingConsultations": "جارٍ تحميل الاستشارات...",
-    "noRecentConsultations": "لا توجد استشارات حديثة."
+    "noRecentConsultations": "لا توجد استشارات حديثة.",
+    "viewAll": "عرض الكل"
   },
   "rating": {
     "title": "قيّم تجربتك",
@@ -103,6 +122,34 @@
     "faqs": "الأسئلة الشائعة",
     "contactAdmin": "تواصل مع المسؤول"
   },
+  "stats": {
+    "totalConsultations": "إجمالي الاستشارات",
+    "thisMonthConsultation": "استشارات هذا الشهر"
+  },
+  "consultation": {
+    "service": "الخدمة",
+    "status": "الحالة",
+    "viewChat": "عرض المحادثة",
+    "yearOld": "سنة",
+    "year": "سنة",
+    "decline": "رفض",
+    "accept": "قبول",
+    "yearsOldPlural": "سنة",
+    "yearsOldSingular": "سنة",
+    "yearsPlural": "سنة",
+    "yearsSingular": "سنة"
+  },
+  "endModal": {
+    "titleEnded": "تم إنهاء الاستشارة!",
+    "titleEndPrompt": "إنهاء الاستشارة؟",
+    "descReadyToEnd": "هل أنت مستعد لإنهاء هذه الاستشارة؟",
+    "descEndedSuccess": "تم إنهاء الاستشارة بنجاح.",
+    "descEnded": "انتهت الاستشارة.",
+    "endConsultation": "إنهاء الاستشارة",
+    "writePrescription": "كتابة وصفة طبية",
+    "addPrescription": "إضافة وصفة طبية",
+    "close": "إغلاق"
+  },
   "settingsScreen": {
     "personalInformation": "المعلومات الشخصية",
     "workingHour": "ساعات العمل",
@@ -114,10 +161,43 @@
     "logoutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
     "loggingOut": "جاري تسجيل الخروج..."
   },
+  "days": {
+    "monday": "الإثنين",
+    "tuesday": "الثلاثاء",
+    "wednesday": "الأربعاء",
+    "thursday": "الخميس",
+    "friday": "الجمعة",
+    "saturday": "السبت",
+    "sunday": "الأحد"
+  },
   "chat": {
     "title": "الدردشة",
     "end": "إنهاء",
-    "aiChatHistory": "سجل الدردشة بالذكاء الاصطناعي"
+    "aiChatHistory": "سجل الدردشة بالذكاء الاصطناعي",
+    "video": "فيديو",
+    "audio": "صوت",
+    "customerSupport": "الدعم الفني",
+    "noMessages": "لا توجد رسائل بعد",
+    "startConversationPatient": "ابدأ المحادثة بإرسال رسالة إلى المريض.",
+    "startConversation": "ابدأ المحادثة بإرسال رسالة.",
+    "loadingMessages": "جاري تحميل الرسائل...",
+    "placeholder": "رسالة...",
+    "sessions": "الجلسات",
+    "session": "الجلسة",
+    "chatWithVenaAI": "محادثة مع فينا AI",
+    "messagesCount": "رسائل",
+    "noAiChatHistory": "لا يوجد سجل دردشة بالذكاء الاصطناعي",
+    "noAiChatHistoryDesc": "ستظهر المحادثات السابقة بالذكاء الاصطناعي هنا.",
+    "retry": "إعادة المحاولة"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "clearAll": "مسح الكل",
+    "clearAllConfirmTitle": "مسح جميع الإشعارات",
+    "clearAllConfirmMessage": "هل أنت متأكد من أنك تريد مسح جميع الإشعارات؟",
+    "loadingNotifications": "جاري تحميل الإشعارات...",
+    "noNotifications": "لا توجد إشعارات",
+    "noNotificationsDescription": "ليس لديك أي إشعارات حتى الآن. عندما تتلقى إشعارات، ستظهر هنا."
   },
   "history": {
     "title": "السجل",
