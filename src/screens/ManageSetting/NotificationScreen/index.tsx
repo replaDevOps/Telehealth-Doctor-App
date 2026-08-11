@@ -67,15 +67,15 @@ export const NotificationScreen = () => {
   // Clear all notifications
   const handleClearAll = async () => {
     Alert.alert(
-      'Clear All Notifications',
-      'Are you sure you want to clear all notifications?',
+      t('notifications.clearAllConfirmTitle'),
+      t('notifications.clearAllConfirmMessage'),
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Clear All',
+          text: t('notifications.clearAll'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -156,7 +156,7 @@ export const NotificationScreen = () => {
             ) : (
               <>
                 <Icon name="delete-sweep" size={18} color={colors.primary} />
-                <Text style={styles.clearAllText}>Clear All</Text>
+                <Text style={styles.clearAllText}>{t('notifications.clearAll')}</Text>
               </>
             )}
           </TouchableOpacity>
@@ -166,7 +166,7 @@ export const NotificationScreen = () => {
       {isLoading ? (
         <View style={styles.emptyState}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading notifications...</Text>
+          <Text style={styles.loadingText}>{t('notifications.loadingNotifications')}</Text>
         </View>
       ) : mappedNotifications.length > 0 ? (
         <ScrollView
@@ -223,9 +223,9 @@ export const NotificationScreen = () => {
       ) : (
         <View style={styles.emptyState}>
           <Icon name="bell-off-outline" size={64} color={colors.secondaryText} />
-          <Text style={styles.emptyTitle}>No Notifications</Text>
+          <Text style={styles.emptyTitle}>{t('notifications.noNotifications')}</Text>
           <Text style={styles.emptyMessage}>
-            You don't have any notifications yet. When you receive notifications, they will appear here.
+            {t('notifications.noNotificationsDescription')}
           </Text>
         </View>
       )}

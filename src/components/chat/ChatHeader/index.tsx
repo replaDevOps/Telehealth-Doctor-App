@@ -51,12 +51,28 @@ function capitalizeFirst(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
-function formatGenderAge(gender?: string, age?: string | number): string {
-  const g = gender ? capitalizeFirst(String(gender).trim()) : '';
+function formatGenderAge(gender: string | undefined, age: string | number | undefined, t: any): string {
+  let g = '';
+  if (gender) {
+    const trimmed = String(gender).trim().toLowerCase();
+    if (trimmed === 'male') {
+      g = t('profile.male');
+    } else if (trimmed === 'female') {
+      g = t('profile.female');
+    } else {
+      g = capitalizeFirst(trimmed);
+    }
+  }
   const a = age != null && age !== '' ? Number(age) : NaN;
-  if (g && !Number.isNaN(a)) return `${g}, ${a} Year${a !== 1 ? 's' : ''} old`;
+  if (g && !Number.isNaN(a)) {
+    const yearsOldStr = a !== 1 ? t('consultation.yearsOldPlural') : t('consultation.yearsOldSingular');
+    return `${g}, ${a} ${yearsOldStr}`;
+  }
   if (g) return g;
-  if (!Number.isNaN(a)) return `${a} Year${a !== 1 ? 's' : ''} old`;
+  if (!Number.isNaN(a)) {
+    const yearsOldStr = a !== 1 ? t('consultation.yearsOldPlural') : t('consultation.yearsOldSingular');
+    return `${a} ${yearsOldStr}`;
+  }
   return '';
 }
 
@@ -76,7 +92,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => {
   const { t } = useTranslation();
   const [aiHistoryVisible, setAiHistoryVisible] = useState(false);
-  const headerDisplayText = consultationId ? 'Customer Support' : (doctorDisplayName || doctorInfo.name);
+  const headerDisplayText = consultationId ? t('chat.customerSupport') : (doctorDisplayName || doctorInfo.name);
 
   const patient = consultationData?.patient;
   const patientName = patient?.name || patientInfo?.name || 'Patient';
@@ -84,7 +100,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const patientImage = patient?.image || patientInfo?.image;
   const gender = patient?.gender ?? patientInfo?.gender ?? '';
   const age = patient?.age ?? patientInfo?.age ?? '';
-  const genderAgeLine = formatGenderAge(gender, age);
+  const genderAgeLine = formatGenderAge(gender, age, t);
 
   const serviceName = consultationData?.service?.name || '';
   const consultationType = consultationData?.type || '';
@@ -148,7 +164,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           onPress={() => setAiHistoryVisible(true)}
           activeOpacity={0.8}
         >
-          <Text style={styles.chatHistoryButtonText} numberOfLines={1}>AI Chat History</Text>
+          <Text style={styles.chatHistoryButtonText} numberOfLines={1}>{t('chat.aiChatHistory')}</Text>
         </TouchableOpacity>
       </View>
 

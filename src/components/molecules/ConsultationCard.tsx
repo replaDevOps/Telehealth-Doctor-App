@@ -4,6 +4,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Avatar from '@components/common/Avatar';
+import { useTranslation } from 'react-i18next';
 
 interface ConsultationCardProps {
   sevviceName: string;
@@ -37,8 +38,9 @@ const ConsultationCard = ({
   onViewPrescription,
   onViewChat,
 }: ConsultationCardProps) => {
+  const { t } = useTranslation();
   // Format patient info: Gender and Age
-  const patientInfo = [gender, age ? `${age} Year` : ''].filter(Boolean).join(', ');
+  const patientInfo = [gender, age ? `${age} ${t('consultation.year')}` : ''].filter(Boolean).join(', ');
 
   // Get status color
   const getStatusColor = (status: string) => {
@@ -70,7 +72,9 @@ const ConsultationCard = ({
               size={14}
               color={colors.white}
             />
-            <Text style={styles.typeText}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+            <Text style={styles.typeText}>
+              {type === 'video' ? t('chat.video') : type === 'audio' ? t('chat.audio') : t('chat.title')}
+            </Text>
           </View>
           {duration && duration.trim() !== '' && duration !== 'null' && duration.toLowerCase() !== 'null' && (
             <View style={styles.timeContainer}>
@@ -103,14 +107,14 @@ const ConsultationCard = ({
         {/* Service and Status Row */}
         <View style={styles.serviceStatusRow}>
           <View style={styles.serviceInfo}>
-            <Text style={styles.serviceLabel}>Service</Text>
+            <Text style={styles.serviceLabel}>{t('consultation.service')}</Text>
             <Text style={styles.serviceValue} numberOfLines={1}>{sevviceName}</Text>
           </View>
           {status && (
             <>
               <View style={styles.separator} />
               <View style={styles.statusInfo}>
-                <Text style={styles.statusLabel}>Status</Text>
+                <Text style={styles.statusLabel}>{t('consultation.status')}</Text>
                 <Text style={[styles.statusValue, { color: getStatusColor(status) }]}>
                   {status}
                 </Text>
@@ -128,7 +132,7 @@ const ConsultationCard = ({
               onPress={onViewChat}
               activeOpacity={0.7}
             >
-              <Text style={styles.chatButtonText}>View Chat</Text>
+              <Text style={styles.chatButtonText}>{t('consultation.viewChat')}</Text>
             </TouchableOpacity>
           )}
           {/* <TouchableOpacity

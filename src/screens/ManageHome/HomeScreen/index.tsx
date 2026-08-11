@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, StatusBar, Platform, PermissionsAndroid, RefreshControl, Modal, ActivityIndicator, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import StatsRow from '../../../components/molecules/StatsRow';
 
 import { colors } from '../../../styles/colors';
@@ -16,6 +17,7 @@ import { acceptConsultation } from '../../../services/api/chatConsultationServic
 import { Toast } from 'toastify-react-native';
 
 export const HomeScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const { profileData } = useProfileStore();
   const { stats, recentConsultations, fetchDashboardData, isLoading } = useDashboardStore();
   const { fetchNotifications } = useNotificationStore();
@@ -342,7 +344,7 @@ console.log('HomeScreen render', consultationRequests)
         <View style={styles.connectingModal}>
           <View style={styles.connectingModalContent}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.connectingText}>Connecting with patient, please wait...</Text>
+            <Text style={styles.connectingText}>{t('home.connectingWithPatient')}</Text>
           </View>
         </View>
       </Modal>

@@ -5,6 +5,7 @@ import {
   View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../../styles/colors';
 import { styles } from './style';
 
@@ -21,6 +22,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   handleSend,
   canSendMessages,
 }) => {
+  const { t } = useTranslation();
   if (!canSendMessages) {
     return null;
   }
@@ -29,7 +31,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     <View style={styles.inputContainer}>
       <TextInput
         style={styles.input}
-        placeholder="Message"
+        placeholder={t('chat.placeholder')}
         placeholderTextColor={colors.secondaryText}
         value={message}
         onChangeText={setMessage}
