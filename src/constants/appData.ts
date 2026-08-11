@@ -3,7 +3,6 @@ import {
   RecommandImage,
   onboarding1,
   onboarding2,
-  onboarding3,
   onboardingArabic1,
   onboardingArabic2,
   pimples
