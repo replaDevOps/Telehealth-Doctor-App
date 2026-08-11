@@ -3,6 +3,7 @@ import { API } from './endpoints';
 import { Platform } from 'react-native';
 import { BASE_URL } from '../../constants/api';
 import { useAuthStore } from '../../store';
+import { handleUnauthenticated } from './sessionManager';
 
 export const changePassword = async (data: any) => {
     try {
@@ -42,6 +43,11 @@ export const updateSignature = async (imageUri: string) => {
             },
         });
 
+        // fetch bypasses the apiClient interceptor, so handle 401 here too
+        if (response.status === 401) {
+            handleUnauthenticated();
+        }
+
         const result = await response.json();
         if (!response.ok) {
             throw result;
@@ -72,6 +78,11 @@ export const updateProfileImage = async (imageUri: string) => {
                 'Authorization': `Bearer ${token}`,
             },
         });
+
+        // fetch bypasses the apiClient interceptor, so handle 401 here too
+        if (response.status === 401) {
+            handleUnauthenticated();
+        }
 
         const result = await response.json();
         if (!response.ok) {

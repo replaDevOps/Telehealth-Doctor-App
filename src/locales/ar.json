@@ -16,7 +16,8 @@
     "submit": "إرسال",
     "continue": "متابعة",
     "needHelp": "تحتاج مساعدة؟",
-    "contactAdmin": "تواصل مع الإدارة"
+    "contactAdmin": "تواصل مع الإدارة",
+    "sessionExpired": "انتهت صلاحية جلستك. الرجاء تسجيل الدخول مرة أخرى."
   },
   "language": {
     "title": "اختر اللغة",

@@ -2,6 +2,7 @@ import { apiClient } from './apiClient';
 import { API } from './endpoints';
 import { BASE_URL } from '../../constants/api';
 import { useAuthStore } from '../../store';
+import { handleUnauthenticated } from './sessionManager';
 
 export interface ChatMessage {
   id?: number;
@@ -240,6 +241,11 @@ export const sendMessage = async (
         body: formData,
       },
     );
+
+    // fetch bypasses the apiClient interceptor, so handle 401 here too
+    if (response.status === 401) {
+      handleUnauthenticated();
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

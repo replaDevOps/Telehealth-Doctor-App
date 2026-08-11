@@ -16,7 +16,8 @@
     "submit": "Submit",
     "continue": "Continue",
     "needHelp": "Need Help?",
-    "contactAdmin": "Contact admin"
+    "contactAdmin": "Contact admin",
+    "sessionExpired": "Your session has expired. Please sign in again."
   },
   "language": {
     "title": "Select Language",
