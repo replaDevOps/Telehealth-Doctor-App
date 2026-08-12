@@ -1919,7 +1919,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-webrtc (124.0.7):
+  - react-native-webrtc (124.0.8):
     - JitsiWebRTC (~> 124.0.0)
     - React-Core
   - React-NativeModulesApple (0.82.1):
@@ -2461,6 +2461,8 @@ PODS:
     - React-perflogger (= 0.82.1)
     - React-utils (= 0.82.1)
     - SocketRocket
+  - ReactNativeIncallManager (4.2.1):
+    - React-Core
   - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
@@ -2969,6 +2971,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - ReactNativeIncallManager (from `../node_modules/react-native-incall-manager`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNFastImage (from `../node_modules/@d11/react-native-fast-image`)"
@@ -3148,6 +3151,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  ReactNativeIncallManager:
+    :path: "../node_modules/react-native-incall-manager"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCPicker:
@@ -3216,7 +3221,7 @@ SPEC CHECKSUMS:
   react-native-image-picker: 0314366753615115fa55c3cc937ac44cb7e75702
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
-  react-native-webrtc: e8f0ce746353adc2744a2b933645e1aeb41eaa74
+  react-native-webrtc: da75ba1f85a36981cbcb3fdae7dfbab7ad63c040
   React-NativeModulesApple: 46690a0fe94ec28fc6fc686ec797b911d251ded0
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb
   React-perflogger: 2e229bf33e42c094fd64516d89ec1187a2b79b5b
@@ -3249,6 +3254,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: a45ef34bb22dc1c9b2ac1f74167d9a28af961176
   ReactCodegen: 878add6c7d8ff8cea87697c44d29c03b79b6f2d9
   ReactCommon: 804dc80944fa90b86800b43c871742ec005ca424
+  ReactNativeIncallManager: dccd3e7499caa3bb73d3acfedf4fb0360f1a87d5
   RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNCPicker: bf95ec4b2483e2ab256047130bc536b437cd916c
   RNFastImage: b076a6378b1ce90debc27a927a437db3652bef14
