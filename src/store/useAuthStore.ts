@@ -70,12 +70,20 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => (state) => {
-        // After rehydration, update isAuthenticated based on token presence
-        if (state) {
-          state.isAuthenticated = !!state.token;
-          state.isLoading = false;
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('Failed to rehydrate auth store:', error);
         }
+
+        // After rehydration, update isAuthenticated based on token presence.
+        // This must go through setState: mutating `state` in place updates the
+        // object but does not notify subscribers, so every component would keep
+        // rendering the pre-hydration isLoading: true and never move on.
+        // Runs on the error path too, otherwise the app hangs on the splash.
+        useAuthStore.setState({
+          isAuthenticated: !!state?.token,
+          isLoading: false,
+        });
       },
     }
   )
