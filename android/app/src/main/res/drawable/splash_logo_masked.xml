@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ renders windowSplashScreenAnimatedIcon on a 288dp canvas and clips it
+     to the inner 192dp circle. Inset by 74dp so the ~140dp mark stays inside that
+     circle instead of having its edges shaved off. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/splash_logo"
+    android:inset="74dp" />

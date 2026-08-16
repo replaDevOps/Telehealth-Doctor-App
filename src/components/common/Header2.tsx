@@ -341,7 +341,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   emptySpace: {
-    width: 45,
+    // Matches headerButton so the centred title is actually centred.
+    width: 40,
   },
   rightHeaderControls: {
     flexDirection: 'row',

@@ -11,3 +11,4 @@ export const onboarding2 = require("./onboarding2.png");
 export const onboardingArabic1 = require("./onboardingArabic1.png");
 export const onboardingArabic2 = require("./onboardingArabic2.png");
 export const LogoPng = require("./LOGOPNG.png");
+export const SplashLogo = require("./splashLogo.png");

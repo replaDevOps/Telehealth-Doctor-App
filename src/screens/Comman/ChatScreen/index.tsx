@@ -5,8 +5,9 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, BackHandler, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, ActivityIndicator, ScrollView, BackHandler } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetailBottomSheet, PrescriptionBottomSheet } from '@components/molecules';
 import { styles } from './style';
@@ -64,7 +65,6 @@ export function ChatScreen({ navigation, route }) {
   const consultationEndedRef = useRef(false); // Prevent duplicate API calls
   const handleEndConsultationConfirmRef = useRef<(() => void) | undefined>(undefined); // Ref for background timer callback
   const prescriptionOpenedFromEndModalRef = useRef(false); // true only when opened from End modal; don't end chat when opened from plus button
-  const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const { profileData } = useProfileStore();
   const doctorID = user?.id;
@@ -807,12 +807,24 @@ export function ChatScreen({ navigation, route }) {
 
   // ---------- Main Render ----------
   return (
+    // This must stay the full-screen root: it pads by exactly the keyboard height.
+    // The bottom safe-area inset is owned by MessageInput, which collapses it as the
+    // keyboard rises — a SafeAreaView bottom edge here would stack on top of the
+    // keyboard padding and leave the gap this screen used to show.
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
+      behavior="padding"
       style={{ flex: 1, backgroundColor: '#fff' }}
     >
-      <SafeAreaView style={styles.container}>
+      {/* MessageInput owns the bottom inset when it is rendered; in read-only history
+          there is no input bar, so the safe area falls back to this container. */}
+      <SafeAreaView
+        style={styles.container}
+        edges={
+          canSendMessages
+            ? ['top', 'left', 'right']
+            : ['top', 'left', 'right', 'bottom']
+        }
+      >
       <ChatHeader
         chatType={chatType}
         doctorInfo={doctorInfo}

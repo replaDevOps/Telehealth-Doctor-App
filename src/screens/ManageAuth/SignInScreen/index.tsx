@@ -8,8 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Linking,
 } from 'react-native';
+import { contactAdmin } from '@utils/contactAdmin';
 import { LogoPng } from '../../../assets/images';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
@@ -290,7 +290,7 @@ export function SignInScreen({ navigation }) {
           {/* Sign Up Link */}
           <View style={styles.signinRow}>
             <Text style={styles.TextContent}>{t('common.needHelp')} </Text>
-            <TouchableOpacity onPress={() => Linking.openURL('mailto:Info@vena-app.com')}>
+            <TouchableOpacity onPress={contactAdmin}>
               <Text style={styles.signinLink}>{t('common.contactAdmin')}</Text>
             </TouchableOpacity>
           </View>

@@ -1,0 +1,5 @@
+<resources>
+    <!-- Splash background. Kept in sync with the JS splash screen so there is no
+         colour flash when the native launch window hands over to React Native. -->
+    <color name="splash_background">#FFFFFF</color>
+</resources>

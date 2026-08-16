@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: mvs(16),
-    paddingVertical: mvs(16),
+    paddingVertical: mvs(14),
     backgroundColor: colors.white,
   },
   notificationBorder: {
@@ -23,15 +23,22 @@ export const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: mvs(12),
-    marginTop: 2,
     borderWidth: 1,
     borderColor: colors.border,
     padding: mvs(4),
     borderRadius: mvs(8),
+    // Fixed box so the bell, the title and the delete button share one top line
+    // regardless of how many lines the message wraps to.
+    width: mvs(30),
+    height: mvs(30),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   contentContainer: {
     flex: 1,
-    marginRight: mvs(12),
+    marginRight: mvs(8),
+    minHeight: mvs(30),
+    justifyContent: 'center',
   },
   title: {
     fontSize: mvs(16),
@@ -57,14 +64,20 @@ export const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.primary,
-    marginTop: mvs(8),
+  },
+  deleteButton: {
+    width: mvs(30),
+    height: mvs(30),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: mvs(24),
-    paddingVertical: mvs(128),
+    // No vertical padding: this box is already flex-centred, and the old mvs(128)
+    // top+bottom pushed the icon and copy off-screen on shorter iPhones.
   },
   loadingText: {
     marginTop: mvs(12),
@@ -106,8 +119,12 @@ export const styles = StyleSheet.create({
   },
   rightActions: {
     flexDirection: 'row',
+    // Top-aligned to match the row's flex-start content, so the delete button no
+    // longer floats to the middle of a long, multi-line message.
     alignItems: 'center',
-    gap: mvs(8),
+    alignSelf: 'flex-start',
+    height: mvs(30),
+    gap: mvs(6),
   },
 });
 

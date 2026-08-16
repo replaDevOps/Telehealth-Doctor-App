@@ -211,18 +211,22 @@ console.log('HomeScreen render', consultationRequests)
   };
 
   const handleToggleActive = async (value: boolean) => {
+    // Flip optimistically: the native switch has already moved under the user's
+    // finger, so waiting for the API left iOS showing a state the app didn't hold.
+    // The header mirrors this prop, so the rollback below reaches the native switch.
+    const previousValue = isActive;
+    setIsActive(value);
     setIsStatusLoading(true);
     try {
-      // Call API first; only flip the toggle on success
       await updateOnlineStatus(value);
-
-      setIsActive(value);
 
       if (!value) {
         // Clear requests when going offline
         clearAllRequests();
       }
     } catch (error: any) {
+      setIsActive(previousValue);
+
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||

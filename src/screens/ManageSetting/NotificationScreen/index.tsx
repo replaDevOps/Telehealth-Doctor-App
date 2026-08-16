@@ -3,13 +3,14 @@ import React, { useState, useCallback } from 'react';
 import { Header2 } from '@components/common/Header2';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { styles } from './style';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
 import { colors } from '../../../styles/colors';
 import { useNotificationStore } from '../../../store';
 import { useFocusEffect } from '@react-navigation/native';
 import { Toast } from 'toastify-react-native';
 import { useTranslation } from 'react-i18next';
+import { mvs } from '@config/metrices';
 
 interface NotificationItem {
   id: number | string;
@@ -23,6 +24,7 @@ interface NotificationItem {
 
 export const NotificationScreen = () => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { notifications, isLoading, fetchNotifications, markAllAsRead, removeNotification, clearAll } = useNotificationStore();
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [clearingAll, setClearingAll] = useState(false);
@@ -103,14 +105,22 @@ export const NotificationScreen = () => {
     if (!timeStr) return '';
 
     try {
-      const date = new Date(timeStr);
+      // The API returns MySQL datetimes ("2026-08-15 10:30:00"). Hermes only parses
+      // the ISO form, so an unconverted value produced "Invalid Date" in the list.
+      const date = new Date(
+        /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(timeStr)
+          ? timeStr.replace(' ', 'T')
+          : timeStr,
+      );
+      if (isNaN(date.getTime())) return timeStr;
+
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMs / 3600000);
       const diffDays = Math.floor(diffMs / 86400000);
 
-      if (diffMins < 1) return 'Just now';
+      if (diffMs < 0 || diffMins < 1) return 'Just now';
       if (diffMins < 60) return `${diffMins}m ago`;
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays < 7) return `${diffDays}d ago`;
@@ -139,7 +149,7 @@ export const NotificationScreen = () => {
   }));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
 
       <Header2 title={t('settings.notifications')} back />
@@ -171,6 +181,7 @@ export const NotificationScreen = () => {
       ) : mappedNotifications.length > 0 ? (
         <ScrollView
           style={styles.scrollView}
+          contentContainerStyle={{ paddingBottom: insets.bottom + mvs(16) }}
           showsVerticalScrollIndicator={false}
         >
           {mappedNotifications.map((notification, index) => (
@@ -191,13 +202,18 @@ export const NotificationScreen = () => {
               </View>
 
               <View style={styles.contentContainer}>
-                <Text style={[
-                  styles.title,
-                  !notification.read && styles.titleUnread
-                ]}>
+                <Text
+                  style={[
+                    styles.title,
+                    !notification.read && styles.titleUnread,
+                  ]}
+                  numberOfLines={2}
+                >
                   {notification.title}
                 </Text>
-                <Text style={styles.message}>{notification.message}</Text>
+                {!!notification.message && (
+                  <Text style={styles.message}>{notification.message}</Text>
+                )}
                 <Text style={styles.time}>
                   {formatTime(notification.time || notification.created_at)}
                 </Text>
@@ -208,7 +224,7 @@ export const NotificationScreen = () => {
                 <TouchableOpacity
                   onPress={() => handleDeleteNotification(notification.id)}
                   disabled={deletingId === notification.id}
-                  style={{ padding: 8, marginLeft: 8 }}
+                  style={styles.deleteButton}
                 >
                   {deletingId === notification.id ? (
                     <ActivityIndicator size="small" color={colors.secondaryText} />

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, ActivityIndicator, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, Animated, ActivityIndicator, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { useAuthStore, useProfileStore } from '../../store';
 import { SingleLogo } from '../../assets/icons';
+import { SplashLogo } from '../../assets/images';
 
 type SplashScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -13,30 +14,23 @@ type Props = {
 };
 
 export const SplashScreen: React.FC<Props> = ({ navigation }) => {
+  // The logo is intentionally NOT animated in: it is drawn at the same size and
+  // position as the native launch screen, so the handover is seamless. Only the
+  // secondary lockup fades in.
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.92)).current;
   const hasNavigatedRef = useRef(false);
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
 
   const { isAuthenticated, isLoading, token } = useAuthStore();
   const { fetchProfile } = useProfileStore();
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1200,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, scaleAnim]);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      delay: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   useEffect(() => {
     if (isLoading) {
@@ -145,24 +139,12 @@ export const SplashScreen: React.FC<Props> = ({ navigation }) => {
     checkAndNavigate();
   }, [isLoading, token, isAuthenticated, navigation]);
 
-  const lockupColor = isDarkMode ? '#FFFFFF' : '#4A148C';
+  const lockupColor = '#4A148C';
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#1E1930' : '#FFFFFF' }]}>
-      {/* Centered App Icon Card with Soft Shadow */}
-      <Animated.View
-        style={[
-          styles.iconContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-        <View style={styles.iconCard}>
-          <SingleLogo width={68} height={64} fill="#FFFFFF" />
-        </View>
-      </Animated.View>
+    <View style={styles.container}>
+      {/* Brand mark — matches the native launch screen exactly (160pt, centred). */}
+      <Image source={SplashLogo} style={styles.logo} resizeMode="contain" />
 
       {/* Small Bottom Lockup: فينا VENA */}
       <Animated.View style={[styles.bottomLockup, { opacity: fadeAnim }]}>
@@ -173,11 +155,9 @@ export const SplashScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={[styles.englishText, { color: lockupColor }]}>VENA</Text>
       </Animated.View>
 
-      <ActivityIndicator
-        size="small"
-        color="#4A148C"
-        style={styles.loader}
-      />
+      <Animated.View style={[styles.loader, { opacity: fadeAnim }]}>
+        <ActivityIndicator size="small" color="#4A148C" />
+      </Animated.View>
     </View>
   );
 };
@@ -187,23 +167,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
   },
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCard: {
-    width: 120,
-    height: 120,
-    borderRadius: 34,
-    backgroundColor: '#4A148C',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.28,
-    shadowRadius: 20,
-    elevation: 10,
+  logo: {
+    width: 160,
+    height: 160,
   },
   bottomLockup: {
     position: 'absolute',

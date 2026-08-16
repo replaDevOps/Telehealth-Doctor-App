@@ -1,0 +1,10 @@
+<resources>
+
+    <!-- Android 12+ draws the launch window through the platform splash screen API,
+         which ignores android:windowBackground. -->
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo_masked</item>
+    </style>
+
+</resources>

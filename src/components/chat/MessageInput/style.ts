@@ -4,12 +4,16 @@ import {
     StyleSheet,
   } from 'react-native';
 
+// Vertical breathing room around the input row. The bottom half is applied in the
+// component so the safe-area inset can be animated on top of it.
+export const INPUT_BAR_PADDING = 12;
+
 export const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingTop: INPUT_BAR_PADDING,
         borderTopWidth: 1,
         borderTopColor: '#f0f0f0',
         backgroundColor: colors.white,
