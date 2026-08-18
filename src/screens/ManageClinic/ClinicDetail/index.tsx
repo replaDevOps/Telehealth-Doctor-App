@@ -11,6 +11,7 @@ import {
 import { ClinicInfo } from '@components/molecules/ClinicInfo';
 import { colors } from '../../../styles/colors';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -26,9 +27,10 @@ import {
   CLINIC_ABOUT_DATA,
 } from '@constants/appData';
 export const ClinicDetailScreen = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { clinic } = route.params;
   const { notificationCount } = useNotificationCount();
-  const [activeTab, setActiveTab] = useState('Services');
+  const [activeTab, setActiveTab] = useState(t('services') || 'Services');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -111,23 +113,23 @@ export const ClinicDetailScreen = ({ navigation, route }) => {
 
         {/* Tab Bar */}
         <TabBar
-          tabs={['Services', 'Reviews', 'About']}
+          tabs={[t('services') || 'Services', t('reviews') || 'Reviews', t('about') || 'About']}
           activeTab={activeTab}
           onTabPress={setActiveTab}
         />
 
         {/* Content based on active tab */}
-        {activeTab === 'Services' && (
+        {(activeTab === 'Services' || activeTab === t('services')) && (
           <View style={styles.servicesContent}>
             {/* All Services Header */}
-            <Text style={styles.sectionTitle}>All Services</Text>
+            <Text style={styles.sectionTitle}>{t('all_services') || 'All Services'}</Text>
 
             {/* Search Bar */}
             <SearchServicesBar
               value={searchQuery}
               onChangeText={setSearchQuery}
               onFilterPress={handleFilterPress}
-              placeholder="Search Clinics"
+              placeholder={t('search_clinics') || 'Search Clinics'}
             />
 
             {/* Services List */}
@@ -150,15 +152,15 @@ export const ClinicDetailScreen = ({ navigation, route }) => {
           </View>
         )}
 
-        {activeTab === 'Reviews' && (
+        {(activeTab === 'Reviews' || activeTab === t('reviews')) && (
           <View style={styles.reviewsContent}>
             {/* Reviews Header */}
             <View style={styles.reviewsHeader}>
               <Text style={styles.reviewsTitle}>
-                Reviews ({reviews.length})
+                {t('reviews') || 'Reviews'} ({reviews.length})
               </Text>
               <TouchableOpacity style={styles.sortButton}>
-                <Text style={styles.sortText}>Sort by</Text>
+                <Text style={styles.sortText}>{t('sort_by') || 'Sort by'}</Text>
                 <Ionicons
                   name="chevron-down"
                   size={16}
@@ -168,24 +170,32 @@ export const ClinicDetailScreen = ({ navigation, route }) => {
             </View>
 
             {/* Reviews List */}
-            <View style={styles.reviewsList}>
-              {reviews.map(review => (
-                <ReviewCard
-                  key={review.id}
-                  review={review}
-                  isExpanded={expandedReviewId === review.id}
-                  onPress={() =>
-                    setExpandedReviewId(
-                      expandedReviewId === review.id ? null : review.id,
-                    )
-                  }
-                />
-              ))}
-            </View>
+            {reviews.length > 0 ? (
+              <View style={styles.reviewsList}>
+                {reviews.map(review => (
+                  <ReviewCard
+                    key={review.id}
+                    review={review}
+                    isExpanded={expandedReviewId === review.id}
+                    onPress={() =>
+                      setExpandedReviewId(
+                        expandedReviewId === review.id ? null : review.id,
+                      )
+                    }
+                  />
+                ))}
+              </View>
+            ) : (
+              <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, color: colors.secondaryText }}>
+                  {t('no_reviews_found') || 'No reviews found'}
+                </Text>
+              </View>
+            )}
           </View>
         )}
 
-        {activeTab === 'About' && (
+        {(activeTab === 'About' || activeTab === t('about')) && (
           <AboutClinic
             description={aboutData.description}
             devices={aboutData.devices}
