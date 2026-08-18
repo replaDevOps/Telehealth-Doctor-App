@@ -212,7 +212,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 120,
-    borderRadius: 34,
   },
   bottomLockup: {
     position: 'absolute',
