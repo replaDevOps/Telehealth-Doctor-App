@@ -1,9 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../styles/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const ReviewCard = ({ review, isExpanded, onPress }) => {
+  const { t } = useTranslation();
   const maxLength = 150;
   const shouldTruncate = review.text.length > maxLength && !isExpanded;
 
@@ -32,7 +34,7 @@ export const ReviewCard = ({ review, isExpanded, onPress }) => {
         {review.text}
       </Text>
 
-      {shouldTruncate && <Text style={styles.readMore}>Read more</Text>}
+      {shouldTruncate && <Text style={styles.readMore}>{t('read_more') || 'Read more'}</Text>}
     </TouchableOpacity>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -34,6 +35,7 @@ export default function ConsultDoctorBottomSheet({
   visible: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -139,37 +141,37 @@ export default function ConsultDoctorBottomSheet({
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.header}>
-                <Text style={styles.title}>Consult with a Doctor</Text>
+                <Text style={styles.title}>{t('consult_with_doctor') || 'Consult with a Doctor'}</Text>
                 <Text style={styles.subtitle}>
-                  Choose how you'd like to connect
+                  {t('choose_how_to_connect') || "Choose how you'd like to connect"}
                 </Text>
               </View>
 
               <CustomDropdown
-                label="Service Type"
+                label={t('service_type') || 'Service Type'}
                 value={serviceType}
                 onValueChange={setServiceType}
                 options={serviceTypes}
-                placeholder="Select Type"
+                placeholder={t('select_type') || 'Select Type'}
               />
               <CustomDropdown
-                label="Service Group"
+                label={t('service_group') || 'Service Group'}
                 value={serviceGroup}
                 onValueChange={setServiceGroup}
                 options={serviceGroups}
-                placeholder="Select Group"
+                placeholder={t('select_group') || 'Select Group'}
               />
               <CustomDropdown
-                label="Service"
+                label={t('service') || 'Service'}
                 value={service}
                 onValueChange={setService}
                 options={services}
-                placeholder="Select Service"
+                placeholder={t('select_service') || 'Select Service'}
               />
 
               {/* Consultation Type */}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Consultation Type</Text>
+                <Text style={styles.label}>{t('consultation_type') || 'Consultation Type'}</Text>
                 {consultationTypes.map(type => {
                   const isSelected = selectedConsultation === type.id;
                   const Icon = type.Icon;

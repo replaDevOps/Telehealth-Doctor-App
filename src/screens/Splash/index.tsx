@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, ActivityIndicator, Image } from 'react-native';
+import { View, StyleSheet, Animated, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { useAuthStore, useProfileStore } from '../../store';
-import { SingleLogo } from '../../assets/icons';
-import { SplashLogo } from '../../assets/images';
+import { SplashLogo, SplashBottomIcon } from '../../assets/images';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 type SplashScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -14,23 +15,35 @@ type Props = {
 };
 
 export const SplashScreen: React.FC<Props> = ({ navigation }) => {
-  // The logo is intentionally NOT animated in: it is drawn at the same size and
-  // position as the native launch screen, so the handover is seamless. Only the
-  // secondary lockup fades in.
+  // The logo and bottom icon animate in with fade, scale, and blur for a smooth handover.
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.92)).current;
+  const blurAnim = useRef(new Animated.Value(10)).current;
   const hasNavigatedRef = useRef(false);
 
   const { isAuthenticated, isLoading, token } = useAuthStore();
   const { fetchProfile } = useProfileStore();
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 600,
-      delay: 250,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeAnim]);
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: false,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: false,
+      }),
+      Animated.timing(blurAnim, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  }, [fadeAnim, scaleAnim, blurAnim]);
 
   useEffect(() => {
     if (isLoading) {
@@ -139,24 +152,42 @@ export const SplashScreen: React.FC<Props> = ({ navigation }) => {
     checkAndNavigate();
   }, [isLoading, token, isAuthenticated, navigation]);
 
-  const lockupColor = '#4A148C';
-
   return (
     <View style={styles.container}>
-      {/* Brand mark — matches the native launch screen exactly (160pt, centred). */}
-      <Image source={SplashLogo} style={styles.logo} resizeMode="contain" />
-
-      {/* Small Bottom Lockup: فينا VENA */}
-      <Animated.View style={[styles.bottomLockup, { opacity: fadeAnim }]}>
-        <Text style={[styles.arabicText, { color: lockupColor }]}>فينا</Text>
-        <View style={styles.heartWrapper}>
-          <SingleLogo width={16} height={15} fill={lockupColor} />
-        </View>
-        <Text style={[styles.englishText, { color: lockupColor }]}>VENA</Text>
+      {/* Brand mark — matches mobile app center icon size with blur & scale animation */}
+      <Animated.View
+        style={[
+          styles.iconContainer,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
+        <AnimatedImage
+          source={SplashLogo}
+          style={styles.logo}
+          resizeMode="contain"
+          blurRadius={blurAnim}
+        />
       </Animated.View>
 
-      <Animated.View style={[styles.loader, { opacity: fadeAnim }]}>
-        <ActivityIndicator size="small" color="#4A148C" />
+      {/* Bottom Lockup with blur & scale animation */}
+      <Animated.View
+        style={[
+          styles.bottomLockup,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
+        <AnimatedImage
+          source={SplashBottomIcon}
+          style={styles.bottomIcon}
+          resizeMode="contain"
+          blurRadius={blurAnim}
+        />
       </Animated.View>
     </View>
   );
@@ -169,33 +200,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#4A148C',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.28,
+    shadowRadius: 20,
+    elevation: 10,
+  },
   logo: {
-    width: 160,
-    height: 160,
+    width: 120,
+    height: 120,
+    borderRadius: 34,
   },
   bottomLockup: {
     position: 'absolute',
     bottom: 54,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  arabicText: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginRight: 6,
-  },
-  heartWrapper: {
-    marginHorizontal: 3,
-  },
-  englishText: {
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 1.5,
-    marginLeft: 6,
-  },
-  loader: {
-    position: 'absolute',
-    bottom: 100,
+  bottomIcon: {
+    width: 90,
+    height: 40,
   },
 });
+
+
