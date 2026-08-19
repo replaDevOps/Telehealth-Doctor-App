@@ -111,15 +111,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   serviceName: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.text || '#1A1A1A',
-    marginBottom: 6,
+    flex: 1,
+    flexShrink: 1,
+    paddingRight: 6,
   },
   serviceFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
   },
   price: {
     fontSize: 16,
@@ -131,6 +135,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    flexShrink: 0,
   },
   duration: {
     fontSize: 13,
