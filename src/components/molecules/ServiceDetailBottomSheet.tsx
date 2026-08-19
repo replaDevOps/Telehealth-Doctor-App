@@ -322,12 +322,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 6,
+    flex: 1,
+    flexShrink: 1,
+    paddingRight: 6,
   },
   serviceFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flexShrink: 0,
+  },
+  duration: {
+    fontSize: 13,
+    color: colors.secondaryText || '#666666',
   },
 });
 
