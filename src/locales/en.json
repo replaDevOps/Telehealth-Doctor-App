@@ -91,9 +91,9 @@
     "active": "Active"
   },
   "recent": {
-    "recentConsultations": "Recent Consultations",
-    "loadingConsultations": "Loading consultations...",
-    "noRecentConsultations": "No recent consultations found.",
+    "recentConsultations": "Recent Contacts",
+    "loadingConsultations": "Loading contacts...",
+    "noRecentConsultations": "No recent contacts found.",
     "viewAll": "View all"
   },
   "rating": {
@@ -124,8 +124,8 @@
     "contactAdmin": "Contact Admin"
   },
   "stats": {
-    "totalConsultations": "Total Consultations",
-    "thisMonthConsultation": "This Month Consultation"
+    "totalConsultations": "Total Contacts",
+    "thisMonthConsultation": "This Month Contacts"
   },
   "consultation": {
     "service": "Service",
@@ -141,12 +141,12 @@
     "yearsSingular": "Year"
   },
   "endModal": {
-    "titleEnded": "Consultation Ended!",
-    "titleEndPrompt": "End Consultation?",
-    "descReadyToEnd": "Are you ready to end this consultation?",
-    "descEndedSuccess": "The consultation has ended successfully.",
-    "descEnded": "The consultation has ended.",
-    "endConsultation": "End Consultation",
+    "titleEnded": "Contact Ended!",
+    "titleEndPrompt": "End Contact?",
+    "descReadyToEnd": "Are you ready to end this contact?",
+    "descEndedSuccess": "The contact has ended successfully.",
+    "descEnded": "The contact has ended.",
+    "endConsultation": "End Contact",
     "writePrescription": "Write Prescription",
     "addPrescription": "Add Prescription",
     "close": "Close"

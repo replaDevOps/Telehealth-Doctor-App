@@ -91,9 +91,9 @@
     "active": "نشط"
   },
   "recent": {
-    "recentConsultations": "الاستشارات الأخيرة",
-    "loadingConsultations": "جارٍ تحميل الاستشارات...",
-    "noRecentConsultations": "لا توجد استشارات حديثة.",
+    "recentConsultations": "جهات التواصل الأخيرة",
+    "loadingConsultations": "جارٍ تحميل جهات التواصل...",
+    "noRecentConsultations": "لا توجد جهات تواصل حديثة.",
     "viewAll": "عرض الكل"
   },
   "rating": {
@@ -124,8 +124,8 @@
     "contactAdmin": "تواصل مع المسؤول"
   },
   "stats": {
-    "totalConsultations": "إجمالي الاستشارات",
-    "thisMonthConsultation": "استشارات هذا الشهر"
+    "totalConsultations": "إجمالي التواصل",
+    "thisMonthConsultation": "تواصل هذا الشهر"
   },
   "consultation": {
     "service": "الخدمة",
@@ -141,12 +141,12 @@
     "yearsSingular": "سنة"
   },
   "endModal": {
-    "titleEnded": "تم إنهاء الاستشارة!",
-    "titleEndPrompt": "إنهاء الاستشارة؟",
-    "descReadyToEnd": "هل أنت مستعد لإنهاء هذه الاستشارة؟",
-    "descEndedSuccess": "تم إنهاء الاستشارة بنجاح.",
-    "descEnded": "انتهت الاستشارة.",
-    "endConsultation": "إنهاء الاستشارة",
+    "titleEnded": "تم إنهاء التواصل!",
+    "titleEndPrompt": "إنهاء التواصل؟",
+    "descReadyToEnd": "هل أنت مستعد لإنهاء هذا التواصل؟",
+    "descEndedSuccess": "تم إنهاء التواصل بنجاح.",
+    "descEnded": "انتهى التواصل.",
+    "endConsultation": "إنهاء التواصل",
     "writePrescription": "كتابة وصفة طبية",
     "addPrescription": "إضافة وصفة طبية",
     "close": "إغلاق"
